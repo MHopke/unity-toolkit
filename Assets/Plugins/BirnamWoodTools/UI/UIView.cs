@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public class UIScreen : MonoBehaviour {
+public class UIView : MonoBehaviour {
 
 	#region Events
 	//Fired when the screen is activated;
@@ -87,7 +87,7 @@ public class UIScreen : MonoBehaviour {
 	//Used to draw text
 	void OnGUI()
 	{
-		GUI.skin = UIManager.Skin;
+		GUI.skin = UIViewController.Skin;
 
 		for(int i = 0; i < labels.Count; i++)
 			labels[i].Draw();
@@ -98,8 +98,6 @@ public class UIScreen : MonoBehaviour {
 	public void Activate()
 	{
 		if(enabled) return;
-
-		//Debug.Log(name + " " + UIElements.Count);
 
 		//background = (Texture2D)Resources.Load(BackgroundName);
 
@@ -209,6 +207,8 @@ public class UIScreen : MonoBehaviour {
 		}
 
 		movementState = MovementState.EXITING;
+
+		Debug.Log("exit");
 	}
 
 	bool HasUIExited()

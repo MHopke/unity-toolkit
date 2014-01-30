@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public class UIManager : MonoBehaviour 
+public class UIViewController : MonoBehaviour 
 {
 	#region Constants
 	const float PERCENT_FOR_SCALE = 0.01f;
+	const string SCREEN_PATH = "Screens/";
 	#endregion
 
 	#region Public Variables
@@ -17,17 +18,20 @@ public class UIManager : MonoBehaviour
 	public static Vector2 AspectRatio;
 
 	public GUISkin guiSkin;
-
+	
 	//Reference to the current screen that is active
-	public UIScreen header = null;
-	public UIScreen content = null;
-	public UIScreen footer = null;
+	public UIView header = null;
+	public UIView content = null;
+	public UIView footer = null;
 
-	public List<UIScreen> screens;
+	public List<UIView> screens;
 	#endregion
 
 	#region Private Variables
-	static UIManager instance = null;
+	UIView previousHeader;
+	UIView previousContent;
+	UIView previousFooter;
+	static UIViewController instance = null;
 	#endregion
 
 	#region Unity Methods
@@ -44,30 +48,31 @@ public class UIManager : MonoBehaviour
 	void Start () 
 	{
 		if(header)
-			ChangeScreen(header, header.section);
+			ActivateInitialUI(header, header.section);
 
 		if(content)
-			ChangeScreen(content, content.section);
+			ActivateInitialUI(content, content.section);
 
 		if(footer)
-			ChangeScreen(footer, footer.section);
+			ActivateInitialUI(footer, footer.section);
 	}
 	#endregion
 
 	#region Screen Methods
-	public static void ActivateScreen(string screen)
+	void ActivateInitialUI(UIView view, UIView.Section section)
 	{
-		if (screen == "") return;
-
-		UIScreen temp = GetScreenWithName(screen);
-
-		if(temp)
-			ChangeScreen(temp, temp.section);
+		if(view)
+		{
+			view.Activate();
+			instance.SetSection(view, section);
+		}
 	}
 
-	public static void ChangeScreen(UIScreen toScreen, UIScreen.Section section)
+	public static void ChangeScreen(string screen, UIView.Section section)
 	{
 		instance.ExitSection(section);
+
+		UIView toScreen = instance.GetView(screen,section);
 
 		if(toScreen)
 			toScreen.Activate();
@@ -75,39 +80,92 @@ public class UIManager : MonoBehaviour
 		instance.SetSection(toScreen, section);
 	}
 
-	void ExitSection(UIScreen.Section section)
+	void ExitSection(UIView.Section section)
 	{
 		switch(section)
 		{
-		case UIScreen.Section.HEADER:
-			if(UIManager.Header)
-				UIManager.Header.FlagForExit();
+		case UIView.Section.HEADER:
+			if(UIViewController.Header)
+			{
+				if(instance.previousHeader)
+					Destroy(instance.previousHeader);
+
+				instance.previousHeader = UIViewController.Header;
+
+				UIViewController.Header.FlagForExit();
+			}
 			break;
-		case UIScreen.Section.CONTENT:
-			if(UIManager.Content)
-				UIManager.Content.FlagForExit();
+		case UIView.Section.CONTENT:
+			if(UIViewController.Content)
+			{
+				if(instance.previousContent)
+					Destroy(instance.previousContent);
+				instance.previousContent = UIViewController.Content;
+
+				UIViewController.Content.FlagForExit();
+			}
 			break;
-		case UIScreen.Section.FOOTER:
-			if(UIManager.Footer)
-				UIManager.Footer.FlagForExit();
+		case UIView.Section.FOOTER:
+			if(UIViewController.Footer)
+			{
+				if(instance.previousFooter)
+					Destroy(instance.previousFooter);
+				instance.previousFooter = UIViewController.Footer;
+
+				UIViewController.Footer.FlagForExit();
+			}
 			break;
 		}
 	}
 
-	void SetSection(UIScreen screen, UIScreen.Section section)
+	void SetSection(UIView screen, UIView.Section section)
 	{
 		switch(section)
 		{
-		case UIScreen.Section.HEADER:
-			UIManager.Header = screen;
+		case UIView.Section.HEADER:
+			UIViewController.Header = screen;
 			break;
-		case UIScreen.Section.CONTENT:
-			UIManager.Content = screen;
+		case UIView.Section.CONTENT:
+			UIViewController.Content = screen;
 			break;
-		case UIScreen.Section.FOOTER:
-			UIManager.Footer = screen;
+		case UIView.Section.FOOTER:
+			UIViewController.Footer = screen;
 			break;
 		}
+	}
+
+	UIView GetView(string viewName, UIView.Section section)
+	{
+		switch(section)
+		{
+		case UIView.Section.HEADER:
+			if(previousHeader.name == viewName)
+				return previousHeader;
+			else
+				return LoadNewView(viewName);
+		case UIView.Section.CONTENT:
+			if(previousContent.name == viewName)
+				return previousContent;
+			else
+				return LoadNewView(viewName);
+		case UIView.Section.FOOTER:
+			if(previousFooter.name == viewName)
+				return previousFooter;
+			else
+				return LoadNewView(viewName);
+		}
+
+		return null;
+	}
+
+	UIView LoadNewView(string viewName)
+	{
+		if(viewName == "")
+			return null;
+
+		GameObject obj = (GameObject)Resources.Load(SCREEN_PATH + viewName);
+
+		return obj.GetComponent<UIView>();
 	}
 
 	public static void EnableButtons()
@@ -152,7 +210,7 @@ public class UIManager : MonoBehaviour
 			return null;
 	}*/
 
-	public static UIScreen GetScreenWithName(string name)
+	public static UIView GetScreenWithName(string name)
 	{
 		for (int i = 0; i < instance.screens.Count; i++)
 		{
@@ -194,17 +252,17 @@ public class UIManager : MonoBehaviour
 		get { return instance.guiSkin; }
 	}
 
-	public static UIScreen Header
+	public static UIView Header
 	{
 		get { return instance.header; }
 		set { instance.header = value; }
 	}
-	public static UIScreen Content
+	public static UIView Content
 	{
 		get { return instance.content; }
 		set { instance.content = value; }
 	}
-	public static UIScreen Footer
+	public static UIView Footer
 	{
 		get { return instance.footer; }
 		set { instance.footer = value; }

@@ -2,19 +2,18 @@
 using System.Collections;
 
 public class Trophy : MonoBehaviour {
-	public UIButton button;
 
-	Animator animator;
+	GameObject obj;
+
 	// Use this for initialization
 	void Start () 
 	{
-		button.clickEvent += Click;
-		//enabled = false;
-		animator = GetComponent<Animator>();
+		obj = (GameObject)GameObject.Instantiate(Resources.Load("Screens/UIManager"));
 	}
 
-	void Click()
+	void Update()
 	{
-		animator.SetTrigger("Click");
+		if(Input.GetMouseButtonDown(0) && obj)
+			Destroy(obj);
 	}
 }

@@ -34,7 +34,7 @@ public class UIBase : MonoBehaviour {
 	#region Activation, Deactivation, Init Methods
 	public virtual void Init(Vector2 offset=new Vector2())
 	{
-		position.Scale(UIManager.AspectRatio);
+		position.Scale(UIViewController.AspectRatio);
 
 		SetPosition(position + offset);
 	}

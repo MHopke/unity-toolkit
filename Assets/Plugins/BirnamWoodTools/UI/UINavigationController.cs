@@ -4,7 +4,7 @@ using System.Collections.Generic;
 public class UINavigationController : MonoBehaviour 
 {
 	#region Public Variables
-	public List<UIScreen> screens;
+	public List<UIView> screens;
 	#endregion
 
 	#region Control Methods

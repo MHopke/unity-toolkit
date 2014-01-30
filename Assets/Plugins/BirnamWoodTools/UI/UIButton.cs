@@ -84,9 +84,9 @@ public class UIButton : UISprite
 	void Click()
 	{
 		//Change UIScreens
-		Header.ChangeScreen(UIScreen.Section.HEADER);
-		Content.ChangeScreen(UIScreen.Section.CONTENT);
-		Footer.ChangeScreen(UIScreen.Section.FOOTER);
+		Header.ChangeScreen(UIView.Section.HEADER);
+		Content.ChangeScreen(UIView.Section.CONTENT);
+		Footer.ChangeScreen(UIView.Section.FOOTER);
 
 		//Send click event
 		if(clickEvent != null)
@@ -122,15 +122,15 @@ public class ChangeUIScreen
 {
 	#region Public Variables
 	public bool Change;
-	public UIScreen Screen;
+	public string Screen;
 	#endregion
 
 	#region Change Methods
-	public void ChangeScreen(UIScreen.Section section)
+	public void ChangeScreen(UIView.Section section)
 	{
 		if(Change)
 		{
-			UIManager.ChangeScreen(Screen, section);
+			UIViewController.ChangeScreen(Screen, section);
 		}
 	}
 	#endregion

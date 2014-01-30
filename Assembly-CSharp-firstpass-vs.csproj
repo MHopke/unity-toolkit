@@ -5,7 +5,7 @@
 	<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
 	<ProductVersion>10.0.20506</ProductVersion>
 	<SchemaVersion>2.0</SchemaVersion>
-	<ProjectGuid>{2ABB03A7-3C57-0F87-D74D-CC8DD11C293A}</ProjectGuid>
+	<ProjectGuid>{CEA4572C-8CFC-373B-5226-D80F2C8DBEC6}</ProjectGuid>
 	<OutputType>Library</OutputType>
 	<AppDesignerFolder>Properties</AppDesignerFolder>
 	<RootNamespace></RootNamespace>
@@ -49,14 +49,14 @@
      <Compile Include="Assets\Plugins\BirnamWoodTools\BWGPluginsManager.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\InputHandler.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\MiniJSON.cs" />
+     <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIBase.cs" />
+     <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIButton.cs" />
+     <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UILabel.cs" />
+     <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UINavigationController.cs" />
+     <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UISprite.cs" />
+     <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIView.cs" />
+     <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIViewController.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\UIExtensions.cs" />
-     <Compile Include="Assets\Plugins\BirnamWoodTools\UIManager\UIBase.cs" />
-     <Compile Include="Assets\Plugins\BirnamWoodTools\UIManager\UIButton.cs" />
-     <Compile Include="Assets\Plugins\BirnamWoodTools\UIManager\UILabel.cs" />
-     <Compile Include="Assets\Plugins\BirnamWoodTools\UIManager\UIManager.cs" />
-     <Compile Include="Assets\Plugins\BirnamWoodTools\UIManager\UINavigationController.cs" />
-     <Compile Include="Assets\Plugins\BirnamWoodTools\UIManager\UIScreen.cs" />
-     <Compile Include="Assets\Plugins\BirnamWoodTools\UIManager\UISprite.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\UnityExtensions.cs" />
      <None Include="Assets\Resources\Screens.xml" />
      <None Include="Assets\Resources\ScreenOne.xml" />
