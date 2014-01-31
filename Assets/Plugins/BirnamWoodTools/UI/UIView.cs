@@ -12,7 +12,7 @@ public class UIView : MonoBehaviour {
 
 	#region Enums
 	public enum Section { NONE = 0, HEADER, CONTENT, FOOTER }
-	enum MovementState { INITIAL = 0, IN_PLACE, EXITING }
+	protected enum MovementState { INITIAL = 0, IN_PLACE, EXITING }
 	#endregion
 
 	#region Public Variables
@@ -21,12 +21,10 @@ public class UIView : MonoBehaviour {
 	public List<UIBase> UIElements;
 	#endregion
 
-	#region Private Variables
-	bool transitionToEmpty;
+	#region Protected Variables
+	protected MovementState movementState;
 
-	MovementState movementState;
-
-	List<UILabel> labels;
+	protected List<UILabel> labels;
 	#endregion
 
 	#region Unity Methods
@@ -73,7 +71,8 @@ public class UIView : MonoBehaviour {
 			return;
 
 		for(int i = 0; i < UIElements.Count; i++)
-			UIElements[i].UpdateUI(Time.deltaTime, Transition.Speed);
+			if(UIElements[i] != null)
+				UIElements[i].UpdateUI(Time.deltaTime, Transition.Speed);
 
 		if(movementState == MovementState.EXITING)
 		{
@@ -81,12 +80,20 @@ public class UIView : MonoBehaviour {
 				Deactivate();
 
 		} else if(IsUIInPlace())
+		{
+			//If there are no labels you can disable the component
+			//so that it doesn't update / draw unneccessarily
+			if(HasNoLabels())
+				enabled = false;
 			movementState = MovementState.IN_PLACE;
+		}
 	}
 
 	//Used to draw text
 	void OnGUI()
 	{
+		useGUILayout = false;
+
 		GUI.skin = UIViewController.Skin;
 
 		for(int i = 0; i < labels.Count; i++)
@@ -101,6 +108,16 @@ public class UIView : MonoBehaviour {
 
 		//background = (Texture2D)Resources.Load(BackgroundName);
 
+		Activation();
+
+		enabled = true;
+
+		if(activatedEvent != null)
+			activatedEvent();
+	}
+
+	protected virtual void Activation()
+	{
 		if(UIElements != null)
 		{
 			for(int i = 0; i < UIElements.Count; i++)
@@ -111,11 +128,6 @@ public class UIView : MonoBehaviour {
 		}
 
 		movementState = MovementState.INITIAL;
-
-		enabled = true;
-
-		if(activatedEvent != null)
-			activatedEvent();
 	}
 
 	public void Deactivate() 
@@ -125,10 +137,17 @@ public class UIView : MonoBehaviour {
 
 		//Debug.Log(name + " deactivate");
 
+		Deactivation();
+
 		enabled = false;
 
-		//Debug.Log(name);
+		if(deactivatedEvent != null)
+			deactivatedEvent();
+		//Resources.UnloadUnusedAssets();
+	}
 
+	protected virtual void Deactivation()
+	{
 		if(UIElements != null)
 		{
 			for(int i = 0; i < UIElements.Count; i++)
@@ -139,10 +158,6 @@ public class UIView : MonoBehaviour {
 				}
 			}
 		}
-
-		if(deactivatedEvent != null)
-			deactivatedEvent();
-		//Resources.UnloadUnusedAssets();
 	}
 	#endregion
 
@@ -192,6 +207,11 @@ public class UIView : MonoBehaviour {
 
 		return true;
 	}
+
+	bool HasNoLabels()
+	{
+		return (labels.Count == 0);
+	}
 	#endregion
 
 	#region Exit Methods
@@ -206,9 +226,12 @@ public class UIView : MonoBehaviour {
 			}
 		}
 
-		movementState = MovementState.EXITING;
+		//If there are no labels make sure you enable the component
+		//so that elements will move upon exit
+		if(HasNoLabels())
+			enabled = true;
 
-		Debug.Log("exit");
+		movementState = MovementState.EXITING;
 	}
 
 	bool HasUIExited()

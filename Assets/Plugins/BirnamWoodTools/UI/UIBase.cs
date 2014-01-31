@@ -34,7 +34,7 @@ public class UIBase : MonoBehaviour {
 	#region Activation, Deactivation, Init Methods
 	public virtual void Init(Vector2 offset=new Vector2())
 	{
-		position.Scale(UIViewController.AspectRatio);
+		position.Scale(UINavigationController.AspectRatio);
 
 		SetPosition(position + offset);
 	}
@@ -102,6 +102,12 @@ public class UIBase : MonoBehaviour {
 	public bool Exited
 	{
 		get { return movementState == MovementState.EXITED; }
+	}
+
+	public Vector2 CurrentPosition
+	{
+		get { return currentPosition; }
+		set { SetPosition(value); }
 	}
 	#endregion
 }

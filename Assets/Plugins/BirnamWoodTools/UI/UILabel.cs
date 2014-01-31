@@ -29,7 +29,7 @@ public class UILabel : UIBase
 	{
 		base.Init(offset);
 
-		size.Scale(UIViewController.AspectRatio);
+		size.Scale(UINavigationController.AspectRatio);
 
 		drawRect = new Rect(position.x, position.y, size.x, size.y);
 

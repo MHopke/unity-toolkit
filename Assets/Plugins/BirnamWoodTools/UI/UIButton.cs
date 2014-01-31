@@ -8,9 +8,10 @@ public class UIButton : UISprite
 	#endregion
 
 	#region Public Variables
-	public ChangeUIScreen Header;
-	public ChangeUIScreen Content;
-	public ChangeUIScreen Footer;
+	public string ControllerId;
+	public ChangeUIView Header;
+	public ChangeUIView Content;
+	public ChangeUIView Footer;
 	#endregion
 
 	#region Private Variables
@@ -83,10 +84,14 @@ public class UIButton : UISprite
 	#region Click Methods
 	void Click()
 	{
-		//Change UIScreens
-		Header.ChangeScreen(UIView.Section.HEADER);
-		Content.ChangeScreen(UIView.Section.CONTENT);
-		Footer.ChangeScreen(UIView.Section.FOOTER);
+		if(ControllerId == "")
+		{
+			//Change UIScreens
+			Header.ChangeScreen(UIView.Section.HEADER);
+			Content.ChangeScreen(UIView.Section.CONTENT);
+			Footer.ChangeScreen(UIView.Section.FOOTER);
+		} else
+			UINavigationController.NavigateToController(ControllerId);
 
 		//Send click event
 		if(clickEvent != null)
@@ -118,20 +123,18 @@ public class UIButton : UISprite
 }
 
 [System.Serializable]
-public class ChangeUIScreen
+public class ChangeUIView
 {
 	#region Public Variables
 	public bool Change;
-	public string Screen;
+	public UIView View;
 	#endregion
 
 	#region Change Methods
 	public void ChangeScreen(UIView.Section section)
 	{
 		if(Change)
-		{
-			UIViewController.ChangeScreen(Screen, section);
-		}
+			UIViewController.ChangeScreen(View, section);
 	}
 	#endregion
 }

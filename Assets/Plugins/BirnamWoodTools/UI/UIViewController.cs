@@ -3,20 +3,7 @@ using System.Collections.Generic;
 
 public class UIViewController : MonoBehaviour 
 {
-	#region Constants
-	const float PERCENT_FOR_SCALE = 0.01f;
-	const string SCREEN_PATH = "Screens/";
-	#endregion
-
 	#region Public Variables
-	//Hold the x and y resolutions that the screens were
-	//originally designed at. 
-	public Vector2 DESIGNED_RESOLUTION;
-
-	//This is used to rescale graphics if the resolution
-	//is different than the Designed Resolution
-	public static Vector2 AspectRatio;
-
 	public GUISkin guiSkin;
 	
 	//Reference to the current screen that is active
@@ -28,24 +15,19 @@ public class UIViewController : MonoBehaviour
 	#endregion
 
 	#region Private Variables
-	UIView previousHeader;
-	UIView previousContent;
-	UIView previousFooter;
 	static UIViewController instance = null;
 	#endregion
 
 	#region Unity Methods
-	void Awake()
-	{
-		if(AspectRatio == Vector2.zero)
-			AspectRatio = new Vector2((float)Screen.width / DESIGNED_RESOLUTION.x,
-				(float)Screen.height / DESIGNED_RESOLUTION.y);
-
-		instance = this;
-	}
-
 	// Use this for initialization
 	void Start () 
+	{
+		Activate();
+	}
+	#endregion
+
+	#region Activate, Deactivate Methods
+	public void Activate()
 	{
 		if(header)
 			ActivateInitialUI(header, header.section);
@@ -55,117 +37,36 @@ public class UIViewController : MonoBehaviour
 
 		if(footer)
 			ActivateInitialUI(footer, footer.section);
+
+		enabled = true;
+
+		instance = this;
+	}
+
+	public void Deactivate()
+	{
+		if(header)
+			header.FlagForExit();
+
+		if(content)
+			content.FlagForExit();
+
+		if(footer)
+			footer.FlagForExit();
+
+		enabled = false;
 	}
 	#endregion
 
-	#region Screen Methods
-	void ActivateInitialUI(UIView view, UIView.Section section)
-	{
-		if(view)
-		{
-			view.Activate();
-			instance.SetSection(view, section);
-		}
-	}
-
-	public static void ChangeScreen(string screen, UIView.Section section)
+	#region Control Methods
+	public static void ChangeScreen(UIView view, UIView.Section section)
 	{
 		instance.ExitSection(section);
 
-		UIView toScreen = instance.GetView(screen,section);
+		if(view)
+			view.Activate();
 
-		if(toScreen)
-			toScreen.Activate();
-
-		instance.SetSection(toScreen, section);
-	}
-
-	void ExitSection(UIView.Section section)
-	{
-		switch(section)
-		{
-		case UIView.Section.HEADER:
-			if(UIViewController.Header)
-			{
-				if(instance.previousHeader)
-					Destroy(instance.previousHeader);
-
-				instance.previousHeader = UIViewController.Header;
-
-				UIViewController.Header.FlagForExit();
-			}
-			break;
-		case UIView.Section.CONTENT:
-			if(UIViewController.Content)
-			{
-				if(instance.previousContent)
-					Destroy(instance.previousContent);
-				instance.previousContent = UIViewController.Content;
-
-				UIViewController.Content.FlagForExit();
-			}
-			break;
-		case UIView.Section.FOOTER:
-			if(UIViewController.Footer)
-			{
-				if(instance.previousFooter)
-					Destroy(instance.previousFooter);
-				instance.previousFooter = UIViewController.Footer;
-
-				UIViewController.Footer.FlagForExit();
-			}
-			break;
-		}
-	}
-
-	void SetSection(UIView screen, UIView.Section section)
-	{
-		switch(section)
-		{
-		case UIView.Section.HEADER:
-			UIViewController.Header = screen;
-			break;
-		case UIView.Section.CONTENT:
-			UIViewController.Content = screen;
-			break;
-		case UIView.Section.FOOTER:
-			UIViewController.Footer = screen;
-			break;
-		}
-	}
-
-	UIView GetView(string viewName, UIView.Section section)
-	{
-		switch(section)
-		{
-		case UIView.Section.HEADER:
-			if(previousHeader.name == viewName)
-				return previousHeader;
-			else
-				return LoadNewView(viewName);
-		case UIView.Section.CONTENT:
-			if(previousContent.name == viewName)
-				return previousContent;
-			else
-				return LoadNewView(viewName);
-		case UIView.Section.FOOTER:
-			if(previousFooter.name == viewName)
-				return previousFooter;
-			else
-				return LoadNewView(viewName);
-		}
-
-		return null;
-	}
-
-	UIView LoadNewView(string viewName)
-	{
-		if(viewName == "")
-			return null;
-
-		GameObject obj = (GameObject)Resources.Load(SCREEN_PATH + viewName);
-
-		return obj.GetComponent<UIView>();
+		instance.SetSection(view, section);
 	}
 
 	public static void EnableButtons()
@@ -192,44 +93,68 @@ public class UIViewController : MonoBehaviour
 			Footer.DisableButtons();
 	}
 
-	/*public static void AddElementToScreen(BaseDrawable drawable, string screen)
+	void ActivateInitialUI(UIView view, UIView.Section section)
 	{
-		UIScreen temp = GetScreenWithName(screen);
-
-		if(temp != null)
-			temp.AddExternalElement(drawable);
+		if(view)
+		{
+			view.Activate();
+			SetSection(view, section);
+		}
 	}
 
-	public static BaseDrawable GetElementFromScreen(string screen, string elementName)
+	void ExitSection(UIView.Section section)
 	{
-		UIScreen temp = GetScreenWithName(screen);
-
-		if(temp != null)
-			return temp.GetElement(elementName);
-		else
-			return null;
-	}*/
-
-	public static UIView GetScreenWithName(string name)
-	{
-		for (int i = 0; i < instance.screens.Count; i++)
+		switch(section)
 		{
-			if (instance.screens[i] && instance.screens[i].name == name)
-				return instance.screens[i];
+		case UIView.Section.HEADER:
+			if(UIViewController.Header)
+				UIViewController.Header.FlagForExit();
+			break;
+		case UIView.Section.CONTENT:
+			if(UIViewController.Content)
+				UIViewController.Content.FlagForExit();
+			break;
+		case UIView.Section.FOOTER:
+			if(UIViewController.Footer)
+				UIViewController.Footer.FlagForExit();
+			break;
+		}
+	}
+
+	void SetSection(UIView screen, UIView.Section section)
+	{
+		switch(section)
+		{
+		case UIView.Section.HEADER:
+			header = screen;
+			break;
+		case UIView.Section.CONTENT:
+			content = screen;
+			break;
+		case UIView.Section.FOOTER:
+			footer = screen;
+			break;
+		}
+	}
+
+	public UIView GetScreenWithName(string name)
+	{
+		for (int i = 0; i < screens.Count; i++)
+		{
+			if (screens[i] && screens[i].name == name)
+				return screens[i];
 		}
 
 		return null;
 	}
-	#endregion
 
-	#region Scale Methods
-	/// <summary>
-	/// Determines if the UI should be scaled.
-	/// </summary>
-	/// <returns><c>true</c>, if the Aspect Ratio is greater than the required amount <c>false</c> otherwise.</returns>
-	public static bool ShouldScaleDimensions()
+	bool HasUIView(string name)
 	{
-		return !(Mathf.Abs(1.0f - AspectRatio.x) < PERCENT_FOR_SCALE || Mathf.Abs(1.0f - AspectRatio.y) < PERCENT_FOR_SCALE);
+		for (int i = 0; i < screens.Count; i++)
+			if (screens[i] && screens[i].name == name)
+				return true;
+
+		return false;
 	}
 	#endregion
 

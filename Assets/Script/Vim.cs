@@ -9,9 +9,15 @@ public class Vim : MonoBehaviour {
 	// Use this for initialization
 	void Start () 
 	{
-		button.clickEvent += Click;
+		//button.clickEvent += Click;
 		//enabled = false;
 		animator = GetComponent<Animator>();
+	}
+
+	void OnApplicationPause(bool pause)
+	{
+		if(pause)
+			Debug.Log("pausing");
 	}
 
 	void Click()
