@@ -28,7 +28,7 @@ public class UIButton : UISprite
 		animator = GetComponent<Animator>();
 		base.Init(offset);
 	}
-	public override void Activate()
+	public override void Activate(MovementState state=MovementState.INITIAL)
 	{
 		enabled = true;
 
@@ -40,7 +40,7 @@ public class UIButton : UISprite
 		InputHandler.touchEnd += TouchEnd;
 		InputHandler.touchMoving += TouchMoving;
 
-		base.Activate();
+		base.Activate(state);
 	}
 	public override void Deactivate()
 	{

@@ -2,7 +2,8 @@
 using System.Collections;
 
 /// <summary>
-/// User interface scroll view.
+/// User interface scroll view. The first element in UIElements is the container Sprite.
+/// leave it null if there is no container.
 /// </summary>
 public class UIScrollView : UIView {
 
@@ -33,7 +34,6 @@ public class UIScrollView : UIView {
 	#region Touch Events
 	void TouchMoving(Vector2 pos, Vector2 delta, int id)
 	{
-		//Debug.Log(pos + " " + ViewRect);
 		if(movementState == MovementState.IN_PLACE && ViewRect.Contains(new Vector2(pos.x,Screen.height - pos.y)))
 		{
 			//Ensure that movement is locked if it should be
@@ -42,14 +42,17 @@ public class UIScrollView : UIView {
 			else if(Type == ScrollType.VERTICAL)
 				delta.x = 0;
 
-			for(int i = 0; i < UIElements.Count; i++)
+			for(int i = 1; i < UIElements.Count; i++)
 			{
-				if(ViewRect.Contains(UIElements[i].CurrentPosition))
-					UIElements[i].Activate();
-				else
-					UIElements[i].Deactivate();
+				if(UIElements[i])
+				{
+					UIElements[i].CurrentPosition += delta;
 
-				UIElements[i].CurrentPosition += delta;
+					if(ViewRect.Contains(UIElements[i].CurrentPosition))
+						UIElements[i].Activate(UIBase.MovementState.IN_PLACE);
+					else
+						UIElements[i].Deactivate();
+				}
 			}
 		}
 	}

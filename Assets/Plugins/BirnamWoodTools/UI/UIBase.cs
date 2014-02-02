@@ -4,7 +4,7 @@ using System.Collections;
 public class UIBase : MonoBehaviour {
 
 	#region Enumerations
-	protected enum MovementState { INITIAL = 0, IN_PLACE, EXITING, EXITED }
+	public enum MovementState { INITIAL = 0, IN_PLACE, EXITING, EXITED }
 	#endregion
 
 	#region Constants
@@ -21,6 +21,7 @@ public class UIBase : MonoBehaviour {
 
 	#region Protected Variables
 	protected MovementState movementState;
+	protected Vector2 startPosition;
 	#endregion
 
 	#region Private Variables
@@ -36,11 +37,15 @@ public class UIBase : MonoBehaviour {
 	{
 		position.Scale(UINavigationController.AspectRatio);
 
-		SetPosition(position + offset);
+		startPosition = position + offset;
+
+		SetStartPosition();
 	}
-	public virtual void Activate()
+	public virtual void Activate(MovementState state=MovementState.INITIAL)
 	{
-		movementState = MovementState.INITIAL;
+		movementState = state;
+
+		SetStartPosition();
 	}
 	public virtual void Deactivate(){}
 	#endregion
@@ -79,10 +84,14 @@ public class UIBase : MonoBehaviour {
 	}
 	#endregion
 
-	#region Movement Methods
+	#region Position Methods
 	protected virtual void SetPosition(Vector2 position)
 	{
 		currentPosition = position;
+	}
+	void SetStartPosition()
+	{
+		SetPosition(startPosition);
 	}
 	#endregion
 

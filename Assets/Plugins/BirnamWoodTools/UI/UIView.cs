@@ -29,7 +29,7 @@ public class UIView : MonoBehaviour {
 
 	#region Unity Methods
 	// Use this for initialization
-	void Start () 
+	protected void Start () 
 	{
 		labels = new List<UILabel>();
 
@@ -65,7 +65,7 @@ public class UIView : MonoBehaviour {
 		enabled = false;
 	}
 	
-	void Update()
+	protected void Update()
 	{
 		if(movementState == MovementState.IN_PLACE)
 			return;

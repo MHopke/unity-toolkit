@@ -37,7 +37,7 @@ public class UILabel : UIBase
 	}
 	#endregion
 
-	#region Movement Methods
+	#region Position Methods
 	protected override void SetPosition(Vector2 position)
 	{
 		base.SetPosition(position);

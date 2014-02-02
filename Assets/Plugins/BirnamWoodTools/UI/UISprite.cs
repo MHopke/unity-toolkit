@@ -4,13 +4,13 @@ using System.Collections;
 public class UISprite : UIBase
 {
 	#region Activation, Deactivation, Init Methods
-	public override void Activate()
+	public override void Activate(MovementState state=MovementState.INITIAL)
 	{
 		enabled = true;
 
 		renderer.enabled = true;
 
-		base.Activate();
+		base.Activate(state);
 	}
 	public override void Deactivate()
 	{
@@ -22,7 +22,7 @@ public class UISprite : UIBase
 	}
 	#endregion
 
-	#region Movement Methods
+	#region Position Methods
 	protected override void SetPosition(Vector2 position)
 	{
 		base.SetPosition(position);
