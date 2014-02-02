@@ -23,6 +23,16 @@ public class UIViewController : MonoBehaviour
 	void Start () 
 	{
 		Activate();
+
+		#if !UNITY_EDITOR
+		if(Skin != null)
+		{
+			for(int i = 0; i < Skin.customStyles.Length; i++)
+				Skin.customStyles[i].fontSize = Mathf.RoundToInt(UINavigationController.AspectRatio.x * (float)Skin.customStyles[i].fontSize);
+
+			//Skin.label.fontSize = Mathf.RoundToInt((UINavigationController.AspectRatio.x * (float)Skin.label.fontSize));
+		}
+		#endif
 	}
 	#endregion
 
