@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Vim : MonoBehaviour {
 	
-	public UIButton button;
+	public UIPercentBar bar;
 
 	Animator animator;
 	// Use this for initialization
@@ -12,6 +12,12 @@ public class Vim : MonoBehaviour {
 		//button.clickEvent += Click;
 		//enabled = false;
 		animator = GetComponent<Animator>();
+	}
+
+	void Update()
+	{
+		if(Input.GetMouseButtonDown(0))
+			bar.AdjustBar(0.5f);
 	}
 
 	void OnApplicationPause(bool pause)

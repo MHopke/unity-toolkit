@@ -51,13 +51,14 @@
      <Compile Include="Assets\Plugins\BirnamWoodTools\MiniJSON.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIBase.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIButton.cs" />
+     <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIExtensions.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UILabel.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UINavigationController.cs" />
+     <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIPercentBar.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIScrollView.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UISprite.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIView.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIViewController.cs" />
-     <Compile Include="Assets\Plugins\BirnamWoodTools\UIExtensions.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\UnityExtensions.cs" />
      <None Include="Assets\Resources\Screens.xml" />
      <None Include="Assets\Resources\ScreenOne.xml" />

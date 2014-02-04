@@ -51,7 +51,7 @@ public class UIBase : MonoBehaviour {
 	#endregion
 
 	#region Update Methods
-	public virtual void UpdateUI(float deltaTime, float speed)
+	public virtual void UpdateUIElement(float deltaTime, float speed)
 	{
 		if(renderTimer <= 0.0f)
 		{

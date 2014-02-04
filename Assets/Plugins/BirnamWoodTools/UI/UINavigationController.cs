@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System;
 
+[RequireComponent(typeof(InputHandler))]
 public class UINavigationController : MonoBehaviour 
 {
 	#region Events

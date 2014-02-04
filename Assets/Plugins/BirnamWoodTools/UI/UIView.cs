@@ -72,7 +72,7 @@ public class UIView : MonoBehaviour {
 
 		for(int i = 0; i < UIElements.Count; i++)
 			if(UIElements[i] != null)
-				UIElements[i].UpdateUI(Time.deltaTime, Transition.Speed);
+				UIElements[i].UpdateUIElement(Time.deltaTime, Transition.Speed);
 
 		if(movementState == MovementState.EXITING)
 		{
