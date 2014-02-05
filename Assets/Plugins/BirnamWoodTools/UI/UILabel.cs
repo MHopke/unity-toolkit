@@ -1,8 +1,11 @@
-﻿using UnityEngine;
+﻿//#define DRAWLABELS
+using UnityEngine;
 
 public class UILabel : UIBase 
 {
 	#region Public Variables
+	public int depth;
+
 	public string text;
 
 	public Vector2 size;
@@ -14,9 +17,27 @@ public class UILabel : UIBase
 	Rect drawRect;
 	#endregion
 
+	#region Update
+	protected override bool CanDisable()
+	{
+		return false;
+	}
+	#endregion
+
 	#region Draw Methods
+	#if DRAWLABELS
 	public void Draw()
 	{
+	#else
+	void OnGUI()
+	{
+		useGUILayout = false;
+
+		GUI.skin = UIViewController.Skin;
+
+		GUI.depth = depth;
+
+	#endif
 		if(customStyle.custom)
 			GUI.Label(drawRect, text, customStyle.style);
 		else
@@ -25,9 +46,9 @@ public class UILabel : UIBase
 	#endregion
 
 	#region Activation, Deactivation, Init Methods
-	public override void Init(Vector2 offset)
+	public override void Init(Vector2 offset, float speed)
 	{
-		base.Init(offset);
+		base.Init(offset,speed);
 
 		size.Scale(UINavigationController.AspectRatio);
 

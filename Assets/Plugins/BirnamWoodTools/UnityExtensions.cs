@@ -29,6 +29,11 @@ public static class UnityExtensions {
 	{
 		transform.localScale = new Vector3(transform.localScale.x + x, transform.localScale.y + y, transform.localScale.z);
 	}
+
+	public static void ScaleXYZ(this Transform transform, Vector3 vector)
+	{
+		transform.localScale = new Vector3(transform.localScale.x + vector.x, transform.localScale.y + vector.y, transform.localScale.z + vector.z);
+	}
 	#endregion
 
 	#region Color Extensions

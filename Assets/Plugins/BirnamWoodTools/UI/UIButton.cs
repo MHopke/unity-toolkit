@@ -23,10 +23,10 @@ public class UIButton : UISprite
 	#endregion
 
 	#region Activation, Deactivation, Init Methods
-	public override void Init(Vector2 offset)
+	public override void Init(Vector2 offset, float speed)
 	{
 		animator = GetComponent<Animator>();
-		base.Init(offset);
+		base.Init(offset,speed);
 	}
 	public override void Activate(MovementState state=MovementState.INITIAL)
 	{

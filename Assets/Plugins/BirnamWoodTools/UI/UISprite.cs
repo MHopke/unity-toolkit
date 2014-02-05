@@ -26,7 +26,10 @@ public class UISprite : UIBase
 	protected override void SetPosition(Vector2 position)
 	{
 		base.SetPosition(position);
-		transform.position = Camera.main.ScreenToWorldPoint(new Vector3(position.x,Screen.height - position.y,1f));
+
+		//Debug.Log(name + " " + currentPosition);
+
+		transform.position = Camera.main.ScreenToWorldPoint(new Vector3(currentPosition.x,Screen.height - currentPosition.y,1f));
 	}
 	#endregion
 }

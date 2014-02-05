@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿//#define DRAWLABELS
+using UnityEngine;
 using System.Collections.Generic;
 
 public class UIView : MonoBehaviour {
@@ -24,14 +25,21 @@ public class UIView : MonoBehaviour {
 	#region Protected Variables
 	protected MovementState movementState;
 
+	#if DRAWLABELS
 	protected List<UILabel> labels;
+	#endif
 	#endregion
 
 	#region Unity Methods
 	// Use this for initialization
 	protected void Start () 
 	{
+		#if DRAWLABELS
 		labels = new List<UILabel>();
+		#endif
+
+		if(Transition.Speed == 0)
+			Transition.Speed = 1;
 
 		if(UIElements != null)
 		{
@@ -39,7 +47,7 @@ public class UIView : MonoBehaviour {
 			{
 				if(UIElements[i] != null)
 				{
-					UIElements[i].Init(Transition.MovementIn);
+					UIElements[i].Init(Transition.MovementIn,Transition.Speed);
 
 					//If its not a label check to see if it has one
 					if(UIElements[i].GetType() != typeof(UILabel))
@@ -48,13 +56,17 @@ public class UIView : MonoBehaviour {
 
 						for(int j = 0; j < labelComponents.Length; j++)
 						{
-							labelComponents[j].Init(Transition.MovementIn);
+							labelComponents[j].Init(Transition.MovementIn,Transition.Speed);
+							#if DRAWLABELS
 							labels.Add(labelComponents[j]);
+							#endif
 							UIElements.Add(labelComponents[j]);
 						}
 					}
+					#if DRAWLABELS
 					else
 						labels.Add(UIElements[i] as UILabel);
+					#endif
 				}
 			}
 		}
@@ -70,10 +82,6 @@ public class UIView : MonoBehaviour {
 		if(movementState == MovementState.IN_PLACE)
 			return;
 
-		for(int i = 0; i < UIElements.Count; i++)
-			if(UIElements[i] != null)
-				UIElements[i].UpdateUIElement(Time.deltaTime, Transition.Speed);
-
 		if(movementState == MovementState.EXITING)
 		{
 			if(HasUIExited())
@@ -81,14 +89,19 @@ public class UIView : MonoBehaviour {
 
 		} else if(IsUIInPlace())
 		{
+			#if DRAWLABELS
 			//If there are no labels you can disable the component
 			//so that it doesn't update / draw unneccessarily
 			if(HasNoLabels())
 				enabled = false;
+			#else
+			enabled = false;
+			#endif
 			movementState = MovementState.IN_PLACE;
 		}
 	}
 
+	#if DRAWLABELS
 	//Used to draw text
 	void OnGUI()
 	{
@@ -99,6 +112,7 @@ public class UIView : MonoBehaviour {
 		for(int i = 0; i < labels.Count; i++)
 			labels[i].Draw();
 	}
+	#endif
 	#endregion
 
 	#region Activation, Deactivation Methods
@@ -208,10 +222,12 @@ public class UIView : MonoBehaviour {
 		return true;
 	}
 
+	#if DRAWLABELS
 	bool HasNoLabels()
 	{
 		return (labels.Count == 0);
 	}
+	#endif
 	#endregion
 
 	#region Exit Methods
@@ -226,9 +242,11 @@ public class UIView : MonoBehaviour {
 			}
 		}
 
+		#if DRAWLABELS
 		//If there are no labels make sure you enable the component
 		//so that elements will move upon exit
 		if(HasNoLabels())
+		#endif
 			enabled = true;
 
 		movementState = MovementState.EXITING;

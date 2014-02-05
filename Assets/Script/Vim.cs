@@ -12,12 +12,13 @@ public class Vim : MonoBehaviour {
 		//button.clickEvent += Click;
 		//enabled = false;
 		animator = GetComponent<Animator>();
+		//Debug.Log(animator.Pl);
 	}
 
 	void Update()
 	{
 		if(Input.GetMouseButtonDown(0))
-			bar.AdjustBar(0.5f);
+			bar.AdjustBar(50.0f);
 	}
 
 	void OnApplicationPause(bool pause)
@@ -26,8 +27,8 @@ public class Vim : MonoBehaviour {
 			Debug.Log("pausing");
 	}
 
-	void Click()
+	/*void Click()
 	{
 		animator.SetTrigger("Idle_Trigger");
-	}
+	}*/
 }

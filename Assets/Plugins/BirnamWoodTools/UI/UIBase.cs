@@ -22,37 +22,47 @@ public class UIBase : MonoBehaviour {
 	#region Protected Variables
 	protected MovementState movementState;
 	protected Vector2 startPosition;
+	protected Vector2 currentPosition;
 	#endregion
 
 	#region Private Variables
 	float renderTimer;
 	float moveRate;
+	float speed;
 
-	Vector2 currentPosition;
 	Vector2 exitPosition;
 	#endregion
 
 	#region Activation, Deactivation, Init Methods
-	public virtual void Init(Vector2 offset=new Vector2())
+	public virtual void Init(Vector2 offset, float speedParam)
 	{
+		speed = speedParam;
+
 		position.Scale(UINavigationController.AspectRatio);
 
 		startPosition = position + offset;
 
 		SetStartPosition();
+
+		enabled = false;
 	}
 	public virtual void Activate(MovementState state=MovementState.INITIAL)
 	{
 		movementState = state;
 
 		SetStartPosition();
+		enabled = true;
 	}
-	public virtual void Deactivate(){}
+	public virtual void Deactivate()
+	{
+		enabled = false;
+	}
 	#endregion
 
 	#region Update Methods
-	public virtual void UpdateUIElement(float deltaTime, float speed)
+	protected virtual void Update()
 	{
+		//Debug.Log(name);
 		if(renderTimer <= 0.0f)
 		{
 			if(movementState == MovementState.INITIAL)
@@ -64,6 +74,9 @@ public class UIBase : MonoBehaviour {
 				{
 					SetPosition(position);
 					movementState = MovementState.IN_PLACE;
+
+					if(CanDisable())
+						enabled = false;
 				}
 
 			} else if(movementState == MovementState.EXITING)
@@ -82,6 +95,7 @@ public class UIBase : MonoBehaviour {
 		} else
 			renderTimer -= Time.deltaTime;
 	}
+	protected virtual bool CanDisable(){return true;}
 	#endregion
 
 	#region Position Methods
@@ -98,6 +112,9 @@ public class UIBase : MonoBehaviour {
 	#region Exit Methods
 	public virtual void Exit(Vector2 exitPos)
 	{
+		if(!enabled)
+			enabled = true;
+
 		movementState = MovementState.EXITING;
 		exitPosition = position + exitPos;
 	}
