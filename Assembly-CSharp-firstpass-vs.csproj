@@ -5,7 +5,7 @@
 	<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
 	<ProductVersion>10.0.20506</ProductVersion>
 	<SchemaVersion>2.0</SchemaVersion>
-	<ProjectGuid>{CEA4572C-8CFC-373B-5226-D80F2C8DBEC6}</ProjectGuid>
+	<ProjectGuid>{AC540092-D83E-D2DD-279E-22EFBB971EA4}</ProjectGuid>
 	<OutputType>Library</OutputType>
 	<AppDesignerFolder>Properties</AppDesignerFolder>
 	<RootNamespace></RootNamespace>
@@ -47,6 +47,10 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Plugins\BirnamWoodTools\BWGPluginsManager.cs" />
+     <Compile Include="Assets\Plugins\BirnamWoodTools\GameKit\GKFriendsList.cs" />
+     <Compile Include="Assets\Plugins\BirnamWoodTools\GameKit\GKTurnBasedMatch.cs" />
+     <Compile Include="Assets\Plugins\BirnamWoodTools\GameKit\GameKitBinding.cs" />
+     <Compile Include="Assets\Plugins\BirnamWoodTools\GameKit\GameKitManager.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\InputHandler.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\MiniJSON.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIBase.cs" />
@@ -60,6 +64,8 @@
      <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIView.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIViewController.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\UnityExtensions.cs" />
+     <Compile Include="Assets\Plugins\BirnamWoodTools\iOSGeneral\iOSBinding.cs" />
+     <Compile Include="Assets\Plugins\BirnamWoodTools\iOSGeneral\iOSManager.cs" />
      <None Include="Assets\Resources\Screens.xml" />
      <None Include="Assets\Resources\ScreenOne.xml" />
   </ItemGroup>
