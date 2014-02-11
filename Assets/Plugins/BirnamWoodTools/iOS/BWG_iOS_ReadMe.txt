@@ -1,0 +1,1 @@
+In order for the Xcode Project to recognize the external plugin calls you will need to move any .h & .mm files from this folder to Assets > Plugins > iOS

@@ -3,14 +3,21 @@ using System.Collections;
 using UnityEngine.SocialPlatforms;
 
 public class Vim : MonoBehaviour {
-	
+
+	#region Constants
+	const string ACHIEVEMENT_KEY = "Achievements";
+	#endregion
+
 	public UIPercentBar bar;
 
 	Animator animator;
 	// Use this for initialization
 	void Start () 
 	{
-		GameKitBinding.AuthenticatePlayer();
+		AchievementManager.LoadAchievements(PlayerPrefs.GetString(ACHIEVEMENT_KEY, ""));
+
+		PlayerPrefs.SetString(ACHIEVEMENT_KEY,AchievementManager.SaveAchievements());
+
 		//iOSBinding.PopAlertWithHeaderAndText("header", "text!");
 		//button.clickEvent += Click;
 		//enabled = false;
@@ -18,11 +25,11 @@ public class Vim : MonoBehaviour {
 		//Debug.Log(animator.Pl);
 	}
 
-	void Update()
+	/*void Update()
 	{
 		if(Input.GetMouseButtonDown(0))
 			bar.AdjustBar(50.0f);
-	}
+	}*/
 
 	void OnApplicationPause(bool pause)
 	{
@@ -32,7 +39,7 @@ public class Vim : MonoBehaviour {
 
 	void Authenticate(bool authenticated)
 	{
-		Debug.Log(authenticated);
+		Debug.Log(GameKitBinding._localUser.displayName + GameKitBinding._localUser.playerID);
 	}
 
 	/*void Click()

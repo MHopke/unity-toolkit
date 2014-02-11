@@ -36,9 +36,9 @@ public class UIButton : UISprite
 
 		fingerID = InputHandler.INVALID_FINGER;
 
-		InputHandler.touchStart += TouchStart;
-		InputHandler.touchEnd += TouchEnd;
-		InputHandler.touchMoving += TouchMoving;
+		InputHandler.touchStartEvent += TouchStart;
+		InputHandler.touchEndEvent += TouchEnd;
+		InputHandler.touchMovingEvent += TouchMoving;
 
 		base.Activate(state);
 	}
@@ -48,9 +48,9 @@ public class UIButton : UISprite
 
 		renderer.enabled = false;
 
-		InputHandler.touchStart -= TouchStart;
-		InputHandler.touchEnd -= TouchEnd;
-		InputHandler.touchMoving -= TouchMoving;
+		InputHandler.touchStartEvent -= TouchStart;
+		InputHandler.touchEndEvent -= TouchEnd;
+		InputHandler.touchMovingEvent -= TouchMoving;
 
 		base.Deactivate();
 	}
@@ -62,9 +62,9 @@ public class UIButton : UISprite
 		if(!disabled)
 			return;
 
-		InputHandler.touchStart -= TouchStart;
-		InputHandler.touchEnd -= TouchEnd;
-		InputHandler.touchMoving -= TouchMoving;
+		InputHandler.touchStartEvent -= TouchStart;
+		InputHandler.touchEndEvent -= TouchEnd;
+		InputHandler.touchMovingEvent -= TouchMoving;
 
 		disabled = false;
 	}
@@ -73,9 +73,9 @@ public class UIButton : UISprite
 		if(disabled)
 			return;
 
-		InputHandler.touchStart += TouchStart;
-		InputHandler.touchEnd += TouchEnd;
-		InputHandler.touchMoving += TouchMoving;
+		InputHandler.touchStartEvent += TouchStart;
+		InputHandler.touchEndEvent += TouchEnd;
+		InputHandler.touchMovingEvent += TouchMoving;
 
 		disabled = true;
 	}

@@ -7,8 +7,8 @@ using System.Collections.Generic;
 /// </summary>
 public class GKFriendsList
 {
-	static List<GKFriend> friends;
-	public GKFriendsList(){ friends = new List<GKFriend>(); }
+	static List<GKUser> friends;
+	public GKFriendsList(){ friends = new List<GKUser>(); }
 
 	/// <summary>
 	/// Sets the friends list. Rewrites the list each time this is called.
@@ -16,7 +16,7 @@ public class GKFriendsList
 	/// <param name="list">JSON formed list.</param>
 	public void SetFriendsList(string list)
 	{
-		friends = new List<GKFriend>();
+		friends = new List<GKUser>();
 
 		var dict = Json.Deserialize(list) as Dictionary<string,object>;
 
@@ -24,7 +24,7 @@ public class GKFriendsList
 		{
 			//Debug.Log(pair.Key + " " + pair.Value);
 			if(!ListContains(pair.Key))
-				friends.Add(new GKFriend(pair.Key, (string)pair.Value));
+				friends.Add(new GKUser(pair.Key, (string)pair.Value));
 		}
 	}
 
@@ -37,7 +37,7 @@ public class GKFriendsList
 		return false;
 	}
 
-	public GKFriend this[int index]
+	public GKUser this[int index]
 	{
 		get { return friends [index]; }
 	}
@@ -50,12 +50,18 @@ public class GKFriendsList
 /// <summary>
 /// GK friend. Holds the user's GameCenter display name and player id.
 /// </summary>
-public class GKFriend
+public class GKUser
 {
 	public string displayName;
 	public string playerID;
 
-	public GKFriend(string id, string name)
+	public GKUser()
+	{
+		displayName = "Default";
+		playerID = "-1";
+	}
+
+	public GKUser(string id, string name)
 	{
 		displayName = name;
 		playerID = id;

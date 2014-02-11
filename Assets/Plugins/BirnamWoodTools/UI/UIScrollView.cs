@@ -19,15 +19,24 @@ public class UIScrollView : UIView {
 	#region Activation, Deactivation
 	protected override void Activation()
 	{
-		base.Activation();
+		if(UIElements != null)
+		{
+			for(int i = 0; i < UIElements.Count; i++)
+			{
+				if(UIElements[i] != null && ViewRect.Contains(UIElements[i].CurrentPosition))
+					UIElements[i].Activate();
+			}
+		}
 
-		InputHandler.touchMoving += TouchMoving;
+		movementState = MovementState.INITIAL;
+
+		InputHandler.touchMovingEvent += TouchMoving;
 	}
 	protected override void Deactivation()
 	{
 		base.Deactivation();
 
-		InputHandler.touchMoving -= TouchMoving;
+		InputHandler.touchMovingEvent -= TouchMoving;
 	}
 	#endregion
 

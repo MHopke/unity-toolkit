@@ -37,7 +37,7 @@ const NSString* STATUSES = @"status";
     NSLog(@"view did finish");
 }
 
-#pragma mark Other Methods
+#pragma mark Internal Methods
 - (void) authenticateLocalPlayer
 {
     GKLocalPlayer *localPlayer = [GKLocalPlayer localPlayer];
@@ -89,12 +89,18 @@ const NSString* STATUSES = @"status";
     //register listener
     [[GKLocalPlayer localPlayer] registerListener:self];
     
-    UnitySendMessage("BWGPluginsManager", "GameCenterStatus", "true");
+    //Generate player status string
+    NSMutableString* status = [[[NSMutableString alloc] initWithString:[GKLocalPlayer localPlayer].playerID]autorelease];
+    
+    [status appendString:@","];
+    [status appendString:[GKLocalPlayer localPlayer].alias];
+    
+    UnitySendMessage("BWGPluginsManager", "Authenticated", [status cStringUsingEncoding:NSASCIIStringEncoding]);
 }
 
 - (void) disableGameCenter
 {
-    UnitySendMessage("BWGPluginsManager", "GameCenterStatus", "false");
+    UnitySendMessage("BWGPluginsManager", "Authenticated", "false");
 }
 
 - (void) loadLeaderboardInfo

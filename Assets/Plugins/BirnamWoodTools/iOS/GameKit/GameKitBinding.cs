@@ -2,7 +2,14 @@ using System.Runtime.InteropServices;
 
 public class GameKitBinding
 {
+	#region Public Variables
 	public static bool Enabled = false;
+	#endregion
+
+	#region Private Variables
+	public static GKUser _localUser;
+	#endregion
+
 
 	[DllImport ("__Internal")]
 	static extern void GKAuthenticatePlayer();

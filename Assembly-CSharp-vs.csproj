@@ -46,8 +46,10 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Script\Trophy.cs" />
-     <Compile Include="Assets\Script\Vim.cs" />
+     <Compile Include="Assets\Scripts\Trophy.cs" />
+     <Compile Include="Assets\Scripts\Vim.cs" />
+     <None Include="Assets\Plugins\BirnamWoodTools\iOS\BWG_iOS_ReadMe.txt" />
+     <None Include="Assets\Resources\Achievements.xml" />
      <None Include="Assets\Resources\Screens.xml" />
      <None Include="Assets\Resources\ScreenOne.xml" />
   </ItemGroup>

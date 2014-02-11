@@ -1,5 +1,4 @@
-﻿#define MULTI_TOUCH
-using UnityEngine;
+﻿using UnityEngine;
 using System;
 
 /// <summary>
@@ -10,52 +9,62 @@ public class InputHandler : MonoBehaviour
 	#region Events
 	public delegate void TouchInfo(Vector2 touchPosition, int touchID);
 
-	public static event TouchInfo touchEnd;
-	public static event TouchInfo touchStart;
-	public static event TouchInfo touchStationary;
+	public static event TouchInfo touchEndEvent;
+	public static event TouchInfo touchStartEvent;
+	public static event TouchInfo touchStationaryEvent;
 
 	public delegate void TouchMoving(Vector2 touch, Vector2 deltaPos,int touchID);
-	public static event TouchMoving touchMoving;
+	public static event TouchMoving touchMovingEvent;
 
 	//Fired when a swipe is detected
-	public static event Action<bool> swipe;
+	public static event Action<bool> swipeEvent;
 
 	//Fired when a shake is detected
-	public static event Action shake;
+	public static event Action shakeEvent;
 
-	//Fired when a pinch is detected
-	public static event Action<int> pinch;
+	//Fired when a pinch is detected. False indicates a pull
+	public static event Action<bool> pinchEvent;
 	#endregion
 
 	#region Constants
 	public const int INVALID_FINGER = -1;
+	public const float SWIPE_THRESHOLD = 20.0f;
 	public const float MOVE_THRESHOLD = 0.0001f;
 	#endregion
 
 	#region Private Variables
-	bool shaken;
+	bool _shaken;
+	bool _checkShake;
+	bool _checkPinch;
 
-	bool checkShake;
-	bool checkPinch;
+	//Used to determine if the monobehaviour can be disabled
+	//when input checks such as shake, or pinch are disabled;
+	int _checkState = 0;
 
-	Vector3 oldAcceleration;
-	Vector3 shakeThreshold;
+	float _shakeResetTime;
+	float _oldDistance;
+	float _shakeTimer;
 
-	float shakeResetTime;
-	float oldDistance;
-	float shakeTimer;
+	Vector3 _oldAcceleration;
+	Vector3 _shakeThreshold;
+	#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBPLAYER
+	bool _mouseDown;
+	Vector3 _oldMousePosition;
+	#endif
 
-	static InputHandler singleton = null;
+	static InputHandler _instance = null;
 	#endregion
 
 	#region Unity Methods
 	void Start()
 	{
-		if(singleton == null)
+		if(_instance == null)
 		{
-			oldAcceleration = new Vector3(-2f,-2f,-2f);
-			singleton = this;
+			_instance = this;
+
 			DontDestroyOnLoad(this.gameObject);
+
+			//CheckToDisable();
 		}
 		else
 			Destroy(this.gameObject);
@@ -64,47 +73,71 @@ public class InputHandler : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-		#if UNITY_EDITOR
-		if(Input.GetMouseButtonUp(0) && touchStart != null)
-			touchStart(Input.mousePosition,0);
-		else if(Input.GetMouseButtonDown(0) && touchEnd != null)
-			touchEnd(Input.mousePosition,0);
-
-		if(checkShake && Input.GetMouseButtonDown(1))
+		#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBPLAYER
+		if(Input.GetMouseButtonDown(0))
 		{
-			shake();
+			_mouseDown = true;
+
+			_oldMousePosition = Input.mousePosition;
+
+			if(touchStartEvent != null)
+				touchStartEvent(Input.mousePosition,0);
 		}
-		#else
-		if(checkShake)
+		else if(Input.GetMouseButtonUp(0))
+		{
+			_mouseDown = false;
+			if(touchEndEvent != null)
+				touchEndEvent(Input.mousePosition,0);
+		}
+		else if(_mouseDown)
+		{
+			if(_oldMousePosition != Input.mousePosition)
+			{
+				if(touchMovingEvent != null)
+					touchMovingEvent(Input.mousePosition,Input.mousePosition - _oldMousePosition,0);
+			}
+			else if(_oldMousePosition == Input.mousePosition)
+			{
+				if(touchStationaryEvent != null)
+					touchStationaryEvent(Input.mousePosition,0);
+			}
+
+			_oldMousePosition = Input.mousePosition;
+		}
+
+		if(_checkShake && Input.GetMouseButtonDown(1) && shakeEvent != null)
+			shakeEvent();
+		//#else
+		if(_checkShake)
 		{
 			Vector3 acc = Input.acceleration;
 
-			if(!shaken)
+			if(!_shaken)
 			{
-				float xDif = Mathf.Abs(oldAcceleration.x - acc.x);
-				float yDif = Mathf.Abs(oldAcceleration.y - acc.y);
-				float zDif = Mathf.Abs(oldAcceleration.z - acc.z);
+				float xDif = Mathf.Abs(_oldAcceleration.x - acc.x);
+				float yDif = Mathf.Abs(_oldAcceleration.y - acc.y);
+				float zDif = Mathf.Abs(_oldAcceleration.z - acc.z);
 				
-				if(shake != null && ((shakeThreshold.x != 0.0f && xDif > shakeThreshold.x) || 
-				                     (shakeThreshold.y != 0.0f && yDif > shakeThreshold.y) 
-				                     || (shakeThreshold.z != 0.0f && zDif > shakeThreshold.z)))
+				if(shakeEvent != null && ((_shakeThreshold.x != 0.0f && xDif > _shakeThreshold.x) || 
+				                     (_shakeThreshold.y != 0.0f && yDif > _shakeThreshold.y) 
+				                     || (_shakeThreshold.z != 0.0f && zDif > _shakeThreshold.z)))
 				{
-					shake();
-					shaken = true;
+					shakeEvent();
+					_shaken = true;
 				}
 			}
 			else
 			{
-				shakeTimer += Time.deltaTime;
+				_shakeTimer += Time.deltaTime;
 
-				if(shakeTimer > shakeResetTime)
+				if(_shakeTimer > _shakeResetTime)
 				{
-					shakeTimer = 0.0f;
-					shaken = false;
+					_shakeTimer = 0.0f;
+					_shaken = false;
 				}
 			}
 					
-			oldAcceleration = acc;
+			_oldAcceleration = acc;
 		}
 
 		for(int i = 0; i < Input.touchCount; i++)
@@ -113,49 +146,47 @@ public class InputHandler : MonoBehaviour
 
 			switch(touch.phase)
 			{
-				case TouchPhase.Began:
-				if(touchStart != null)
-					touchStart(touch.position, touch.fingerId);
+			case TouchPhase.Began:
+				if(touchStartEvent != null)
+					touchStartEvent(touch.position, touch.fingerId);
 				break;
-				case TouchPhase.Ended:
-				if(touchEnd != null)
-					touchEnd(touch.position, touch.fingerId);
+			case TouchPhase.Ended:
+				if(touchEndEvent != null)
+					touchEndEvent(touch.position, touch.fingerId);
 				break;
-				case TouchPhase.Moved:
-				if(touchMoving != null)
-					touchMoving(touch.position, touch.deltaPosition, touch.fingerId);
+			case TouchPhase.Moved:
+				if(touchMovingEvent != null)
+					touchMovingEvent(touch.position, touch.deltaPosition, touch.fingerId);
 				break;
-				case TouchPhase.Stationary:
-				if(touchStationary != null)
-					touchStationary(touch.position, touch.fingerId);
-				break;
-				default:
+			case TouchPhase.Stationary:
+				if(touchStationaryEvent != null)
+					touchStationaryEvent(touch.position, touch.fingerId);
 				break;
 			}
 
 			float delta = touch.deltaPosition.x;
-			if(Mathf.Abs(delta) > 20.0f)
+			if(Mathf.Abs(delta) > SWIPE_THRESHOLD)
 			{
-				if(swipe != null)
+				if(swipeEvent != null)
 				{
 					if(delta > 0.0f)
-						swipe(true);
+					swipeEvent(true);
 					else if(delta < 0.0f)
-						swipe(false);
+					swipeEvent(false);
 				}
 			}
 		}
 
-		if(checkPinch && Input.touchCount == 2)
+		if(_checkPinch && pinchEvent != null && Input.touchCount == 2)
 		{
 			float distance = (Input.GetTouch(0).position - Input.GetTouch(1).position).magnitude;
 
-			if(oldDistance < distance && pinch != null)
-				pinch(1);
-			else if(oldDistance > distance && pinch != null)
-				pinch(-1);
+			if(_oldDistance < distance)
+				pinchEvent(false);
+			else if(_oldDistance > distance)
+				pinchEvent(true);
 
-			oldDistance = distance;
+			_oldDistance = distance;
 		}
 		#endif
     }
@@ -164,46 +195,64 @@ public class InputHandler : MonoBehaviour
 	#region Enable & Disable Methods
 	public static void EnableShake(Vector3 threshold, float resetTime, Action shakeMethod)
 	{
-		if(singleton.checkShake)
+		if(_instance._checkShake)
 			return;
 
-		singleton.checkShake = true;
-		singleton.shakeThreshold = threshold;
-		singleton.shakeResetTime = resetTime;
-		singleton.oldAcceleration = Input.acceleration;
+		_instance._checkShake = true;
+		_instance._shakeThreshold = threshold;
+		_instance._shakeResetTime = resetTime;
+		_instance._oldAcceleration = Input.acceleration;
 
-		shake = shakeMethod;
+		shakeEvent = shakeMethod;
+
+		_instance.enabled = true;
+
+		_instance._checkState++;
 	}
 	public static void DisableShake()
 	{
-		if(!singleton.checkPinch)
+		if(!_instance._checkPinch)
 			return;
 
-		singleton.checkShake = false;
-		singleton.shakeTimer = 0.0f;
+		_instance._checkShake = false;
+		_instance._shakeTimer = 0.0f;
 
-		shake = null;
+		shakeEvent = null;
+
+		_instance.CheckToDisable();
 	}
-	public static void EnablePinch(Action<int> pinchMethod)
+	public static void EnablePinch(Action<bool> pinchMethod)
 	{
-		if(singleton.checkPinch)
+		if(_instance._checkPinch)
 			return;
 
-		singleton.checkPinch = true;
+		_instance._checkPinch = true;
 
 		if(Input.touchCount == 2)
-			singleton.oldDistance = (Input.GetTouch(0).position - Input.GetTouch(1).position).magnitude;
+			_instance._oldDistance = (Input.GetTouch(0).position - Input.GetTouch(1).position).magnitude;
 
-		pinch = pinchMethod;
+		pinchEvent = pinchMethod;
+
+		_instance.enabled = true;
+
+		_instance._checkState++;
 	}
 	public static void DisablePinch()
 	{
-		if(!singleton.checkPinch)
+		if(!_instance._checkPinch)
 			return;
 
-		singleton.checkPinch = false;
+		_instance._checkPinch = false;
 
-		pinch = null;
+		pinchEvent = null;
+
+		_instance.CheckToDisable();
+	}
+
+	void CheckToDisable()
+	{
+		if(_checkState-- == 0)
+			enabled = false;
 	}
 	#endregion
 }

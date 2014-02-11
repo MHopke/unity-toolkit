@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root>
+	<Achievement name="First Run" description="You've completed your first run!" gameCenter="first_run" googlePlay=""/>
+	<Achievement name="Trophy 2" description="Trophy Filler" gameCenter="trophy_two" googlePlay=""/>
+	<Achievement name="Trophy 3" description="Trophy Filler" gameCenter="trophy_three" googlePlay=""/>
+	<Achievement name="Trophy 4" description="Trophy Filler" gameCenter="trophy_four" googlePlay=""/>
+	<Achievement name="Trophy 5" description="Trophy Filler" gameCenter="trophy_five" googlePlay=""/>
+	<Achievement name="Trophy 6" description="Trophy Filler" gameCenter="trophy_six" googlePlay=""/>
+	<Achievement name="Trophy 7" description="Trophy Filler" gameCenter="trophy_seven" googlePlay=""/>
+	<Achievement name="Trophy 8" description="Trophy Filler" gameCenter="trophy_eight" googlePlay=""/>
+	<Achievement name="Trophy 9" description="Trophy Filler" gameCenter="trophy_nine" googlePlay=""/>
+</root>
