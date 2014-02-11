@@ -1,50 +1,30 @@
 ﻿using MiniJSON;
-using UnityEngine;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 
-#if UNITY_IPHONE
+/// <summary>
+/// GK friends list. Holds a list of GKFriend representing the user's GameCenter Friends.
+/// </summary>
 public class GKFriendsList
 {
 	static List<GKFriend> friends;
-
-	Rect defaultRect;
-
 	public GKFriendsList(){ friends = new List<GKFriend>(); }
 
 	/// <summary>
 	/// Sets the friends list. Rewrites the list each time this is called.
 	/// </summary>
 	/// <param name="list">JSON formed list.</param>
-	public void SetFriendsList(string list, Rect displayRect)
+	public void SetFriendsList(string list)
 	{
 		friends = new List<GKFriend>();
 
 		var dict = Json.Deserialize(list) as Dictionary<string,object>;
 
-		int i = 0;
-		defaultRect = displayRect;
 		foreach(KeyValuePair<string,object> pair in dict)
 		{
 			//Debug.Log(pair.Key + " " + pair.Value);
 			if(!ListContains(pair.Key))
-			{
-				friends.Add(new GKFriend(pair.Key, (string)pair.Value,
-					displayRect,(i%2 == 0) ? "ListEven" : "SubtitleBlue"));
-				displayRect.y += displayRect.height;
-				i++;
-			}
-		}
-	}
-
-	public void Draw()
-	{
-		if(friends.Count == 0)
-			GUI.Label(defaultRect, "You have no Game Center friends.", "ListEven");
-		else
-		{
-			for(int i = 0; i < friends.Count; i++)
-				friends[i].Draw();
+				friends.Add(new GKFriend(pair.Key, (string)pair.Value));
 		}
 	}
 
@@ -67,36 +47,17 @@ public class GKFriendsList
 	}
 }
 
+/// <summary>
+/// GK friend. Holds the user's GameCenter display name and player id.
+/// </summary>
 public class GKFriend
 {
-	//Fired when a friend is chosen for an invitation
-	public static event Action<GKFriend> friendSelectedEvent;
-
 	public string displayName;
 	public string playerID;
 
-	//GUI rect stored for ease of use
-	public Rect rect;
-	public string style;
-
-	public GKFriend(string id, string name,Rect rectangle,string styleParam)
+	public GKFriend(string id, string name)
 	{
 		displayName = name;
 		playerID = id;
-		rect = rectangle;
-		style = styleParam;
-	}
-
-	public void Draw()
-	{
-		if(GUI.Button(rect, displayName, style))
-		{
-			if(friendSelectedEvent != null)
-				friendSelectedEvent(this);
-			//friendName = friends[i].displayName;
-			//PopUpOneField.Activate("SEND AN INVITE", "Are you sure you want challenge " + friends[i].displayName + "?", InviteConfirm);
-			//GameKitBinding.CreateMatch(friends[i].playerID);
-		}
 	}
 }
-#endif

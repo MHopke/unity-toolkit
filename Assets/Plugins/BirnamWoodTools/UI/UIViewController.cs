@@ -68,7 +68,7 @@ public class UIViewController : MonoBehaviour
 	}
 	#endregion
 
-	#region Control Methods
+	#region Methods
 	public static void ChangeScreen(UIView view, UIView.Section section)
 	{
 		instance.ExitSection(section);
@@ -101,6 +101,16 @@ public class UIViewController : MonoBehaviour
 
 		if(Footer)
 			Footer.DisableButtons();
+	}
+	public static UIBase RetrieveElementFromUIView(string view, string element)
+	{
+		for(int i = 0; i < instance.screens.Count; i++)
+		{
+			if(instance.screens[i] && view == instance.screens[i].name)
+				return instance.screens[i].RetrieveUIElement(element);
+		}
+
+		return null;
 	}
 
 	void ActivateInitialUI(UIView view, UIView.Section section)

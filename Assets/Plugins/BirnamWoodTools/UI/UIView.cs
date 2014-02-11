@@ -5,9 +5,13 @@ using System.Collections.Generic;
 public class UIView : MonoBehaviour {
 
 	#region Events
-	//Fired when the screen is activated;
+	//Fired when the screen is activated
 	public event System.Action activatedEvent;
-	//Fired when the screen is deactivated;
+	//Fired when the screen has completed its transition in
+	public event System.Action transitionInEvent;
+	//Fired when the screen is told to transition out
+	public event System.Action transitionOutEvent;
+	//Fired when the screen is deactivated
 	public event System.Action deactivatedEvent;
 	#endregion
 
@@ -79,8 +83,12 @@ public class UIView : MonoBehaviour {
 	
 	protected void Update()
 	{
+		#if DRAWLABELS
+		//prevents uneccessary checks if the UIView is enabled because
+		//it contains labels
 		if(movementState == MovementState.IN_PLACE)
 			return;
+		#endif
 
 		if(movementState == MovementState.EXITING)
 		{
@@ -98,6 +106,9 @@ public class UIView : MonoBehaviour {
 			enabled = false;
 			#endif
 			movementState = MovementState.IN_PLACE;
+
+			if(transitionInEvent != null)
+				transitionInEvent();
 		}
 	}
 
@@ -205,6 +216,17 @@ public class UIView : MonoBehaviour {
 			}
 		}
 	}
+
+	public UIBase RetrieveUIElement(string name)
+	{
+		for(int i = 0; i < UIElements.Count; i++)
+		{
+			if(name == UIElements[i].name)
+				return UIElements[i];
+		}
+
+		return null;
+	}
 	#endregion
 
 	#region Movement Methods
@@ -250,6 +272,9 @@ public class UIView : MonoBehaviour {
 			enabled = true;
 
 		movementState = MovementState.EXITING;
+
+		if(transitionOutEvent != null)
+			transitionOutEvent();
 	}
 
 	bool HasUIExited()

@@ -1,46 +1,79 @@
 ﻿using UnityEngine;
-using System.Collections;
 
-public static class UnityExtensions {
-
+public static class UnityExtensions 
+{
 	#region Transform Extentensions
-	public static void SetX(this Transform transform, float x)
+	#region Position
+	public static void SetXPosition(this Transform transform, float x)
 	{
 		transform.position = new Vector3(x,transform.position.y,transform.position.z);
 	}
-	public static void AddX(this Transform transform, float x)
+	public static void AddXPosition(this Transform transform, float x)
 	{
 		transform.position = new Vector3(transform.position.x + x, transform.position.y, transform.position.z);
 	}
-	public static void SetY(this Transform transform, float y)
+	public static void SetYPosition(this Transform transform, float y)
 	{
 		transform.position = new Vector3(transform.position.x,y,transform.position.z);
 	}
+	public static void AddYPosition(this Transform transform, float y)
+	{
+		transform.position = new Vector3(transform.position.x, transform.position.y + y, transform.position.z);
+	}
+	public static void SetZPosition(this Transform transform, float z)
+	{
+		transform.position = new Vector3(transform.position.x, transform.position.y, z);
+	}
+	public static void AddZPosition(this Transform transform, float z)
+	{
+		transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z + z);
+	}
+	#endregion
 
-	public static void ScaleX(this Transform transform, float x)
+	#region Scale
+	public static void SetXScale(this Transform transform, float x)
+	{
+		transform.localScale = new Vector3(x, transform.localScale.y, transform.localScale.z);
+	}
+	public static void AddXScale(this Transform transform, float x)
 	{
 		transform.localScale = new Vector3(transform.localScale.x + x, transform.localScale.y, transform.localScale.z);
 	}
-	public static void ScaleXY(this Transform transform, Vector2 vector)
+	public static void SetYScale(this Transform transform, float y)
+	{
+		transform.localScale = new Vector3(transform.localScale.x, y, transform.localScale.z);
+	}
+	public static void AddYScale(this Transform transform, float y)
+	{
+		transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y + y, transform.localScale.z);
+	}public static void SetZScale(this Transform transform, float z)
+	{
+		transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y, z);
+	}
+	public static void AddZScale(this Transform transform, float z)
+	{
+		transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y, transform.localScale.z + z);
+	}
+	public static void AddXYScale(this Transform transform, Vector2 vector)
 	{
 		transform.localScale = new Vector3(transform.localScale.x + vector.x, transform.localScale.y + vector.y, transform.localScale.z);
 	}
-	public static void ScaleXY(this Transform transform, float x, float y)
+	public static void AddXYScale(this Transform transform, float x, float y)
 	{
 		transform.localScale = new Vector3(transform.localScale.x + x, transform.localScale.y + y, transform.localScale.z);
 	}
-
-	public static void ScaleXYZ(this Transform transform, Vector3 vector)
+	public static void AddXYZScale(this Transform transform, Vector3 vector)
 	{
 		transform.localScale = new Vector3(transform.localScale.x + vector.x, transform.localScale.y + vector.y, transform.localScale.z + vector.z);
 	}
 	#endregion
+	#endregion
 
 	#region Color Extensions
-	public static bool CloseTo(this Color color, Color otherColor)
+	public static bool CloseTo(this Color color, Color otherColor, float closeness=0.03f)
 	{
-		return (Mathf.Abs(color.r - otherColor.r) <= 0.03f && Mathf.Abs(color.g - otherColor.g) <= 0.03f
-			&& Mathf.Abs(color.b - otherColor.b) <= 0.03f && Mathf.Abs(color.a - otherColor.a) <= 0.03f);
+		return (Mathf.Abs(color.r - otherColor.r) <= closeness && Mathf.Abs(color.g - otherColor.g) <= closeness
+			&& Mathf.Abs(color.b - otherColor.b) <= closeness && Mathf.Abs(color.a - otherColor.a) <= closeness);
 	}
 	#endregion
 

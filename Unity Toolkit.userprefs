@@ -1,6 +1,13 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Plugins/BirnamWoodTools/UI/UINavigationController.cs">
+    <Files>
+      <File FileName="Assets/Script/Vim.cs" Line="12" Column="3" />
+      <File FileName="Assets/Plugins/BirnamWoodTools/UI/UIViewController.cs" Line="113" Column="15" />
+      <File FileName="Assets/Plugins/BirnamWoodTools/UI/UIView.cs" Line="217" Column="15" />
+      <File FileName="Assets/Plugins/BirnamWoodTools/UI/UINavigationController.cs" Line="128" Column="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>

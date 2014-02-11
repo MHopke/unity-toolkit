@@ -2,7 +2,7 @@
 
 /// <summary>
 /// Simple abstraction of the iOS GKTurnBasedMath. It's 
-/// meant to be a base class which your actual "matchs" inherit
+/// meant to be a base class which your actual "matches" inherit
 /// from.
 /// </summary>
 public class GKTurnBasedMatch

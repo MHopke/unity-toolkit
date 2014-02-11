@@ -70,7 +70,7 @@ public class UIPercentBar : UISprite
 
 			_newScale = transform.localScale + _scalePerPercent * percent;
 		} else
-			transform.ScaleXYZ(_scalePerPercent * percent);
+			transform.AddXYZScale(_scalePerPercent * percent);
 	}
 	#endregion
 }

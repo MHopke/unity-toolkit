@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.SocialPlatforms;
 
 public class Vim : MonoBehaviour {
 	
@@ -9,6 +10,8 @@ public class Vim : MonoBehaviour {
 	// Use this for initialization
 	void Start () 
 	{
+		GameKitBinding.AuthenticatePlayer();
+		//iOSBinding.PopAlertWithHeaderAndText("header", "text!");
 		//button.clickEvent += Click;
 		//enabled = false;
 		animator = GetComponent<Animator>();
@@ -25,6 +28,11 @@ public class Vim : MonoBehaviour {
 	{
 		if(pause)
 			Debug.Log("pausing");
+	}
+
+	void Authenticate(bool authenticated)
+	{
+		Debug.Log(authenticated);
 	}
 
 	/*void Click()
