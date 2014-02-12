@@ -9,6 +9,7 @@ public class UIButton : UISprite
 
 	#region Public Variables
 	public string ControllerId;
+
 	public ChangeUIView Header;
 	public ChangeUIView Content;
 	public ChangeUIView Footer;
@@ -82,7 +83,7 @@ public class UIButton : UISprite
 	#endregion
 
 	#region Click Methods
-	void Click()
+	public void Click()
 	{
 		if(ControllerId == "")
 		{

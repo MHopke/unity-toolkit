@@ -3,6 +3,11 @@ using System.Collections;
 
 public class UISprite : UIBase
 {
+	#region Public Variables
+	//Indicates there is a root object so this can animate relative scale & position
+	public bool _hasRoot;
+	#endregion
+
 	#region Activation, Deactivation, Init Methods
 	public override bool Activate(MovementState state=MovementState.INITIAL)
 	{
@@ -31,7 +36,10 @@ public class UISprite : UIBase
 
 		//Debug.Log(name + " " + currentPosition);
 
-		transform.position = Camera.main.ScreenToWorldPoint(new Vector3(currentPosition.x,Screen.height - currentPosition.y,1f));
+		if(_hasRoot)
+			transform.parent.position = Camera.main.ScreenToWorldPoint(new Vector3(currentPosition.x,Screen.height - currentPosition.y,1f));
+		else
+			transform.position = Camera.main.ScreenToWorldPoint(new Vector3(currentPosition.x,Screen.height - currentPosition.y,1f));
 	}
 	#endregion
 }
