@@ -4,21 +4,23 @@ using System.Collections;
 public class UISprite : UIBase
 {
 	#region Activation, Deactivation, Init Methods
-	public override void Activate(MovementState state=MovementState.INITIAL)
+	public override bool Activate(MovementState state=MovementState.INITIAL)
 	{
-		enabled = true;
-
-		renderer.enabled = true;
-
-		base.Activate(state);
+		if(base.Activate(state))
+		{
+			renderer.enabled = true;
+			return true;
+		} else
+			return false;
 	}
-	public override void Deactivate()
+	public override bool Deactivate()
 	{
-		enabled = false;
-
-		renderer.enabled = false;
-
-		base.Deactivate();
+		if(base.Deactivate())
+		{
+			renderer.enabled = false;
+			return true;
+		} else
+			return false;
 	}
 	#endregion
 

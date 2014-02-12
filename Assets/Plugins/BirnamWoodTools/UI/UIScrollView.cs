@@ -30,13 +30,13 @@ public class UIScrollView : UIView {
 
 		movementState = MovementState.INITIAL;
 
-		InputHandler.touchMovingEvent += TouchMoving;
+		InputHandler.AddTouchMoving(TouchMoving);
 	}
 	protected override void Deactivation()
 	{
 		base.Deactivation();
 
-		InputHandler.touchMovingEvent -= TouchMoving;
+		InputHandler.RemoveTouchMoving(TouchMoving);
 	}
 	#endregion
 
@@ -56,6 +56,8 @@ public class UIScrollView : UIView {
 				if(UIElements[i])
 				{
 					UIElements[i].CurrentPosition += delta;
+
+					//Debug.Log(UIElements[i].CurrentPosition);
 
 					if(ViewRect.Contains(UIElements[i].CurrentPosition))
 						UIElements[i].Activate(UIBase.MovementState.IN_PLACE);

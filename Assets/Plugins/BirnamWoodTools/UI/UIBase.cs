@@ -46,16 +46,28 @@ public class UIBase : MonoBehaviour {
 
 		enabled = false;
 	}
-	public virtual void Activate(MovementState state=MovementState.INITIAL)
+	public virtual bool Activate(MovementState state=MovementState.INITIAL)
 	{
+		if(enabled)
+			return false;
+
 		movementState = state;
 
-		SetStartPosition();
+		if(state == MovementState.INITIAL)
+			SetStartPosition();
+
 		enabled = true;
+
+		return true;
 	}
-	public virtual void Deactivate()
+	public virtual bool Deactivate()
 	{
+		if(!enabled)
+			return false;
+
 		enabled = false;
+
+		return true;
 	}
 	#endregion
 

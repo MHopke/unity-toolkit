@@ -28,31 +28,31 @@ public class UIButton : UISprite
 		animator = GetComponent<Animator>();
 		base.Init(offset,speed);
 	}
-	public override void Activate(MovementState state=MovementState.INITIAL)
+	public override bool Activate(MovementState state=MovementState.INITIAL)
 	{
-		enabled = true;
+		if(base.Activate(state))
+		{
+			fingerID = InputHandler.INVALID_FINGER;
 
-		renderer.enabled = true;
+			InputHandler.AddTouchStart(TouchStart);
+			InputHandler.AddTouchEnd(TouchEnd);
+			InputHandler.AddTouchMoving(TouchMoving);
 
-		fingerID = InputHandler.INVALID_FINGER;
-
-		InputHandler.touchStartEvent += TouchStart;
-		InputHandler.touchEndEvent += TouchEnd;
-		InputHandler.touchMovingEvent += TouchMoving;
-
-		base.Activate(state);
+			return true;
+		} else
+			return false;
 	}
-	public override void Deactivate()
+	public override bool Deactivate()
 	{
-		enabled = false;
+		if(base.Deactivate())
+		{
+			InputHandler.RemoveTouchStart(TouchStart);
+			InputHandler.RemoveTouchEnd(TouchEnd);
+			InputHandler.RemoveTouchMoving(TouchMoving);
 
-		renderer.enabled = false;
-
-		InputHandler.touchStartEvent -= TouchStart;
-		InputHandler.touchEndEvent -= TouchEnd;
-		InputHandler.touchMovingEvent -= TouchMoving;
-
-		base.Deactivate();
+			return true;
+		} else
+			return false;
 	}
 	#endregion
 
@@ -62,9 +62,9 @@ public class UIButton : UISprite
 		if(!disabled)
 			return;
 
-		InputHandler.touchStartEvent -= TouchStart;
-		InputHandler.touchEndEvent -= TouchEnd;
-		InputHandler.touchMovingEvent -= TouchMoving;
+		InputHandler.AddTouchStart(TouchStart);
+		InputHandler.AddTouchEnd(TouchEnd);
+		InputHandler.AddTouchMoving(TouchMoving);
 
 		disabled = false;
 	}
@@ -73,9 +73,9 @@ public class UIButton : UISprite
 		if(disabled)
 			return;
 
-		InputHandler.touchStartEvent += TouchStart;
-		InputHandler.touchEndEvent += TouchEnd;
-		InputHandler.touchMovingEvent += TouchMoving;
+		InputHandler.RemoveTouchStart(TouchStart);
+		InputHandler.RemoveTouchEnd(TouchEnd);
+		InputHandler.RemoveTouchMoving(TouchMoving);
 
 		disabled = true;
 	}

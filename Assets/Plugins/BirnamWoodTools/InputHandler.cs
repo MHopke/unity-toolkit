@@ -9,12 +9,12 @@ public class InputHandler : MonoBehaviour
 	#region Events
 	public delegate void TouchInfo(Vector2 touchPosition, int touchID);
 
-	public static event TouchInfo touchEndEvent;
-	public static event TouchInfo touchStartEvent;
-	public static event TouchInfo touchStationaryEvent;
+	static event TouchInfo touchEndEvent;
+	static event TouchInfo touchStartEvent;
+	static event TouchInfo touchStationaryEvent;
 
 	public delegate void TouchMoving(Vector2 touch, Vector2 deltaPos,int touchID);
-	public static event TouchMoving touchMovingEvent;
+	static event TouchMoving touchMovingEvent;
 
 	//Fired when a swipe is detected
 	public static event Action<bool> swipeEvent;
@@ -107,7 +107,7 @@ public class InputHandler : MonoBehaviour
 
 		if(_checkShake && Input.GetMouseButtonDown(1) && shakeEvent != null)
 			shakeEvent();
-		//#else
+		#else
 		if(_checkShake)
 		{
 			Vector3 acc = Input.acceleration;
@@ -248,6 +248,57 @@ public class InputHandler : MonoBehaviour
 
 		_instance.CheckToDisable();
 	}
+
+	#region TouchEvent Hooks
+	public static void AddTouchStart(TouchInfo method)
+	{
+		touchStartEvent += method;
+
+		_instance._checkState++;
+	}
+	public static void RemoveTouchStart(TouchInfo method)
+	{
+		touchStartEvent -= method;
+
+		_instance.CheckToDisable();
+	}
+	public static void AddTouchStationary(TouchInfo method)
+	{
+		touchStationaryEvent += method;
+
+		_instance._checkState++;
+	}
+	public static void RemoveTouchStationary(TouchInfo method)
+	{
+		touchStationaryEvent -= method;
+
+		_instance.CheckToDisable();
+	}
+	public static void AddTouchEnd(TouchInfo method)
+	{
+		touchEndEvent += method;
+
+		_instance._checkState++;
+	}
+	public static void RemoveTouchEnd(TouchInfo method)
+	{
+		touchEndEvent -= method;
+
+		_instance.CheckToDisable();
+	}
+	public static void AddTouchMoving(TouchMoving method)
+	{
+		touchMovingEvent += method;
+
+		_instance._checkState++;
+	}
+	public static void RemoveTouchMoving(TouchMoving method)
+	{
+		touchMovingEvent -= method;
+
+		_instance.CheckToDisable();
+	}
+	#endregion
 
 	void CheckToDisable()
 	{

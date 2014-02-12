@@ -8,7 +8,7 @@ public class Vim : MonoBehaviour {
 	const string ACHIEVEMENT_KEY = "Achievements";
 	#endregion
 
-	public UIPercentBar bar;
+	public UIButton bar;
 
 	Animator animator;
 	// Use this for initialization
@@ -28,7 +28,7 @@ public class Vim : MonoBehaviour {
 	/*void Update()
 	{
 		if(Input.GetMouseButtonDown(0))
-			bar.AdjustBar(50.0f);
+			bar.CurrentPosition = new Vector2(300, 200f);
 	}*/
 
 	void OnApplicationPause(bool pause)
