@@ -36,7 +36,7 @@ public class UIView : MonoBehaviour {
 
 	#region Unity Methods
 	// Use this for initialization
-	protected void Start () 
+	protected void Awake () 
 	{
 		#if DRAWLABELS
 		labels = new List<UILabel>();
@@ -54,7 +54,7 @@ public class UIView : MonoBehaviour {
 					UIElements[i].Init(Transition.MovementIn,Transition.Speed);
 
 					//If its not a label check to see if it has one
-					if(UIElements[i].GetBaseType() != typeof(UILabel))
+					/*if(UIElements[i].GetBaseType() != typeof(UILabel))
 					{
 						UILabel[] labelComponents = UIElements[i].GetComponents<UILabel>();
 
@@ -66,7 +66,7 @@ public class UIView : MonoBehaviour {
 							#endif
 							UIElements.Add(labelComponents[j]);
 						}
-					}
+					}*/
 					#if DRAWLABELS
 					else
 						labels.Add(UIElements[i] as UILabel);
@@ -151,7 +151,7 @@ public class UIView : MonoBehaviour {
 		{
 			for(int i = 0; i < UIElements.Count; i++)
 			{
-				if(UIElements[i] != null)
+				if(UIElements[i] != null && !UIElements[i]._skipUIViewActivation)
 					UIElements[i].Activate();
 			}
 		}
@@ -182,9 +182,7 @@ public class UIView : MonoBehaviour {
 			for(int i = 0; i < UIElements.Count; i++)
 			{
 				if(UIElements[i] != null)
-				{
 					UIElements[i].Deactivate();
-				}
 			}
 		}
 	}

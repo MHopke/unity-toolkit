@@ -33,7 +33,7 @@ public class UILabel : UIBase
 	{
 		useGUILayout = false;
 
-		GUI.skin = UIViewController.Skin;
+		GUI.skin = UINavigationController.Skin;
 
 		GUI.depth = depth;
 
@@ -72,6 +72,17 @@ public class UILabel : UIBase
 	public override System.Type GetBaseType()
 	{
 		return typeof(UILabel);
+	}
+	#endregion
+
+	#region Color Methods
+	protected override Color GetColor()
+	{
+		return customStyle.style.normal.textColor;
+	}
+	protected override void SetColor(Color color)
+	{
+		customStyle.style.normal.textColor = color;
 	}
 	#endregion
 }

@@ -3,9 +3,7 @@ using System.Collections.Generic;
 
 public class UIViewController : MonoBehaviour 
 {
-	#region Public Variables
-	public GUISkin guiSkin;
-	
+	#region Public Variables	
 	//Reference to the current screen that is active
 	public UIView header = null;
 	public UIView content = null;
@@ -15,50 +13,50 @@ public class UIViewController : MonoBehaviour
 	#endregion
 
 	#region Private Variables
+	UIView defaultHeader;
+	UIView defaultContent;
+	UIView defaultFooter;
+
 	static UIViewController instance = null;
 	#endregion
 
-	#region Unity Methods
-	// Use this for initialization
-	void Start () 
+	void Start()
 	{
-		//Debug.Log(name + "start");
-		Activate();
-
-		#if !UNITY_EDITOR
-		if(Skin != null)
-		{
-			for(int i = 0; i < Skin.customStyles.Length; i++)
-				Skin.customStyles[i].fontSize = Mathf.RoundToInt(UINavigationController.AspectRatio.x * (float)Skin.customStyles[i].fontSize);
-
-			//Skin.label.fontSize = Mathf.RoundToInt((UINavigationController.AspectRatio.x * (float)Skin.label.fontSize));
-		}
-		#endif
+		defaultHeader = header;
+		defaultContent = content;
+		defaultFooter = footer;
 	}
-	#endregion
 
 	#region Activate, Deactivate Methods
-	void ActivateInitialUI(UIView view, UIView.Section section)
+	void ActivateUI(UIView view, UIView.Section section)
 	{
-		if(view)
-		{
-			view.Activate();
-			SetSection(view, section);
-		}
+		view.Activate();
+		SetSection(view, section);
 	}
 
-	public void Activate()
+	public void Activate(bool defaults=false)
 	{
-		if(header)
-			ActivateInitialUI(header, header.section);
+		if(defaults)
+		{
+			if(defaultHeader)
+				ActivateUI(defaultHeader, header.section);
 
-		if(content)
-			ActivateInitialUI(content, content.section);
+			if(defaultContent)
+				ActivateUI(defaultContent, content.section);
 
-		if(footer)
-			ActivateInitialUI(footer, footer.section);
+			if(defaultFooter)
+				ActivateUI(defaultFooter, footer.section);
+		} else
+		{
+			if(header)
+				ActivateUI(header, header.section);
 
-		enabled = true;
+			if(content)
+				ActivateUI(content, content.section);
+
+			if(footer)
+				ActivateUI(footer, footer.section);
+		}
 
 		instance = this;
 	}
@@ -73,8 +71,6 @@ public class UIViewController : MonoBehaviour
 
 		if(footer)
 			footer.FlagForExit();
-
-		enabled = false;
 	}
 	#endregion
 
@@ -195,11 +191,6 @@ public class UIViewController : MonoBehaviour
 	#endregion
 
 	#region Accessors
-	public static GUISkin Skin
-	{
-		get { return instance.guiSkin; }
-	}
-
 	public static UIView Header
 	{
 		get { return instance.header; }

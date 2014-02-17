@@ -13,6 +13,9 @@ public class UIButton : UISprite
 	public ChangeUIView Header;
 	public ChangeUIView Content;
 	public ChangeUIView Footer;
+
+	public UIBase[] _elementsToActivate;
+	public UIBase[] _elementsToDeactivate;
 	#endregion
 
 	#region Private Variables
@@ -26,6 +29,7 @@ public class UIButton : UISprite
 	{
 		if(base.Activate(state))
 		{
+			//Debug.Log(name + "add stuff");
 			fingerID = InputHandler.INVALID_FINGER;
 
 			InputHandler.AddTouchStart(TouchStart);
@@ -36,10 +40,11 @@ public class UIButton : UISprite
 		} else
 			return false;
 	}
-	public override bool Deactivate()
+	public override bool Deactivate(bool force=false)
 	{
-		if(base.Deactivate())
+		if(base.Deactivate(force))
 		{
+			//Debug.Log(name + "remove stuff");
 			InputHandler.RemoveTouchStart(TouchStart);
 			InputHandler.RemoveTouchEnd(TouchEnd);
 			InputHandler.RemoveTouchMoving(TouchMoving);
@@ -94,6 +99,12 @@ public class UIButton : UISprite
 		} else
 			UINavigationController.NavigateToController(ControllerId);
 
+		int i = 0;
+		for(i=0; i < _elementsToActivate.Length; i++)
+			_elementsToActivate[i].Activate();
+		for(i = 0; i < _elementsToDeactivate.Length; i++)
+			_elementsToDeactivate[i].Deactivate(true);
+
 		//Send click event
 		if(clickEvent != null)
 			clickEvent();
@@ -111,7 +122,10 @@ public class UIButton : UISprite
 		if(collider2D.OverlapPoint(Camera.main.ScreenToWorldPoint(touch)) && id == fingerID)
 		{
 			//Trigger click animation
-			SetTrigger("Click");
+			if(_spriteAnimator.runtimeAnimatorController)
+				SetTrigger("Click");
+			else
+				Click();
 		}
 	}
 	void TouchMoving(Vector2 pos, Vector2 delta, int id)

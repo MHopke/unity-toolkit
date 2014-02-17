@@ -32,7 +32,7 @@ public class UIFadingLabel : UILabel
 		if(!customStyle.custom)
 		{
 			customStyle.custom = true;
-			customStyle.style = new GUIStyle(UIViewController.Skin.FindStyle(customStyle.styleName));
+			customStyle.style = new GUIStyle(UINavigationController.Skin.FindStyle(customStyle.styleName));
 		}
 
 		original = customStyle.style.normal.textColor;

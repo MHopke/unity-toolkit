@@ -8,21 +8,25 @@ public class Vim : MonoBehaviour {
 	const string ACHIEVEMENT_KEY = "Achievements";
 	#endregion
 
-	public UIButton bar;
+	public UIButton button;
 
 	Animator animator;
 	// Use this for initialization
 	void Start () 
 	{
-		AchievementManager.LoadAchievements(PlayerPrefs.GetString(ACHIEVEMENT_KEY, ""));
+		/*AchievementManager.LoadAchievements(PlayerPrefs.GetString(ACHIEVEMENT_KEY, ""));
 
-		PlayerPrefs.SetString(ACHIEVEMENT_KEY,AchievementManager.SaveAchievements());
+		PlayerPrefs.SetString(ACHIEVEMENT_KEY,AchievementManager.SaveAchievements());*/
+
+		button.clickEvent += Click;
 
 		//iOSBinding.PopAlertWithHeaderAndText("header", "text!");
 		//button.clickEvent += Click;
 		//enabled = false;
 		animator = GetComponent<Animator>();
 		//Debug.Log(animator.Pl);
+
+
 	}
 
 	/*void Update()
@@ -42,8 +46,8 @@ public class Vim : MonoBehaviour {
 		Debug.Log(GameKitBinding._localUser.displayName + GameKitBinding._localUser.playerID);
 	}
 
-	/*void Click()
+	void Click()
 	{
-		animator.SetTrigger("Idle_Trigger");
-	}*/
+		//button.InvokeComponentMethod("FadOut");
+	}
 }

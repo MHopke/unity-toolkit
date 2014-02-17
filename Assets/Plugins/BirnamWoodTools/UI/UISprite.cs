@@ -11,20 +11,28 @@ public class UISprite : UIBase
 	#region Protected Variables
 	protected SpriteRenderer _spriteRenderer;
 	protected Animator _spriteAnimator;
+	protected UILabel _attachedLabel;
 	#endregion
 
 	#region Activation, Deactivation, Init Methods
 	public override void Init(Vector2 offset, float speedParam)
 	{
-		base.Init(offset, speedParam);
-
 		_spriteAnimator = GetComponent<Animator>();
 		_spriteRenderer = GetComponent<SpriteRenderer>();
+		_attachedLabel = GetComponent<UILabel>();
+
+		if(_attachedLabel)
+			_attachedLabel.Init(offset, speedParam);
+
+		base.Init(offset, speedParam);
 	}
 
 	public override bool Activate(MovementState state=MovementState.INITIAL)
 	{
 		//Debug.Log(name + " " +enabled);
+		if(_attachedLabel)
+			_attachedLabel.Activate();
+
 		if(base.Activate(state))
 		{
 			//Debug.Log("active");
@@ -33,9 +41,12 @@ public class UISprite : UIBase
 		} else
 			return false;
 	}
-	public override bool Deactivate()
+	public override bool Deactivate(bool force=false)
 	{
-		if(base.Deactivate())
+		if(_attachedLabel)
+			_attachedLabel.Deactivate(force);
+
+		if(base.Deactivate(force))
 		{
 			_spriteRenderer.enabled = false;
 
@@ -59,6 +70,16 @@ public class UISprite : UIBase
 	}
 	#endregion
 
+	#region Exit Methods
+	public override void Exit(Vector2 exitPos)
+	{
+		if(_attachedLabel)
+			_attachedLabel.Exit(exitPos);
+
+		base.Exit(exitPos);
+	}
+	#endregion
+
 	#region Animation Methods
 	public void SetTrigger(string triggerName)
 	{
@@ -71,6 +92,17 @@ public class UISprite : UIBase
 	public override System.Type GetBaseType()
 	{
 		return typeof(UISprite);
+	}
+	#endregion
+
+	#region Color Methods
+	protected override Color GetColor()
+	{
+		return _spriteRenderer.color;
+	}
+	protected override void SetColor(Color color)
+	{
+		_spriteRenderer.color = color;
 	}
 	#endregion
 }

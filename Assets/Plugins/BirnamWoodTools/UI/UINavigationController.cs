@@ -17,6 +17,9 @@ public class UINavigationController : MonoBehaviour
 
 	#region Public Variables
 	public string FilePath;
+
+	public GUISkin _skin;
+
 	//Hold the x and y resolutions that the screens were
 	//originally designed at. 
 	public Vector2 DESIGNED_RESOLUTION;
@@ -48,8 +51,23 @@ public class UINavigationController : MonoBehaviour
 
 	void Start()
 	{
-		if(currentController && loadedNewControllerEvent != null)
-			loadedNewControllerEvent(currentController.name);
+		#if !UNITY_EDITOR
+		if(_skin != null)
+		{
+			for(int i = 0; i < _skin.customStyles.Length; i++)
+				_skin.customStyles[i].fontSize = Mathf.RoundToInt(AspectRatio.x * (float)_skin.customStyles[i].fontSize);
+
+			//_skin.label.fontSize = Mathf.RoundToInt((AspectRatio.x * (float)_skin.label.fontSize));
+		}
+		#endif
+
+		if(currentController)
+		{
+			currentController.Activate();
+
+			if(loadedNewControllerEvent != null)
+				loadedNewControllerEvent(currentController.name);
+		}
 	}
 	#endregion
 
@@ -80,7 +98,7 @@ public class UINavigationController : MonoBehaviour
 
 				instance.currentController = temp;
 
-				instance.currentController.Activate();
+				instance.currentController.Activate(true);
 			} else
 			{
 				//Delete the old controller
@@ -129,6 +147,13 @@ public class UINavigationController : MonoBehaviour
 			if(loadedNewControllerEvent != null)
 				loadedNewControllerEvent(controllerId);
 		}
+	}
+	#endregion
+
+	#region Accessors
+	public static GUISkin Skin
+	{
+		get { return instance._skin; }
 	}
 	#endregion
 }

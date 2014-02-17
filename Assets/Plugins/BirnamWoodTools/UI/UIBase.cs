@@ -13,14 +13,17 @@ public class UIBase : MonoBehaviour {
 	#endregion
 
 	#region Public Variables
-	public Vector2 position;
-
+	public bool _skipUIViewActivation;
 	//Time in seconds to delay rendering
 	public float renderDelay;
+	public Vector2 position;
 	#endregion
 
 	#region Protected Variables
+	new protected bool active;
+
 	protected MovementState movementState;
+
 	protected Vector2 startPosition;
 	protected Vector2 currentPosition;
 	#endregion
@@ -33,7 +36,7 @@ public class UIBase : MonoBehaviour {
 	Vector2 exitPosition;
 	#endregion
 
-	#region Activation, Deactivation, Init Methods
+	#region Init, Activation, Deactivation Methods
 	public virtual void Init(Vector2 offset, float speedParam)
 	{
 		speed = speedParam;
@@ -48,7 +51,7 @@ public class UIBase : MonoBehaviour {
 	}
 	public virtual bool Activate(MovementState state=MovementState.INITIAL)
 	{
-		if(enabled)
+		if(active)
 			return false;
 
 		movementState = state;
@@ -57,15 +60,20 @@ public class UIBase : MonoBehaviour {
 			SetStartPosition();
 
 		enabled = true;
+		active = true;
 
 		return true;
 	}
-	public virtual bool Deactivate()
+	public virtual bool Deactivate(bool force=false)
 	{
-		if(!enabled)
+		//Debug.Log(name + " disabled");
+		if(!active || (!force && !enabled))
 			return false;
 
 		enabled = false;
+		active = false;
+
+		movementState = MovementState.EXITED;
 
 		return true;
 	}
@@ -74,7 +82,6 @@ public class UIBase : MonoBehaviour {
 	#region Update Methods
 	protected virtual void Update()
 	{
-		//Debug.Log(name);
 		if(renderTimer <= 0.0f)
 		{
 			if(movementState == MovementState.INITIAL)
@@ -101,7 +108,6 @@ public class UIBase : MonoBehaviour {
 				if((currentPosition - exitPosition).magnitude <= CLOSE_ENOUGH)
 				{
 					SetPosition(exitPosition);
-					movementState = MovementState.EXITED;
 
 					Deactivate();
 				}
@@ -126,6 +132,14 @@ public class UIBase : MonoBehaviour {
 	#region Exit Methods
 	public virtual void Exit(Vector2 exitPos)
 	{
+		if(!active)
+		{
+			if(_skipUIViewActivation)
+				movementState = MovementState.EXITED;
+
+			return;
+		}
+
 		if(!enabled)
 			enabled = true;
 
@@ -139,6 +153,11 @@ public class UIBase : MonoBehaviour {
 	{
 		return typeof(UIBase);
 	}
+	#endregion
+
+	#region Color Methods
+	protected virtual Color GetColor(){return Color.white;}
+	protected virtual void SetColor(Color color){}
 	#endregion
 
 	#region Accessors
@@ -155,6 +174,12 @@ public class UIBase : MonoBehaviour {
 	{
 		get { return currentPosition; }
 		set { SetPosition(value); }
+	}
+
+	public Color CurrentColor
+	{
+		get { return GetColor(); }
+		set { SetColor(value); }
 	}
 	#endregion
 }
