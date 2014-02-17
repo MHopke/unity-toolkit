@@ -67,4 +67,11 @@ public class UILabel : UIBase
 		drawRect.y = position.y;
 	}
 	#endregion
+
+	#region Type Methods
+	public override System.Type GetBaseType()
+	{
+		return typeof(UILabel);
+	}
+	#endregion
 }

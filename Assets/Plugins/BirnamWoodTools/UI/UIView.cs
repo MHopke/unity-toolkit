@@ -54,7 +54,7 @@ public class UIView : MonoBehaviour {
 					UIElements[i].Init(Transition.MovementIn,Transition.Speed);
 
 					//If its not a label check to see if it has one
-					if(UIElements[i].GetType() != typeof(UILabel))
+					if(UIElements[i].GetBaseType() != typeof(UILabel))
 					{
 						UILabel[] labelComponents = UIElements[i].GetComponents<UILabel>();
 
@@ -79,6 +79,8 @@ public class UIView : MonoBehaviour {
 			Transition.Speed = 1;
 
 		enabled = false;
+
+		//Debug.Log(name + "start");
 	}
 	
 	protected void Update()
@@ -139,6 +141,8 @@ public class UIView : MonoBehaviour {
 
 		if(activatedEvent != null)
 			activatedEvent();
+
+		//Debug.Log(name + " activate");
 	}
 
 	protected virtual void Activation()

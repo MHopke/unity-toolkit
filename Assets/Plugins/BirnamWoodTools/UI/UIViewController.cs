@@ -22,6 +22,7 @@ public class UIViewController : MonoBehaviour
 	// Use this for initialization
 	void Start () 
 	{
+		//Debug.Log(name + "start");
 		Activate();
 
 		#if !UNITY_EDITOR
@@ -37,6 +38,15 @@ public class UIViewController : MonoBehaviour
 	#endregion
 
 	#region Activate, Deactivate Methods
+	void ActivateInitialUI(UIView view, UIView.Section section)
+	{
+		if(view)
+		{
+			view.Activate();
+			SetSection(view, section);
+		}
+	}
+
 	public void Activate()
 	{
 		if(header)
@@ -113,14 +123,7 @@ public class UIViewController : MonoBehaviour
 		return null;
 	}
 
-	void ActivateInitialUI(UIView view, UIView.Section section)
-	{
-		if(view)
-		{
-			view.Activate();
-			SetSection(view, section);
-		}
-	}
+
 
 	void ExitSection(UIView.Section section)
 	{

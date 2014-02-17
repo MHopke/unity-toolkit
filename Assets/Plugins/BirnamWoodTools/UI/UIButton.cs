@@ -19,16 +19,9 @@ public class UIButton : UISprite
 	bool disabled;
 
 	int fingerID;
-
-	Animator animator;
 	#endregion
 
 	#region Activation, Deactivation, Init Methods
-	public override void Init(Vector2 offset, float speed)
-	{
-		animator = GetComponent<Animator>();
-		base.Init(offset,speed);
-	}
 	public override bool Activate(MovementState state=MovementState.INITIAL)
 	{
 		if(base.Activate(state))
@@ -54,6 +47,13 @@ public class UIButton : UISprite
 			return true;
 		} else
 			return false;
+	}
+	#endregion
+
+	#region Type Methods
+	public override System.Type GetBaseType()
+	{
+		return typeof(UIButton);
 	}
 	#endregion
 
@@ -111,8 +111,7 @@ public class UIButton : UISprite
 		if(collider2D.OverlapPoint(Camera.main.ScreenToWorldPoint(touch)) && id == fingerID)
 		{
 			//Trigger click animation
-			if(animator)
-				animator.SetTrigger("Click");
+			SetTrigger("Click");
 		}
 	}
 	void TouchMoving(Vector2 pos, Vector2 delta, int id)

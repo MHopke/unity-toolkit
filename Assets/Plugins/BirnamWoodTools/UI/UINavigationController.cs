@@ -45,6 +45,12 @@ public class UINavigationController : MonoBehaviour
 		} else
 			Destroy(gameObject);
 	}
+
+	void Start()
+	{
+		if(currentController && loadedNewControllerEvent != null)
+			loadedNewControllerEvent(currentController.name);
+	}
 	#endregion
 
 	#region Scale Methods
@@ -117,6 +123,7 @@ public class UINavigationController : MonoBehaviour
 		{
 			instance.currentController = obj.GetComponent<UIViewController>();
 			instance.currentController.name = instance.currentController.name.Remove(instance.currentController.name.Length - 7, 7);
+			//Debug.Log(instance.currentController.name);
 			instance.currentController.Activate();
 
 			if(loadedNewControllerEvent != null)

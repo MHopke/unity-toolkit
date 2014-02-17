@@ -96,6 +96,8 @@ public class UIBase : MonoBehaviour {
 				moveRate = 1.0f / Vector2.Distance(currentPosition, exitPosition) * speed * Time.deltaTime * SMOOTH_FACTOR;
 				SetPosition(Vector2.Lerp(currentPosition, exitPosition, moveRate));
 
+				//Debug.Log(name + " exiting");
+
 				if((currentPosition - exitPosition).magnitude <= CLOSE_ENOUGH)
 				{
 					SetPosition(exitPosition);
@@ -129,6 +131,13 @@ public class UIBase : MonoBehaviour {
 
 		movementState = MovementState.EXITING;
 		exitPosition = position + exitPos;
+	}
+	#endregion
+
+	#region Type Methods
+	public virtual System.Type GetBaseType()
+	{
+		return typeof(UIBase);
 	}
 	#endregion
 
