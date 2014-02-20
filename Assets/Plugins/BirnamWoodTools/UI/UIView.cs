@@ -45,38 +45,7 @@ public class UIView : MonoBehaviour {
 		if(Transition.Speed == 0)
 			Transition.Speed = 1;
 
-		if(UIElements != null)
-		{
-			for(int i = 0; i < UIElements.Count; i++)
-			{
-				if(UIElements[i] != null)
-				{
-					UIElements[i].Init(Transition.MovementIn,Transition.Speed);
-
-					//If its not a label check to see if it has one
-					/*if(UIElements[i].GetBaseType() != typeof(UILabel))
-					{
-						UILabel[] labelComponents = UIElements[i].GetComponents<UILabel>();
-
-						for(int j = 0; j < labelComponents.Length; j++)
-						{
-							labelComponents[j].Init(Transition.MovementIn,Transition.Speed);
-							#if DRAWLABELS
-							labels.Add(labelComponents[j]);
-							#endif
-							UIElements.Add(labelComponents[j]);
-						}
-					}*/
-					#if DRAWLABELS
-					else
-						labels.Add(UIElements[i] as UILabel);
-					#endif
-				}
-			}
-		}
-
-		if(Transition.Speed == 0)
-			Transition.Speed = 1;
+		Initialize();
 
 		enabled = false;
 
@@ -129,6 +98,39 @@ public class UIView : MonoBehaviour {
 	#endregion
 
 	#region Activation, Deactivation Methods
+	protected virtual void Initialize()
+	{
+		if(UIElements != null)
+		{
+			for(int i = 0; i < UIElements.Count; i++)
+			{
+				if(UIElements[i] != null)
+				{
+					UIElements[i].Init(Transition.MovementIn,Transition.Speed);
+
+					//If its not a label check to see if it has one
+					/*if(UIElements[i].GetBaseType() != typeof(UILabel))
+					{
+						UILabel[] labelComponents = UIElements[i].GetComponents<UILabel>();
+
+						for(int j = 0; j < labelComponents.Length; j++)
+						{
+							labelComponents[j].Init(Transition.MovementIn,Transition.Speed);
+							#if DRAWLABELS
+							labels.Add(labelComponents[j]);
+							#endif
+							UIElements.Add(labelComponents[j]);
+						}
+					}*/
+					#if DRAWLABELS
+					else
+					labels.Add(UIElements[i] as UILabel);
+					#endif
+				}
+			}
+		}
+	}
+
 	public void Activate()
 	{
 		if(enabled) return;
@@ -189,7 +191,7 @@ public class UIView : MonoBehaviour {
 	#endregion
 
 	#region Interaction Methods
-	public void DisableButtons()
+	public virtual void LostFocus()
 	{
 		if(UIElements != null)
 		{
@@ -204,7 +206,7 @@ public class UIView : MonoBehaviour {
 		}
 	}
 
-	public void EnableButtons()
+	public virtual void GainedFocus()
 	{
 		if(UIElements != null)
 		{
@@ -255,7 +257,7 @@ public class UIView : MonoBehaviour {
 	#endregion
 
 	#region Exit Methods
-	public void FlagForExit()
+	public virtual void FlagForExit()
 	{
 		if(UIElements != null)
 		{

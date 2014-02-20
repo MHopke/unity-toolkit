@@ -20,12 +20,14 @@ public class UIViewController : MonoBehaviour
 	static UIViewController instance = null;
 	#endregion
 
+	#region Unity Methods
 	void Start()
 	{
 		defaultHeader = header;
 		defaultContent = content;
 		defaultFooter = footer;
 	}
+	#endregion
 
 	#region Activate, Deactivate Methods
 	void ActivateUI(UIView view, UIView.Section section)
@@ -75,8 +77,32 @@ public class UIViewController : MonoBehaviour
 	#endregion
 
 	#region Methods
-	public static void ChangeScreen(UIView view, UIView.Section section)
+	public static void ChangeView(UIView view)
 	{
+		instance.ExitSection(view.section);
+
+		view.Activate();
+
+		instance.SetSection(view, view.section);
+	}
+	public static void ChangeView(string viewName)
+	{
+		UIView view = GetUIView(viewName);
+
+		if(view)
+		{
+			instance.ExitSection(view.section);
+
+			view.Activate();
+
+			instance.SetSection(view, view.section);
+		}
+	}
+	public static void ChangeView(UIView view, UIView.Section section)
+	{
+		if(view == GetUIView(section))
+			return;
+
 		instance.ExitSection(section);
 
 		if(view)
@@ -88,27 +114,27 @@ public class UIViewController : MonoBehaviour
 	public static void EnableButtons()
 	{
 		if(Header)
-			Header.EnableButtons();
+			Header.GainedFocus();
 
 		if(Content)
-			Content.EnableButtons();
+			Content.GainedFocus();
 
 		if(Footer)
-			Footer.EnableButtons();
+			Footer.GainedFocus();
 	}
 
 	public static void DisableButtons()
 	{
 		if(Header)
-			Header.DisableButtons();
+			Header.LostFocus();
 
 		if(Content)
-			Content.DisableButtons();
+			Content.LostFocus();
 
 		if(Footer)
-			Footer.DisableButtons();
+			Footer.LostFocus();
 	}
-	public static UIBase RetrieveElementFromUIView(string view, string element)
+	public static UIBase GetElementFromView(string element, string view)
 	{
 		for(int i = 0; i < instance.screens.Count; i++)
 		{
@@ -118,8 +144,6 @@ public class UIViewController : MonoBehaviour
 
 		return null;
 	}
-
-
 
 	void ExitSection(UIView.Section section)
 	{
@@ -156,15 +180,27 @@ public class UIViewController : MonoBehaviour
 		}
 	}
 
-	public UIView GetScreenWithName(string name)
+	public static UIView GetUIView(string name)
 	{
-		for (int i = 0; i < screens.Count; i++)
+		for (int i = 0; i < instance.screens.Count; i++)
 		{
-			if (screens[i] && screens[i].name == name)
-				return screens[i];
+			if (instance.screens[i] && instance.screens[i].name == name)
+				return instance.screens[i];
 		}
 
 		return null;
+	}
+
+	public static UIView GetUIView(UIView.Section section)
+	{
+		if(section == UIView.Section.HEADER)
+			return Header;
+		else if(section == UIView.Section.CONTENT)
+			return Content;
+		else if(section == UIView.Section.FOOTER)
+			return Footer;
+		else
+			return null;
 	}
 
 	bool HasUIView(string name)

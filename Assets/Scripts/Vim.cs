@@ -18,7 +18,7 @@ public class Vim : MonoBehaviour {
 
 		PlayerPrefs.SetString(ACHIEVEMENT_KEY,AchievementManager.SaveAchievements());*/
 
-		button.clickEvent += Click;
+		//button.clickEvent += Click;
 
 		//iOSBinding.PopAlertWithHeaderAndText("header", "text!");
 		//button.clickEvent += Click;

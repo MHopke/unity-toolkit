@@ -14,7 +14,7 @@ public class UILabel : UIBase
 	#endregion
 
 	#region Protected Variables
-	Rect drawRect;
+	protected Rect drawRect;
 	#endregion
 
 	#region Update
@@ -29,7 +29,7 @@ public class UILabel : UIBase
 	public void Draw()
 	{
 	#else
-	void OnGUI()
+	protected virtual void OnGUI()
 	{
 		useGUILayout = false;
 
@@ -68,6 +68,17 @@ public class UILabel : UIBase
 	}
 	#endregion
 
+	#region Style Methods
+	public void CreateCustomStyle()
+	{
+		if(!customStyle.custom)
+		{
+			customStyle.custom = true;
+			customStyle.style = new GUIStyle(UINavigationController.Skin.FindStyle(customStyle.styleName));
+		}
+	}
+	#endregion
+
 	#region Type Methods
 	public override System.Type GetBaseType()
 	{
@@ -83,6 +94,13 @@ public class UILabel : UIBase
 	protected override void SetColor(Color color)
 	{
 		customStyle.style.normal.textColor = color;
+	}
+	#endregion
+
+	#region Accessors
+	public override Rect GetBounds()
+	{
+		return new Rect(currentPosition.x, currentPosition.y, size.x, size.y);
 	}
 	#endregion
 }

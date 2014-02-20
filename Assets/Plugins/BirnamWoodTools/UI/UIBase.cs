@@ -26,6 +26,8 @@ public class UIBase : MonoBehaviour {
 
 	protected Vector2 startPosition;
 	protected Vector2 currentPosition;
+
+	protected UIComponentManager _componentManager;
 	#endregion
 
 	#region Private Variables
@@ -48,6 +50,8 @@ public class UIBase : MonoBehaviour {
 		SetStartPosition();
 
 		enabled = false;
+
+		_componentManager = new UIComponentManager(GetComponents<UIComponent>());
 	}
 	public virtual bool Activate(MovementState state=MovementState.INITIAL)
 	{
@@ -62,6 +66,8 @@ public class UIBase : MonoBehaviour {
 		enabled = true;
 		active = true;
 
+		_componentManager.ActivateComponents();
+
 		return true;
 	}
 	public virtual bool Deactivate(bool force=false)
@@ -74,6 +80,8 @@ public class UIBase : MonoBehaviour {
 		active = false;
 
 		movementState = MovementState.EXITED;
+
+		_componentManager.DeactivateComponents();
 
 		return true;
 	}
@@ -129,6 +137,10 @@ public class UIBase : MonoBehaviour {
 	}
 	#endregion
 
+	#region Size Methods
+	protected virtual void GetSize(){}
+	#endregion
+
 	#region Exit Methods
 	public virtual void Exit(Vector2 exitPos)
 	{
@@ -160,6 +172,17 @@ public class UIBase : MonoBehaviour {
 	protected virtual void SetColor(Color color){}
 	#endregion
 
+	#region Component Methods
+	public void InvokeComponentMethod(string method)
+	{
+		_componentManager.InvokeMethod(method);
+	}
+	public UIComponent GetComponent(string component)
+	{
+		return _componentManager.GetComponent(component);
+	}
+	#endregion
+
 	#region Accessors
 	public bool InPlace
 	{
@@ -175,6 +198,8 @@ public class UIBase : MonoBehaviour {
 		get { return currentPosition; }
 		set { SetPosition(value); }
 	}
+
+	public virtual Rect GetBounds(){return new Rect();}
 
 	public Color CurrentColor
 	{

@@ -9,7 +9,11 @@ public class UIPercentBar : UISprite
 
 	#region Public Variables
 	public bool Animate = true;
+	public bool _scaleX;
+	public bool _scaleY;
+	public bool _scaleZ;
 	public Vector3 _maximumScale;
+	public Vector3 _scaleToAdd;
 	#endregion
 
 	#region Private Variable
@@ -56,11 +60,20 @@ public class UIPercentBar : UISprite
 
 	#region Methods
 	/// <summary>
-	/// Adjusts the bar by the percentage based in (out of 100.0f).
+	/// Adjusts the bar by the percentage passed in (out of 100.0f).
 	/// </summary>
 	/// <param name="percent">Percent.</param>
-	public void AdjustBar(float percent)
+	public void ModifyPercent(float percent)
 	{
+		_scaleToAdd = _scalePerPercent * percent;
+
+		if(!_scaleX)
+			_scaleToAdd.x = 0.0f;
+		if(!_scaleY)
+			_scaleToAdd.y = 0.0f;
+		if(!_scaleZ)
+			_scaleToAdd.z = 0.0f;
+
 		if(Animate)
 		{
 			if(!enabled)
@@ -68,9 +81,22 @@ public class UIPercentBar : UISprite
 
 			_scale = true;
 
-			_newScale = transform.localScale + _scalePerPercent * percent;
+			_newScale = transform.localScale + _scaleToAdd;
 		} else
-			transform.AddXYZScale(_scalePerPercent * percent);
+			transform.AddXYZScale(_scaleToAdd);
+	}
+	public void SetPercent(float percent)
+	{
+		_scaleToAdd = _scalePerPercent * percent;
+
+		if(!_scaleX)
+			_scaleToAdd.x = transform.localScale.x;
+		if(!_scaleY)
+			_scaleToAdd.y = transform.localScale.y;
+		if(!_scaleZ)
+			_scaleToAdd.z = transform.localScale.z;
+
+		transform.SetXYZScale(_scaleToAdd);
 	}
 	#endregion
 }

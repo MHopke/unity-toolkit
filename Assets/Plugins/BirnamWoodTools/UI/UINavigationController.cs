@@ -132,7 +132,7 @@ public class UINavigationController : MonoBehaviour
 		if(unloadedControllerEvent != null)
 			unloadedControllerEvent(previousController.name);
 
-		Destroy(previousController);
+		Destroy(previousController.gameObject);
 	}
 	void LoadNewController(string controllerId)
 	{

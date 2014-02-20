@@ -3,19 +3,8 @@ using System.Collections;
 
 public class UIButton : UISprite 
 {
-	#region Events
-	public event System.Action clickEvent;
-	#endregion
-
 	#region Public Variables
-	public string ControllerId;
-
-	public ChangeUIView Header;
-	public ChangeUIView Content;
-	public ChangeUIView Footer;
-
-	public UIBase[] _elementsToActivate;
-	public UIBase[] _elementsToDeactivate;
+	public ButtonSettings _buttonSettings;
 	#endregion
 
 	#region Private Variables
@@ -65,7 +54,7 @@ public class UIButton : UISprite
 	#region Enable Methods
 	public void Enable()
 	{
-		if(!disabled)
+		if(!active || !disabled)
 			return;
 
 		InputHandler.AddTouchStart(TouchStart);
@@ -76,7 +65,7 @@ public class UIButton : UISprite
 	}
 	public void Disable()
 	{
-		if(disabled)
+		if(!active || disabled)
 			return;
 
 		InputHandler.RemoveTouchStart(TouchStart);
@@ -90,24 +79,7 @@ public class UIButton : UISprite
 	#region Click Methods
 	public void Click()
 	{
-		if(ControllerId == "")
-		{
-			//Change UIScreens
-			Header.ChangeScreen(UIView.Section.HEADER);
-			Content.ChangeScreen(UIView.Section.CONTENT);
-			Footer.ChangeScreen(UIView.Section.FOOTER);
-		} else
-			UINavigationController.NavigateToController(ControllerId);
-
-		int i = 0;
-		for(i=0; i < _elementsToActivate.Length; i++)
-			_elementsToActivate[i].Activate();
-		for(i = 0; i < _elementsToDeactivate.Length; i++)
-			_elementsToDeactivate[i].Deactivate(true);
-
-		//Send click event
-		if(clickEvent != null)
-			clickEvent();
+		_buttonSettings.Click();
 	}
 	#endregion
 
@@ -132,23 +104,6 @@ public class UIButton : UISprite
 	{
 		if(!collider2D.OverlapPoint(Camera.main.ScreenToWorldPoint(pos)))
 			fingerID = InputHandler.INVALID_FINGER;
-	}
-	#endregion
-}
-
-[System.Serializable]
-public class ChangeUIView
-{
-	#region Public Variables
-	public bool Change;
-	public UIView View;
-	#endregion
-
-	#region Change Methods
-	public void ChangeScreen(UIView.Section section)
-	{
-		if(Change)
-			UIViewController.ChangeScreen(View, section);
 	}
 	#endregion
 }

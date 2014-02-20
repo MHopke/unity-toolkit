@@ -70,11 +70,11 @@ public class IntField
 		value = 0;
 	}
 
-	public int Draw(int valueParam,GUIStyle style)
+	public int Draw(int valueParam,GUIStyle labelStyle, GUIStyle fieldStyle)
 	{
-		GUI.Label(labelRect, label,style);
+		GUI.Label(labelRect, label,labelStyle);
 
-		field = GUI.TextField(rect, valueParam.ToString());
+		field = GUI.TextField(rect, valueParam.ToString(),fieldStyle);
 		if(!int.TryParse(field, out value))
 			return defaultValue;
 		else
@@ -120,11 +120,11 @@ public class DoubleField
 		value = 0.0;
 	}
 
-	public double Draw(double valueParam,GUIStyle style)
+	public double Draw(double valueParam,GUIStyle labelStyle,GUIStyle fieldStyle=null)
 	{
-		GUI.Label(labelRect, label,style);
+		GUI.Label(labelRect, label,labelStyle);
 
-		field = GUI.TextField(rect, valueParam.ToString());
+		field = GUI.TextField(rect, valueParam.ToString(),fieldStyle);
 		if(!double.TryParse(field, out value))
 			return defaultValue;
 		else
@@ -230,6 +230,66 @@ public class FadeSettings
 		Delay = delay;
 		TargetColor = target;
 		Triggered = triggered;
+	}
+	#endregion
+}
+
+[System.Serializable]
+public class ButtonSettings
+{
+	#region Events
+	public event System.Action clickEvent;
+	#endregion
+
+	#region Public Variables
+	public string ControllerId;
+
+	public ChangeUIView Header;
+	public ChangeUIView Content;
+	public ChangeUIView Footer;
+
+	public UIBase[] _elementsToActivate;
+	public UIBase[] _elementsToDeactivate;
+	#endregion
+
+	#region Click Methods
+	public void Click()
+	{
+		if(ControllerId == "")
+		{
+			//Change UIScreens
+			Header.ChangeScreen(UIView.Section.HEADER);
+			Content.ChangeScreen(UIView.Section.CONTENT);
+			Footer.ChangeScreen(UIView.Section.FOOTER);
+		} else
+			UINavigationController.NavigateToController(ControllerId);
+
+		int i = 0;
+		for(i=0; i < _elementsToActivate.Length; i++)
+			_elementsToActivate[i].Activate();
+		for(i = 0; i < _elementsToDeactivate.Length; i++)
+			_elementsToDeactivate[i].Deactivate(true);
+
+		//Send click event
+		if(clickEvent != null)
+			clickEvent();
+	}
+	#endregion
+}
+
+[System.Serializable]
+public class ChangeUIView
+{
+	#region Public Variables
+	public bool Change;
+	public UIView View;
+	#endregion
+
+	#region Change Methods
+	public void ChangeScreen(UIView.Section section)
+	{
+		if(Change)
+			UIViewController.ChangeView(View, section);
 	}
 	#endregion
 }

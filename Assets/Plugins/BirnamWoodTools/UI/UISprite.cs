@@ -105,4 +105,17 @@ public class UISprite : UIBase
 		_spriteRenderer.color = color;
 	}
 	#endregion
+
+	#region Accessors
+	public Sprite CurrentSprite
+	{
+		get { return _spriteRenderer.sprite; }
+		set { _spriteRenderer.sprite = value; }
+	}
+	public override Rect GetBounds()
+	{
+		return new Rect(currentPosition.x, currentPosition.y + (_spriteRenderer.sprite.rect.height / 2.0f) * transform.localScale.y,
+			_spriteRenderer.sprite.rect.height * transform.localScale.y, _spriteRenderer.sprite.rect.width * transform.localScale.x);
+	}
+	#endregion
 }
