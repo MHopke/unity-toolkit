@@ -193,32 +193,12 @@ public class UIView : MonoBehaviour {
 	#region Interaction Methods
 	public virtual void LostFocus()
 	{
-		if(UIElements != null)
-		{
-			for(int i = 0; i < UIElements.Count; i++)
-			{
-				if(UIElements[i] != null && UIElements[i].GetType() == typeof(UIButton))
-				{
-					UIButton button = UIElements[i] as UIButton;
-					button.Disable();
-				}
-			}
-		}
+		UIButton.DisableUIButtons();
 	}
 
 	public virtual void GainedFocus()
 	{
-		if(UIElements != null)
-		{
-			for(int i = 0; i < UIElements.Count; i++)
-			{
-				if(UIElements[i] != null && UIElements[i].GetType() == typeof(UIButton))
-				{
-					UIButton button = UIElements[i] as UIButton;
-					button.Enable();
-				}
-			}
-		}
+		UIButton.EnableUIButtons();
 	}
 
 	public UIBase RetrieveUIElement(string name)

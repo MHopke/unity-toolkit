@@ -27,7 +27,9 @@ public class UIBase : MonoBehaviour {
 	protected Vector2 startPosition;
 	protected Vector2 currentPosition;
 
-	protected UIComponentManager _componentManager;
+	protected UIButton _uiButton;
+	protected UIFadeComponent _fadeComponent;
+	protected UIFlashComponent _flashComponent;
 	#endregion
 
 	#region Private Variables
@@ -51,7 +53,16 @@ public class UIBase : MonoBehaviour {
 
 		enabled = false;
 
-		_componentManager = new UIComponentManager(GetComponents<UIComponent>());
+		//Link & initialize components (if they exist).
+		_uiButton = GetComponent<UIButton>();
+
+		_fadeComponent = GetComponent<UIFadeComponent>();
+		if(_fadeComponent)
+			_fadeComponent.Init(this);
+
+		_flashComponent = GetComponent<UIFlashComponent>();
+		if(_flashComponent)
+			_flashComponent.Init(this);
 	}
 	public virtual bool Activate(MovementState state=MovementState.INITIAL)
 	{
@@ -62,11 +73,18 @@ public class UIBase : MonoBehaviour {
 
 		if(state == MovementState.INITIAL)
 			SetStartPosition();
+		else if(state == MovementState.IN_PLACE && _uiButton)
+			_uiButton.Activate();
 
 		enabled = true;
 		active = true;
 
-		_componentManager.ActivateComponents();
+		//Activate components
+		if(_fadeComponent)
+			_fadeComponent.Activate();
+
+		if(_flashComponent)
+			_flashComponent.Activate();
 
 		return true;
 	}
@@ -81,7 +99,15 @@ public class UIBase : MonoBehaviour {
 
 		movementState = MovementState.EXITED;
 
-		_componentManager.DeactivateComponents();
+		if(_uiButton)
+			_uiButton.Deactivate();
+
+		//Deactivate components
+		if(_fadeComponent)
+			_fadeComponent.Deactivate();
+
+		if(_flashComponent)
+			_flashComponent.Deactivate();
 
 		return true;
 	}
@@ -101,6 +127,11 @@ public class UIBase : MonoBehaviour {
 				{
 					SetPosition(position);
 					movementState = MovementState.IN_PLACE;
+
+					//This is activated here because buttons shouldn't be usable during the
+					//transition in.
+					if(_uiButton)
+						_uiButton.Activate();
 
 					if(CanDisable())
 						enabled = false;
@@ -155,6 +186,11 @@ public class UIBase : MonoBehaviour {
 		if(!enabled)
 			enabled = true;
 
+		//This is deactivated here because buttons shouldn't be usable during the
+		//transition out.
+		if(_uiButton)
+			_uiButton.Deactivate();
+
 		movementState = MovementState.EXITING;
 		exitPosition = position + exitPos;
 	}
@@ -170,17 +206,6 @@ public class UIBase : MonoBehaviour {
 	#region Color Methods
 	protected virtual Color GetColor(){return Color.white;}
 	protected virtual void SetColor(Color color){}
-	#endregion
-
-	#region Component Methods
-	public void InvokeComponentMethod(string method)
-	{
-		_componentManager.InvokeMethod(method);
-	}
-	public UIComponent GetComponent(string component)
-	{
-		return _componentManager.GetComponent(component);
-	}
 	#endregion
 
 	#region Accessors

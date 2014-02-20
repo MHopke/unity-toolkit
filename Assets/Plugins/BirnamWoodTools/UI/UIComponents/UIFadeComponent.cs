@@ -25,10 +25,11 @@ public class UIFadeComponent : UIComponent
 	#endregion
 
 	#region Methods
-	public override void Init()
+	public override void Init(UIBase element)
 	{
-		base.Init();
+		base.Init(element);
 
+		//UILabel's need to create a unique instance of their GUIStyle
 		if(_uiElement.GetBaseType() == typeof(UILabel))
 			(_uiElement as UILabel).CreateCustomStyle();
 

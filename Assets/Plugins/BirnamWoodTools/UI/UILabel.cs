@@ -48,13 +48,13 @@ public class UILabel : UIBase
 	#region Activation, Deactivation, Init Methods
 	public override void Init(Vector2 offset, float speed)
 	{
+		customStyle.SetDefaultStyle("label");
+
 		base.Init(offset,speed);
 
 		size.Scale(UINavigationController.AspectRatio);
 
 		drawRect = new Rect(position.x, position.y, size.x, size.y);
-
-		customStyle.SetDefaultStyle("label");
 	}
 	#endregion
 
