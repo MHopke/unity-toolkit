@@ -17,6 +17,13 @@ public class ButtonComponent : MonoBehaviour {
 	int _fingerId;
 	#endregion
 
+	#region Unity Methods
+	void Start()
+	{
+		enabled = false;
+	}
+	#endregion
+
 	#region Methods
 	public virtual void Activate()
 	{
@@ -49,6 +56,8 @@ public class ButtonComponent : MonoBehaviour {
 		InputHandler.AddTouchMoving(InputMoving);
 
 		_eventsAdded = true;
+
+		//Debug.Log(name + "listeners added");
 	}
 	public void RemoveListeners()
 	{
