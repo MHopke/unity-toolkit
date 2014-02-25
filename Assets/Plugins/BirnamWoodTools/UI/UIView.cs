@@ -1,7 +1,9 @@
-﻿//#define DRAWLABELS
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 
+/// <summary>
+/// Representation of a collection of UI elements.
+/// </summary>
 public class UIView : MonoBehaviour {
 
 	#region Events
@@ -22,45 +24,30 @@ public class UIView : MonoBehaviour {
 
 	#region Public Variables
 	public Section section;
+
 	public TransitionSettings Transition;
+
 	public List<UIBase> UIElements;
 	#endregion
 
 	#region Protected Variables
 	protected MovementState movementState;
-
-	#if DRAWLABELS
-	protected List<UILabel> labels;
-	#endif
 	#endregion
 
 	#region Unity Methods
 	// Use this for initialization
 	protected void Awake () 
 	{
-		#if DRAWLABELS
-		labels = new List<UILabel>();
-		#endif
-
 		if(Transition.Speed == 0)
 			Transition.Speed = 1;
 
 		Initialize();
 
 		enabled = false;
-
-		//Debug.Log(name + "start");
 	}
 	
 	protected void Update()
 	{
-		#if DRAWLABELS
-		//prevents uneccessary checks if the UIView is enabled because
-		//it contains labels
-		if(movementState == MovementState.IN_PLACE)
-			return;
-		#endif
-
 		if(movementState == MovementState.EXITING)
 		{
 			if(HasUIExited())
@@ -68,33 +55,14 @@ public class UIView : MonoBehaviour {
 
 		} else if(IsUIInPlace())
 		{
-			#if DRAWLABELS
-			//If there are no labels you can disable the component
-			//so that it doesn't update / draw unneccessarily
-			if(HasNoLabels())
-				enabled = false;
-			#else
 			enabled = false;
-			#endif
+
 			movementState = MovementState.IN_PLACE;
 
 			if(transitionInEvent != null)
 				transitionInEvent();
 		}
 	}
-
-	#if DRAWLABELS
-	//Used to draw text
-	void OnGUI()
-	{
-		useGUILayout = false;
-
-		GUI.skin = UIViewController.Skin;
-
-		for(int i = 0; i < labels.Count; i++)
-			labels[i].Draw();
-	}
-	#endif
 	#endregion
 
 	#region Activation, Deactivation Methods
@@ -104,29 +72,8 @@ public class UIView : MonoBehaviour {
 		{
 			for(int i = 0; i < UIElements.Count; i++)
 			{
-				if(UIElements[i] != null)
-				{
+				if(UIElements[i])
 					UIElements[i].Init(Transition.MovementIn,Transition.Speed);
-
-					//If its not a label check to see if it has one
-					/*if(UIElements[i].GetBaseType() != typeof(UILabel))
-					{
-						UILabel[] labelComponents = UIElements[i].GetComponents<UILabel>();
-
-						for(int j = 0; j < labelComponents.Length; j++)
-						{
-							labelComponents[j].Init(Transition.MovementIn,Transition.Speed);
-							#if DRAWLABELS
-							labels.Add(labelComponents[j]);
-							#endif
-							UIElements.Add(labelComponents[j]);
-						}
-					}*/
-					#if DRAWLABELS
-					else
-					labels.Add(UIElements[i] as UILabel);
-					#endif
-				}
 			}
 		}
 	}
@@ -147,13 +94,16 @@ public class UIView : MonoBehaviour {
 		//Debug.Log(name + " activate");
 	}
 
+	/// <summary>
+	/// Overloadable method which handles the actual activation of UI elements
+	/// </summary>
 	protected virtual void Activation()
 	{
 		if(UIElements != null)
 		{
 			for(int i = 0; i < UIElements.Count; i++)
 			{
-				if(UIElements[i] != null && !UIElements[i]._skipUIViewActivation)
+				if(UIElements[i] && !UIElements[i]._skipUIViewActivation)
 					UIElements[i].Activate();
 			}
 		}
@@ -177,13 +127,16 @@ public class UIView : MonoBehaviour {
 		//Resources.UnloadUnusedAssets();
 	}
 
+	/// <summary>
+	/// Overloadable method which handles the actual deactivation of UI elements
+	/// </summary>
 	protected virtual void Deactivation()
 	{
 		if(UIElements != null)
 		{
 			for(int i = 0; i < UIElements.Count; i++)
 			{
-				if(UIElements[i] != null)
+				if(UIElements[i])
 					UIElements[i].Deactivate();
 			}
 		}
@@ -220,20 +173,13 @@ public class UIView : MonoBehaviour {
 		{
 			for(int i = 0; i < UIElements.Count; i++)
 			{
-				if(UIElements[i] != null && !UIElements[i].InPlace)
+				if(UIElements[i] && !UIElements[i].InPlace)
 					return false;
 			}
 		}
 
 		return true;
 	}
-
-	#if DRAWLABELS
-	bool HasNoLabels()
-	{
-		return (labels.Count == 0);
-	}
-	#endif
 	#endregion
 
 	#region Exit Methods
@@ -243,17 +189,12 @@ public class UIView : MonoBehaviour {
 		{
 			for(int i = 0; i < UIElements.Count; i++)
 			{
-				if(UIElements[i] != null)
+				if(UIElements[i])
 					UIElements[i].Exit(Transition.MovementOut);
 			}
 		}
 
-		#if DRAWLABELS
-		//If there are no labels make sure you enable the component
-		//so that elements will move upon exit
-		if(HasNoLabels())
-		#endif
-			enabled = true;
+		enabled = true;
 
 		movementState = MovementState.EXITING;
 
@@ -267,7 +208,7 @@ public class UIView : MonoBehaviour {
 		{
 			for(int i = 0; i < UIElements.Count; i++)
 			{
-				if(UIElements[i] != null && !UIElements[i].Exited)
+				if(UIElements[i] && !UIElements[i].Exited)
 					return false;
 			}
 		}

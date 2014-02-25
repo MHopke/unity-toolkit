@@ -2,8 +2,7 @@
 using System.Collections;
 
 /// <summary>
-/// User interface scroll view. The first element in UIElements is the container Sprite.
-/// leave it null if there is no container.
+/// Representation of a scroll view.
 /// </summary>
 public class UIScrollView : UIView {
 
@@ -13,8 +12,10 @@ public class UIScrollView : UIView {
 
 	#region Public Variables
 	public UISprite _background;
-	public ScrollType Type;
-	public Rect ViewRect; //The original view position
+
+	public ScrollType _type;
+
+	public Rect _viewRect; //The original view position
 	#endregion
 
 	#region Overriden Method
@@ -25,11 +26,12 @@ public class UIScrollView : UIView {
 
 		base.Initialize();
 	}
-
+		
 	protected override void Activation()
 	{
 		if(UIElements != null)
 		{
+			//Only UI Elements within the _viewRect should be activated
 			for(int i = 0; i < UIElements.Count; i++)
 			{
 				if(UIElements[i] != null && ElementInView(UIElements[i].GetBounds()))
@@ -79,8 +81,8 @@ public class UIScrollView : UIView {
 	#region Methods
 	bool ElementInView(Rect bounds)
 	{
-		return bounds.x >= ViewRect.x && bounds.xMax <= ViewRect.xMax && bounds.y >= ViewRect.y
-			&& bounds.yMax <= ViewRect.yMax;
+		return bounds.x >= _viewRect.x && bounds.xMax <= _viewRect.xMax && bounds.y >= _viewRect.y
+			&& bounds.yMax <= _viewRect.yMax;
 	}
 	#endregion
 
@@ -90,9 +92,9 @@ public class UIScrollView : UIView {
 		if(movementState == MovementState.IN_PLACE/* && ViewRect.Contains(new Vector2(pos.x,Screen.height - pos.y))*/)
 		{
 			//Ensure that movement is locked if it should be
-			if(Type == ScrollType.HORIZONTAL)
+			if(_type == ScrollType.HORIZONTAL)
 				delta.y = 0;
-			else if(Type == ScrollType.VERTICAL)
+			else if(_type == ScrollType.VERTICAL)
 				delta.x = 0;
 
 			for(int i = 0; i < UIElements.Count; i++)

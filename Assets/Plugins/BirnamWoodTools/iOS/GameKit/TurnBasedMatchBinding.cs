@@ -1,5 +1,8 @@
 ﻿using System.Runtime.InteropServices;
 
+/// <summary>
+/// Collection of external methods used to access iOS' Turnbased Match methods.
+/// </summary>
 public class TurnBasedMatchBinding
 {
 	[DllImport ("__Internal")]

@@ -1,5 +1,8 @@
 using System.Runtime.InteropServices;
 
+/// <summary>
+/// Collection of external methods accessing iOS' Gamekit.
+/// </summary>
 public class GameKitBinding
 {
 	#region Public Variables
@@ -10,7 +13,7 @@ public class GameKitBinding
 	public static GKUser _localUser;
 	#endregion
 
-
+	#region External Methods
 	[DllImport ("__Internal")]
 	static extern void GKAuthenticatePlayer();
 
@@ -63,4 +66,5 @@ public class GameKitBinding
 			GKReportAchievement(identifier,progress);
 		#endif
 	}
+	#endregion
 }

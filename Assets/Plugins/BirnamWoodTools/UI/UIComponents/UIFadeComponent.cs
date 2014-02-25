@@ -20,6 +20,7 @@ public class UIFadeComponent : UIComponent
 	bool fadeFromTrigger;
 
 	float delayTimer;
+	float speed;
 
 	Color original;
 	#endregion
@@ -66,7 +67,7 @@ public class UIFadeComponent : UIComponent
 			{
 				//Debug.Log( name + " fading in");
 				_uiElement.CurrentColor = Color.Lerp(_uiElement.CurrentColor, original, 
-					Time.deltaTime * _fadeInSettings.Speed);
+					Time.deltaTime * _fadeOutSettings.Speed);
 
 				if(_uiElement.CurrentColor.CloseTo(original))
 				{
@@ -99,8 +100,6 @@ public class UIFadeComponent : UIComponent
 
 				if(_uiElement.CurrentColor.CloseTo(_fadeOutSettings.TargetColor))
 				{
-					//Debug.Log(name + "faded out");
-
 					fading = false;
 
 					_uiElement.CurrentColor = _fadeOutSettings.TargetColor;

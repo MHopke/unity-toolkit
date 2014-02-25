@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
-using System.Collections;
 
+/// <summary>
+/// Representation of a percent bar.
+/// </summary>
 public class UIPercentBar : UISprite 
 {
 	#region Constants
@@ -8,16 +10,18 @@ public class UIPercentBar : UISprite
 	#endregion
 
 	#region Public Variables
-	public bool Animate = true;
+	public bool _canAnimate = true;
 	public bool _scaleX;
 	public bool _scaleY;
 	public bool _scaleZ;
+
 	public Vector3 _maximumScale;
 	public Vector3 _scaleToAdd;
 	#endregion
 
 	#region Private Variable
-	bool _scale;
+	bool _animate;
+
 	Vector3 _scalePerPercent;
 	Vector3 _newScale;
 	#endregion
@@ -39,7 +43,7 @@ public class UIPercentBar : UISprite
 	{
 		base.Update();
 
-		if(_scale)
+		if(_animate)
 		{
 			transform.localScale = Vector3.Lerp(transform.localScale, _newScale, Time.deltaTime * 20.0f);
 
@@ -47,7 +51,7 @@ public class UIPercentBar : UISprite
 			{
 				transform.localScale = _newScale;
 
-				_scale = false;
+				_animate = false;
 				enabled = false;
 			}
 		}
@@ -60,7 +64,7 @@ public class UIPercentBar : UISprite
 
 	#region Methods
 	/// <summary>
-	/// Adjusts the bar by the percentage passed in (out of 100.0f).
+	/// Adjusts the bar by the percentage passed in (range of 0.0f - 100.0f).
 	/// </summary>
 	/// <param name="percent">Percent.</param>
 	public void ModifyPercent(float percent)
@@ -74,17 +78,21 @@ public class UIPercentBar : UISprite
 		if(!_scaleZ)
 			_scaleToAdd.z = 0.0f;
 
-		if(Animate)
+		if(_canAnimate)
 		{
 			if(!enabled)
 				enabled = true;
 
-			_scale = true;
+			_animate = true;
 
 			_newScale = transform.localScale + _scaleToAdd;
 		} else
 			transform.AddXYZScale(_scaleToAdd);
 	}
+	/// <summary>
+	/// Sets the bar's percentage.
+	/// </summary>
+	/// <param name="percent">Percent.</param>
 	public void SetPercent(float percent)
 	{
 		_scaleToAdd = _scalePerPercent * percent;

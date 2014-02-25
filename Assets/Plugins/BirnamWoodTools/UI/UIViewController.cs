@@ -1,10 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
+/// <summary>
+/// Representation of a collection of UIViews. This class controls which UIViews
+/// are currently active.
+/// </summary>
 public class UIViewController : MonoBehaviour 
 {
 	#region Public Variables	
-	//Reference to the current screen that is active
+	//References to current UIViews that are active
 	public UIView header = null;
 	public UIView content = null;
 	public UIView footer = null;
@@ -13,6 +17,8 @@ public class UIViewController : MonoBehaviour
 	#endregion
 
 	#region Private Variables
+	//Default UIViews to activate when a UIViewController is restored
+	//from being the previous controller.
 	UIView defaultHeader;
 	UIView defaultContent;
 	UIView defaultFooter;
@@ -36,9 +42,9 @@ public class UIViewController : MonoBehaviour
 		SetSection(view, section);
 	}
 
-	public void Activate(bool defaults=false)
+	public void Activate(bool useDefaults=false)
 	{
-		if(defaults)
+		if(useDefaults)
 		{
 			if(defaultHeader)
 				ActivateUI(defaultHeader, header.section);
@@ -79,7 +85,7 @@ public class UIViewController : MonoBehaviour
 	#region Methods
 	public static void ChangeView(UIView view)
 	{
-		instance.ExitSection(view.section);
+		instance.TriggerSectionExit(view.section);
 
 		view.Activate();
 
@@ -91,49 +97,31 @@ public class UIViewController : MonoBehaviour
 
 		if(view)
 		{
-			instance.ExitSection(view.section);
+			instance.TriggerSectionExit(view.section);
 
 			view.Activate();
 
 			instance.SetSection(view, view.section);
 		}
 	}
+	/// <summary>
+	/// Changes the view. Allows for transitions to empty UIViews.
+	/// </summary>
+	/// <param name="view">View.</param>
+	/// <param name="section">Section.</param>
 	public static void ChangeView(UIView view, UIView.Section section)
 	{
 		if(view == GetUIView(section))
 			return;
 
-		instance.ExitSection(section);
+		instance.TriggerSectionExit(section);
 
 		if(view)
 			view.Activate();
 
 		instance.SetSection(view, section);
 	}
-
-	public static void EnableButtons()
-	{
-		if(Header)
-			Header.GainedFocus();
-
-		if(Content)
-			Content.GainedFocus();
-
-		if(Footer)
-			Footer.GainedFocus();
-	}
-
-	public static void DisableButtons()
-	{
-		if(Header)
-			Header.LostFocus();
-
-		if(Content)
-			Content.LostFocus();
-
-		if(Footer)
-			Footer.LostFocus();
-	}
+		
 	public static UIBase GetElementFromView(string element, string view)
 	{
 		for(int i = 0; i < instance.screens.Count; i++)
@@ -145,7 +133,7 @@ public class UIViewController : MonoBehaviour
 		return null;
 	}
 
-	void ExitSection(UIView.Section section)
+	void TriggerSectionExit(UIView.Section section)
 	{
 		switch(section)
 		{
@@ -210,6 +198,30 @@ public class UIViewController : MonoBehaviour
 				return true;
 
 		return false;
+	}
+
+	public static void GainFocus()
+	{
+		if(Header)
+			Header.GainedFocus();
+
+		if(Content)
+			Content.GainedFocus();
+
+		if(Footer)
+			Footer.GainedFocus();
+	}
+
+	public static void LoseFocus()
+	{
+		if(Header)
+			Header.LostFocus();
+
+		if(Content)
+			Content.LostFocus();
+
+		if(Footer)
+			Footer.LostFocus();
 	}
 	#endregion
 

@@ -1,36 +1,37 @@
 ﻿using UnityEngine;
-using System;
 
+/// <summary>
+/// This class controls which UIViewControllers are currently active and
+/// will automatically load & unload UIViewControllers from memory.
+/// </summary>
 [RequireComponent(typeof(InputHandler))]
 public class UINavigationController : MonoBehaviour 
 {
 	#region Events
 	//Fired when the previous controller is destroyed
-	public static event Action<string> unloadedControllerEvent;
+	public static event System.Action<string> unloadedControllerEvent;
 	//Fired when a new controller has been loaded from memory
-	public static event Action<string> loadedNewControllerEvent;
-	#endregion
-
-	#region Constants
-	const float PERCENT_FOR_SCALE = 0.01f;
+	public static event System.Action<string> loadedNewControllerEvent;
 	#endregion
 
 	#region Public Variables
+	//The file path that UIViewControllers will be loaded from.
 	public string FilePath;
 
+	//The Custom GUISkin used by the game's UI.
 	public GUISkin _skin;
 
-	//Hold the x and y resolutions that the screens were
-	//originally designed at. 
+	//Dimensions that the assets were created in.
 	public Vector2 DESIGNED_RESOLUTION;
 
-	//This is used to rescale graphics if the resolution
-	//is different than the Designed Resolution
+	//The relative scale of the current Screen dimensions compared
+	//to the DESIGNED_RESOLUTION. Used to scale UI positions & sizes.
 	public static Vector2 AspectRatio;
+
+	public UIViewController currentController;
 	#endregion
 
 	#region Private Variables
-	public UIViewController currentController;
 	UIViewController previousController;
 
 	static UINavigationController instance = null;
@@ -51,6 +52,8 @@ public class UINavigationController : MonoBehaviour
 
 	void Start()
 	{
+		//Scale fonts to proper size. This can't be done in editor because it will persist
+		//after the game has run.
 		#if !UNITY_EDITOR
 		if(_skin != null)
 		{
@@ -65,31 +68,26 @@ public class UINavigationController : MonoBehaviour
 		{
 			currentController.Activate();
 
+			//Trigger the loadedNewControllerEvent so that UI elements
+			//can be properly linked together.
 			if(loadedNewControllerEvent != null)
 				loadedNewControllerEvent(currentController.name);
 		}
 	}
 	#endregion
 
-	#region Scale Methods
-	/// <summary>
-	/// Determines if the UI should be scaled.
-	/// </summary>
-	/// <returns><c>true</c>, if the Aspect Ratio is greater than the required amount <c>false</c> otherwise.</returns>
-	public static bool ShouldScaleDimensions()
-	{
-		return !(Mathf.Abs(1.0f - AspectRatio.x) < PERCENT_FOR_SCALE || Mathf.Abs(1.0f - AspectRatio.y) < PERCENT_FOR_SCALE);
-	}
-	#endregion
-
-	#region Control Methods
+	#region Methods
 	public static void NavigateToController(string controllerId)
 	{
 		//Debug.Log("id: " + controllerId);
+
 		if(controllerId == instance.currentController.name)
 			return;
 		else if(instance.previousController)
 		{
+			//If the targetted UIViewController is the previous one
+			//the two controllers are switched. Otherwise a new one needs
+			//loaded from memory.
 			if(controllerId == instance.previousController.name)
 			{
 				UIViewController temp = instance.previousController;
@@ -109,6 +107,8 @@ public class UINavigationController : MonoBehaviour
 
 				//Load the new controller
 				instance.LoadNewController(controllerId);
+
+				Resources.UnloadUnusedAssets();
 			}
 		}
 		else

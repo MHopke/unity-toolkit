@@ -1,6 +1,8 @@
-﻿//#define DRAWLABELS
-using UnityEngine;
+﻿using UnityEngine;
 
+/// <summary>
+/// The UI representation of a label. Uses OnGUI to render the text.
+/// </summary>
 public class UILabel : UIBase 
 {
 	#region Public Variables
@@ -17,7 +19,7 @@ public class UILabel : UIBase
 	protected Rect drawRect;
 	#endregion
 
-	#region Update
+	#region Update Methods
 	protected override bool CanDisable()
 	{
 		return false;
@@ -25,10 +27,6 @@ public class UILabel : UIBase
 	#endregion
 
 	#region Draw Methods
-	#if DRAWLABELS
-	public void Draw()
-	{
-	#else
 	protected virtual void OnGUI()
 	{
 		useGUILayout = false;
@@ -37,7 +35,6 @@ public class UILabel : UIBase
 
 		GUI.depth = depth;
 
-	#endif
 		if(customStyle.custom)
 			GUI.Label(drawRect, text, customStyle.style);
 		else
@@ -69,6 +66,9 @@ public class UILabel : UIBase
 	#endregion
 
 	#region Style Methods
+	/// <summary>
+	/// Creates a custom style if the UILabel previously wasn't using one.
+	/// </summary>
 	public void CreateCustomStyle()
 	{
 		if(!customStyle.custom)

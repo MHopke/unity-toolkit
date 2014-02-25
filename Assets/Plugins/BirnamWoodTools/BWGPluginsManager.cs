@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 /// <summary>
 /// BWG plugins manager. All BWG Plugins should be components of this GameObject.

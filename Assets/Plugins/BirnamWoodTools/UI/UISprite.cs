@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
-using System.Collections;
 
+/// <summary>
+/// Representation of a graphical UI element. Uses Unity 4.3 Sprite System.
+/// </summary>
 public class UISprite : UIBase
 {
 	#region Public Variables
@@ -10,8 +12,8 @@ public class UISprite : UIBase
 
 	#region Protected Variables
 	protected SpriteRenderer _spriteRenderer;
+
 	protected Animator _spriteAnimator;
-	protected UILabel _attachedLabel;
 	#endregion
 
 	#region Activation, Deactivation, Init Methods
@@ -19,20 +21,12 @@ public class UISprite : UIBase
 	{
 		_spriteAnimator = GetComponent<Animator>();
 		_spriteRenderer = GetComponent<SpriteRenderer>();
-		_attachedLabel = GetComponent<UILabel>();
-
-		if(_attachedLabel)
-			_attachedLabel.Init(offset, speedParam);
 
 		base.Init(offset, speedParam);
 	}
 
 	public override bool Activate(MovementState state=MovementState.INITIAL)
 	{
-		//Debug.Log(name + " " +enabled);
-		if(_attachedLabel)
-			_attachedLabel.Activate();
-
 		if(base.Activate(state))
 		{
 			//Debug.Log("active");
@@ -43,9 +37,6 @@ public class UISprite : UIBase
 	}
 	public override bool Deactivate(bool force=false)
 	{
-		if(_attachedLabel)
-			_attachedLabel.Deactivate(force);
-
 		if(base.Deactivate(force))
 		{
 			_spriteRenderer.enabled = false;
@@ -67,16 +58,6 @@ public class UISprite : UIBase
 			transform.parent.position = Camera.main.ScreenToWorldPoint(new Vector3(currentPosition.x,Screen.height - currentPosition.y,1f));
 		else
 			transform.position = Camera.main.ScreenToWorldPoint(new Vector3(currentPosition.x,Screen.height - currentPosition.y,1f));
-	}
-	#endregion
-
-	#region Exit Methods
-	public override void Exit(Vector2 exitPos)
-	{
-		if(_attachedLabel)
-			_attachedLabel.Exit(exitPos);
-
-		base.Exit(exitPos);
 	}
 	#endregion
 
@@ -112,6 +93,12 @@ public class UISprite : UIBase
 		get { return _spriteRenderer.sprite; }
 		set { _spriteRenderer.sprite = value; }
 	}
+
+	/// <summary>
+	/// Gets the bounding area of the element (in pixels). Assumes the Sprite's
+	/// pivot point is Left.
+	/// </summary>
+	/// <returns>The bounds.</returns>
 	public override Rect GetBounds()
 	{
 		return new Rect(currentPosition.x, currentPosition.y + (_spriteRenderer.sprite.rect.height / 2.0f) * transform.localScale.y,

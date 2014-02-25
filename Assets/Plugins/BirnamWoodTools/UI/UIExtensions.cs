@@ -1,8 +1,13 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// This class creates objects that will be scaled according the the designedSize.
+/// Using these enables the use of constants instead of percentages of Screen height / width.
+/// </summary>
 public static class AutoSized
 {
 	public static Vector2 designedSize = new Vector2(640,960);
+
 	public static Rect CreateRect(float x, float y, float width, float height)
 	{
 		return new Rect(Screen.width * (x / designedSize.x), Screen.height * (y / designedSize.y),
@@ -18,13 +23,21 @@ public static class AutoSized
 	}
 }
 
+#region Custom UI Classes
+/// <summary>
+/// A wrapper class for a Unity's GUI.Toggle. Enables independent control 
+/// of the toggle and the label.
+/// </summary>
 public class CustomToggle
 {
+	#region Private Variables
 	string label;
 
 	Rect labelRect;
 	Rect toggleRect;
+	#endregion
 
+	#region Methods
 	public CustomToggle(Rect labelRectParam, Rect toggleRectParam, string labelParam)
 	{
 		label = labelParam;
@@ -37,15 +50,22 @@ public class CustomToggle
 		GUI.Label(labelRect, label, style);
 		return GUI.Toggle(toggleRect, toggle,"");
 	}
+	#endregion
 
+	#region Accessors
 	public Rect Area
 	{
 		get { return labelRect; }
 	}
+	#endregion
 }
 
+/// <summary>
+/// A wrapper class to create a standard UI intfield.
+/// </summary>
 public class IntField
 {
+	#region Private Variables
 	string label;
 	string field;
 
@@ -56,7 +76,9 @@ public class IntField
 
 	Rect rect;
 	Rect labelRect;
+	#endregion
 
+	#region Methods
 	public IntField(Rect labelRectParam, Rect rectParam, string labelParam, int maxParam=int.MaxValue, int minParam=int.MinValue)
 	{
 		label = labelParam;
@@ -87,13 +109,19 @@ public class IntField
 			return value;
 		}
 	}
+	#endregion
 
+	#region Accessors
 	public Rect Area
 	{
 		get { return rect; }
 	}
+	#endregion
 }
 
+/// <summary>
+/// A wrapper class to create a standard UI double field.
+/// </summary>
 public class DoubleField
 {
 	string label;
@@ -143,7 +171,12 @@ public class DoubleField
 		get { return rect; }
 	}
 }
+#endregion
 
+#region UI System Classes
+/// <summary>
+/// Wrapper class for variables used by UILabels.
+/// </summary>
 [System.Serializable]
 public class CustomStyle
 {
@@ -180,6 +213,9 @@ public class CustomStyle
 	#endregion
 }
 
+/// <summary>
+/// Wrapper class for variables used in UI Transitions.
+/// </summary>
 [System.Serializable]
 public class TransitionSettings
 {
@@ -209,14 +245,17 @@ public class TransitionSettings
 	#endregion
 }
 
+/// <summary>
+/// Wrapper class for variables used in UIFadeComponents.
+/// </summary>
 [System.Serializable]
 public class FadeSettings
 {
 	#region Public Variables
 	public bool Triggered;
 
-	public float Speed;
-	public float Delay;
+	public float Speed; //time to fade in seconds
+	public float Delay; //delay time in seconds
 
 	public Color TargetColor;
 	#endregion
@@ -234,6 +273,9 @@ public class FadeSettings
 	#endregion
 }
 
+/// <summary>
+/// Wrapper class for used in UIButton components.
+/// </summary>
 [System.Serializable]
 public class ButtonSettings
 {
@@ -277,6 +319,9 @@ public class ButtonSettings
 	#endregion
 }
 
+/// <summary>
+/// Wrapper class for variables involved in chaning a UIView.
+/// </summary>
 [System.Serializable]
 public class ChangeUIView
 {
@@ -297,4 +342,5 @@ public class ChangeUIView
 #region Enumerations
 public enum MovementType { NONE = 0, LERP, LINEAR, ROTATE, SCALE };
 public enum RotatePoint {TOPLEFT = 0, TOPRIGHT, BOTTOMLEFT, BOTTOMRIGHT};
+#endregion
 #endregion

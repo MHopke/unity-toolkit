@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections;
-using UnityEngine.SocialPlatforms;
 
 public class Vim : MonoBehaviour {
 
@@ -8,7 +7,9 @@ public class Vim : MonoBehaviour {
 	const string ACHIEVEMENT_KEY = "Achievements";
 	#endregion
 
-	public UIButton button;
+	public ButtonComponent button;
+
+	public UIFadeComponent _fade;
 
 	Animator animator;
 	// Use this for initialization
@@ -18,14 +19,14 @@ public class Vim : MonoBehaviour {
 
 		PlayerPrefs.SetString(ACHIEVEMENT_KEY,AchievementManager.SaveAchievements());*/
 
-		//button.clickEvent += Click;
+		button.Activate();
+		button.clickEvent += Click;
+
 
 		//iOSBinding.PopAlertWithHeaderAndText("header", "text!");
 		//button.clickEvent += Click;
 		//enabled = false;
 		animator = GetComponent<Animator>();
-		//Debug.Log(animator.Pl);
-
 
 	}
 
@@ -48,6 +49,6 @@ public class Vim : MonoBehaviour {
 
 	void Click()
 	{
-		//button.InvokeComponentMethod("FadOut");
+		_fade.FadeOut();
 	}
 }

@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System;
 
 /// <summary>
 /// Manages Saving and Loading Data. Designed to be de-centralized and sends
@@ -9,8 +8,8 @@ using System;
 public class SaveData : MonoBehaviour {
 
 	#region Events
-	public static event Action _loadDataEvent;
-	public static event Action _saveDataEvent;
+	public static event System.Action _loadDataEvent;
+	public static event System.Action _saveDataEvent;
 	#endregion
 
 	#region Private Variables

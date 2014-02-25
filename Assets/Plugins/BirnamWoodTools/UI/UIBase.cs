@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
-using System.Collections;
 
+/// <summary>
+/// The base class for UI elements. You should not use this class unless inheriting from it.
+/// </summary>
 public class UIBase : MonoBehaviour {
 
 	#region Enumerations
@@ -8,18 +10,24 @@ public class UIBase : MonoBehaviour {
 	#endregion
 
 	#region Constants
-	protected const float CLOSE_ENOUGH = 3.0f;
-	protected const float SMOOTH_FACTOR = 25.0f;
+	protected const float CLOSE_ENOUGH = 3.0f; //Used when checking transition positions
+	protected const float SMOOTH_FACTOR = 25.0f; //Applied to transition movement
 	#endregion
 
 	#region Public Variables
+	//Allows the UI element to skip activation from a UIView.
+	//Used in situations when an element should be hidden by default
 	public bool _skipUIViewActivation;
+
 	//Time in seconds to delay rendering
 	public float renderDelay;
+
+	//Position in pixels. Top Left is (0,0)
 	public Vector2 position;
 	#endregion
 
 	#region Protected Variables
+	//Determines if the element is currently active
 	new protected bool active;
 
 	protected MovementState movementState;
@@ -27,6 +35,7 @@ public class UIBase : MonoBehaviour {
 	protected Vector2 startPosition;
 	protected Vector2 currentPosition;
 
+	//Components (if a component is not present it will be null)
 	protected UIButton _uiButton;
 	protected UIFadeComponent _fadeComponent;
 	protected UIFlashComponent _flashComponent;
@@ -34,13 +43,22 @@ public class UIBase : MonoBehaviour {
 
 	#region Private Variables
 	float renderTimer;
-	float moveRate;
+
+	//Speed applied to elemen movement
 	float speed;
+	//Rate to lerp the movement. Stored here to reduce garbage collection.
+	float moveRate;
 
 	Vector2 exitPosition;
 	#endregion
 
 	#region Init, Activation, Deactivation Methods
+	/// <summary>
+	/// Initialize the element with the specified speed and offset.
+	/// Moves the element to its starting position and links any components.
+	/// </summary>
+	/// <param name="offset">Offset.</param>
+	/// <param name="speedParam">Speed parameter.</param>
 	public virtual void Init(Vector2 offset, float speedParam)
 	{
 		speed = speedParam;
@@ -133,6 +151,7 @@ public class UIBase : MonoBehaviour {
 					if(_uiButton)
 						_uiButton.Activate();
 
+					//To reduce processing we try to disable the element if possible.
 					if(CanDisable())
 						enabled = false;
 				}
@@ -154,10 +173,18 @@ public class UIBase : MonoBehaviour {
 		} else
 			renderTimer -= Time.deltaTime;
 	}
+	/// <summary>
+	/// Determines whether this instance can disabled.
+	/// </summary>
+	/// <returns><c>true</c> if this instance can disable; otherwise, <c>false</c>.</returns>
 	protected virtual bool CanDisable(){return true;}
 	#endregion
 
 	#region Position Methods
+	/// <summary>
+	/// Sets the position. Designed to be overriden such as in UISprite.
+	/// </summary>
+	/// <param name="position">Position.</param>
 	protected virtual void SetPosition(Vector2 position)
 	{
 		currentPosition = position;
@@ -166,10 +193,6 @@ public class UIBase : MonoBehaviour {
 	{
 		SetPosition(startPosition);
 	}
-	#endregion
-
-	#region Size Methods
-	protected virtual void GetSize(){}
 	#endregion
 
 	#region Exit Methods
@@ -192,11 +215,15 @@ public class UIBase : MonoBehaviour {
 			_uiButton.Deactivate();
 
 		movementState = MovementState.EXITING;
-		exitPosition = position + exitPos;
+		exitPosition = currentPosition + exitPos;
 	}
 	#endregion
 
 	#region Type Methods
+	/// <summary>
+	/// Determines the base type.
+	/// </summary>
+	/// <returns>The base type.</returns>
 	public virtual System.Type GetBaseType()
 	{
 		return typeof(UIBase);
@@ -218,13 +245,22 @@ public class UIBase : MonoBehaviour {
 		get { return movementState == MovementState.EXITED; }
 	}
 
+	/// <summary>
+	/// Gets the size. UIBase doesn't actually have a size, but inherited might.
+	/// </summary>
+	protected virtual void GetSize(){}
+
+	/// <summary>
+	/// Gets the bounding area of the element (in pixels).
+	/// </summary>
+	/// <returns>The bounds.</returns>
+	public virtual Rect GetBounds(){return new Rect();}
+
 	public Vector2 CurrentPosition
 	{
 		get { return currentPosition; }
 		set { SetPosition(value); }
 	}
-
-	public virtual Rect GetBounds(){return new Rect();}
 
 	public Color CurrentColor
 	{

@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// A collection of extensions of Unity classes.
+/// </summary>
 public static class UnityExtensions 
 {
 	#region Transform Extentensions
