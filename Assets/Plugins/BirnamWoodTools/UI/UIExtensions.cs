@@ -334,7 +334,7 @@ public class ChangeUIView
 	public void ChangeScreen(UIView.Section section)
 	{
 		if(Change)
-			UIViewController.ChangeView(View, section);
+			UINavigationController.CurrentController.ChangeView(View, section);
 	}
 	#endregion
 }

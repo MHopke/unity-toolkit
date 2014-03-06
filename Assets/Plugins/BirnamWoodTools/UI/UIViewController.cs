@@ -27,7 +27,7 @@ public class UIViewController : MonoBehaviour
 	#endregion
 
 	#region Unity Methods
-	void Start()
+	void Awake()
 	{
 		defaultHeader = header;
 		defaultContent = content;
@@ -36,35 +36,13 @@ public class UIViewController : MonoBehaviour
 	#endregion
 
 	#region Activate, Deactivate Methods
-	void ActivateUI(UIView view, UIView.Section section)
-	{
-		view.Activate();
-		SetSection(view, section);
-	}
-
 	public void Activate(bool useDefaults=false)
 	{
-		if(useDefaults)
-		{
-			if(defaultHeader)
-				ActivateUI(defaultHeader, header.section);
+		DirectViewChange(defaultHeader, UIView.Section.HEADER);
 
-			if(defaultContent)
-				ActivateUI(defaultContent, content.section);
+		DirectViewChange(defaultContent, UIView.Section.CONTENT);
 
-			if(defaultFooter)
-				ActivateUI(defaultFooter, footer.section);
-		} else
-		{
-			if(header)
-				ActivateUI(header, header.section);
-
-			if(content)
-				ActivateUI(content, content.section);
-
-			if(footer)
-				ActivateUI(footer, footer.section);
-		}
+		DirectViewChange(defaultFooter, UIView.Section.FOOTER);
 
 		instance = this;
 	}
@@ -83,7 +61,7 @@ public class UIViewController : MonoBehaviour
 	#endregion
 
 	#region Methods
-	public static void ChangeView(UIView view)
+	public void ChangeView(UIView view)
 	{
 		instance.TriggerSectionExit(view.section);
 
@@ -91,7 +69,7 @@ public class UIViewController : MonoBehaviour
 
 		instance.SetSection(view, view.section);
 	}
-	public static void ChangeView(string viewName)
+	public void ChangeView(string viewName)
 	{
 		UIView view = GetUIView(viewName);
 
@@ -109,7 +87,7 @@ public class UIViewController : MonoBehaviour
 	/// </summary>
 	/// <param name="view">View.</param>
 	/// <param name="section">Section.</param>
-	public static void ChangeView(UIView view, UIView.Section section)
+	public void ChangeView(UIView view, UIView.Section section)
 	{
 		if(view == GetUIView(section))
 			return;
@@ -121,8 +99,16 @@ public class UIViewController : MonoBehaviour
 
 		instance.SetSection(view, section);
 	}
+
+	void DirectViewChange(UIView view, UIView.Section section)
+	{
+		if(view)
+			view.Activate();
+
+		SetSection(view, section);
+	}
 		
-	public static UIBase GetElementFromView(string element, string view)
+	public UIBase GetElementFromView(string element, string view)
 	{
 		for(int i = 0; i < instance.screens.Count; i++)
 		{
@@ -138,16 +124,16 @@ public class UIViewController : MonoBehaviour
 		switch(section)
 		{
 		case UIView.Section.HEADER:
-			if(UIViewController.Header)
-				UIViewController.Header.FlagForExit();
+			if(header)
+				header.FlagForExit();
 			break;
 		case UIView.Section.CONTENT:
-			if(UIViewController.Content)
-				UIViewController.Content.FlagForExit();
+			if(content)
+				content.FlagForExit();
 			break;
 		case UIView.Section.FOOTER:
-			if(UIViewController.Footer)
-				UIViewController.Footer.FlagForExit();
+			if(footer)
+				footer.FlagForExit();
 			break;
 		}
 	}
@@ -168,7 +154,7 @@ public class UIViewController : MonoBehaviour
 		}
 	}
 
-	public static UIView GetUIView(string name)
+	public UIView GetUIView(string name)
 	{
 		for (int i = 0; i < instance.screens.Count; i++)
 		{
@@ -179,14 +165,14 @@ public class UIViewController : MonoBehaviour
 		return null;
 	}
 
-	public static UIView GetUIView(UIView.Section section)
+	public UIView GetUIView(UIView.Section section)
 	{
 		if(section == UIView.Section.HEADER)
-			return Header;
+			return header;
 		else if(section == UIView.Section.CONTENT)
-			return Content;
+			return content;
 		else if(section == UIView.Section.FOOTER)
-			return Footer;
+			return footer;
 		else
 			return null;
 	}
@@ -200,59 +186,41 @@ public class UIViewController : MonoBehaviour
 		return false;
 	}
 
-	public static void GainFocus()
+	public void GainFocus()
 	{
-		if(Header)
-			Header.GainedFocus();
+		if(header)
+			header.GainedFocus();
 
-		if(Content)
-			Content.GainedFocus();
+		if(content)
+			content.GainedFocus();
 
-		if(Footer)
-			Footer.GainedFocus();
+		if(footer)
+			footer.GainedFocus();
 	}
 
-	public static void LoseFocus()
+	public void LoseFocus()
 	{
-		if(Header)
-			Header.LostFocus();
+		if(header)
+			header.LostFocus();
 
-		if(Content)
-			Content.LostFocus();
+		if(content)
+			content.LostFocus();
 
-		if(Footer)
-			Footer.LostFocus();
+		if(footer)
+			footer.LostFocus();
 	}
 	#endregion
 
 	#region Audio Methods
-	public static void PlayButtonAudio(AudioClip clip=null)
+	public void PlayButtonAudio(AudioClip clip=null)
 	{
-		if(instance.audio && !instance.audio.isPlaying)
+		if(audio && !audio.isPlaying)
 		{
 			if(clip == null)
-				instance.audio.Play();
+				audio.Play();
 			else
-				instance.audio.PlayOneShot(clip);
+				audio.PlayOneShot(clip);
 		}
-	}
-	#endregion
-
-	#region Accessors
-	public static UIView Header
-	{
-		get { return instance.header; }
-		set { instance.header = value; }
-	}
-	public static UIView Content
-	{
-		get { return instance.content; }
-		set { instance.content = value; }
-	}
-	public static UIView Footer
-	{
-		get { return instance.footer; }
-		set { instance.footer = value; }
 	}
 	#endregion
 }

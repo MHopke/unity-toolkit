@@ -12,6 +12,12 @@ public class UINavigationController : MonoBehaviour
 	public static event System.Action<string> unloadedControllerEvent;
 	//Fired when a new controller has been loaded from memory
 	public static event System.Action<string> loadedNewControllerEvent;
+	//Fired when a controller starts its transition in
+	public static event System.Action<string> transitionInStartedEvent;
+	//Fired when a controller finishes its transition out
+	public static event System.Action<string> transitionOutFinishedEvent;
+	//Fired when a controller finishes its transition in
+	public static event System.Action<string> transitionDidFinishEvent;
 	#endregion
 
 	#region Public Variables
@@ -28,10 +34,14 @@ public class UINavigationController : MonoBehaviour
 	//to the DESIGNED_RESOLUTION. Used to scale UI positions & sizes.
 	public static Vector2 AspectRatio;
 
+	public UIFadeTransition _fadeTransition;
+
 	public UIViewController currentController;
 	#endregion
 
 	#region Private Variables
+	string _targetControllerId;
+
 	UIViewController previousController;
 
 	static UINavigationController instance = null;
@@ -44,6 +54,14 @@ public class UINavigationController : MonoBehaviour
 		{
 			AspectRatio = new Vector2((float)Screen.width / DESIGNED_RESOLUTION.x,
 				(float)Screen.height / DESIGNED_RESOLUTION.y);
+
+			//Adjust the camera's orthographic size incase it is a different aspect ratio.
+			//Depending on the orientation you need a different calculation.
+			//Ensures that Sprites remain the correct size.
+			if(Screen.height > Screen.width)
+				Camera.main.orthographicSize = ((float)Screen.height / (float)Screen.width) * 2.0f;
+			else
+				Camera.main.orthographicSize = ((float)Screen.width / (float)Screen.height) * 2.0f;
 
 			instance = this;
 		} else
@@ -64,6 +82,9 @@ public class UINavigationController : MonoBehaviour
 		}
 		#endif
 
+		UIFadeTransition.transitionInFinished += TransitionInFinished;
+		UIFadeTransition.transitionOutFinished += TransitionOutFinished;
+
 		if(currentController)
 		{
 			currentController.Activate();
@@ -80,15 +101,24 @@ public class UINavigationController : MonoBehaviour
 	public static void NavigateToController(string controllerId)
 	{
 		//Debug.Log("id: " + controllerId);
-
 		if(controllerId == instance.currentController.name)
 			return;
-		else if(instance.previousController)
+		else
 		{
-			//If the targetted UIViewController is the previous one
-			//the two controllers are switched. Otherwise a new one needs
-			//loaded from memory.
-			if(controllerId == instance.previousController.name)
+			instance._targetControllerId = controllerId;
+
+			if(instance._fadeTransition)
+				instance._fadeTransition.Transition();
+			else
+				instance.SwitchControllers();
+		}
+	}
+
+	void SwitchControllers()
+	{
+		if(instance.previousController)
+		{
+			if(_targetControllerId == instance.previousController.name)
 			{
 				UIViewController temp = instance.previousController;
 
@@ -106,9 +136,7 @@ public class UINavigationController : MonoBehaviour
 				instance.SetPreviousController();
 
 				//Load the new controller
-				instance.LoadNewController(controllerId);
-
-				Resources.UnloadUnusedAssets();
+				instance.LoadNewController(_targetControllerId);
 			}
 		}
 		else
@@ -117,7 +145,7 @@ public class UINavigationController : MonoBehaviour
 			instance.SetPreviousController();
 
 			//Load the new controller
-			instance.LoadNewController(controllerId);
+			instance.LoadNewController(_targetControllerId);
 		}
 	}
 
@@ -126,17 +154,20 @@ public class UINavigationController : MonoBehaviour
 		previousController = currentController;
 		previousController.Deactivate();
 	}
-	
+
 	void UnloadPreviousController()
 	{
 		if(unloadedControllerEvent != null)
 			unloadedControllerEvent(previousController.name);
 
 		Destroy(previousController.gameObject);
+
+		Resources.UnloadUnusedAssets();
 	}
 	void LoadNewController(string controllerId)
 	{
 		GameObject obj = (GameObject)GameObject.Instantiate(Resources.Load(instance.FilePath + controllerId));
+
 		if(obj)
 		{
 			instance.currentController = obj.GetComponent<UIViewController>();
@@ -150,10 +181,35 @@ public class UINavigationController : MonoBehaviour
 	}
 	#endregion
 
+	#region UIFadeTransition Event Listeners
+	void TransitionInFinished()
+	{
+		SwitchControllers();
+		UINavigationController.CurrentController.LoseFocus();
+
+		if(transitionInStartedEvent != null)
+			transitionInStartedEvent(_targetControllerId);
+
+		if(transitionOutFinishedEvent != null)
+			transitionOutFinishedEvent(previousController.name);
+	}
+	void TransitionOutFinished()
+	{
+		UINavigationController.CurrentController.GainFocus();
+
+		if(transitionDidFinishEvent != null)
+			transitionDidFinishEvent(_targetControllerId);
+	}
+	#endregion
+
 	#region Accessors
 	public static GUISkin Skin
 	{
 		get { return instance._skin; }
+	}
+	public static UIViewController CurrentController
+	{
+		get { return instance.currentController; }
 	}
 	#endregion
 }

@@ -37,7 +37,7 @@ public class AchievementManager
 					#if UNITY_IOS
 					reader.MoveToAttribute("gameCenter");
 					#elif UNITY_ANDROID
-				readeder.MoveToAttribute("googePlay");
+					reader.MoveToAttribute("googePlay");
 					#endif
 					achievement._platformIdentifier = reader.Value;
 
