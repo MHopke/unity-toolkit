@@ -18,6 +18,7 @@ public class UIBase : MonoBehaviour {
 	//Allows the UI element to skip activation from a UIView.
 	//Used in situations when an element should be hidden by default
 	public bool _skipUIViewActivation;
+	public bool _animates;
 
 	//Time in seconds to delay rendering
 	public float renderDelay;
@@ -35,6 +36,8 @@ public class UIBase : MonoBehaviour {
 	protected Vector2 startPosition;
 	protected Vector2 currentPosition;
 
+	public Animator _animator;
+
 	//Components (if a component is not present it will be null)
 	protected UIButton _uiButton;
 	protected UIFadeComponent _fadeComponent;
@@ -43,13 +46,6 @@ public class UIBase : MonoBehaviour {
 
 	#region Private Variables
 	float renderTimer;
-
-	//Speed applied to elemen movement
-	float speed;
-	//Rate to lerp the movement. Stored here to reduce garbage collection.
-	float moveRate;
-
-	Vector2 exitPosition;
 	#endregion
 
 	#region Init, Activation, Deactivation Methods
@@ -59,17 +55,15 @@ public class UIBase : MonoBehaviour {
 	/// </summary>
 	/// <param name="offset">Offset.</param>
 	/// <param name="speedParam">Speed parameter.</param>
-	public virtual void Init(Vector2 offset, float speedParam)
+	public virtual void Init()
 	{
-		speed = speedParam;
-
 		position.Scale(UINavigationController.AspectRatio);
 
-		startPosition = position + offset;
+		startPosition = position;
 
-		SetStartPosition();
+		//SetStartPosition();
 
-		enabled = false;
+		_animator = GetComponent<Animator>();
 
 		//Link & initialize components (if they exist).
 		_uiButton = GetComponent<UIButton>();
@@ -90,11 +84,13 @@ public class UIBase : MonoBehaviour {
 		movementState = state;
 
 		if(state == MovementState.INITIAL)
+		{
 			SetStartPosition();
+			SetTrigger("Activate");
+		}
 		else if(state == MovementState.IN_PLACE && _uiButton)
 			_uiButton.Activate();
 
-		enabled = true;
 		active = true;
 
 		//Activate components
@@ -109,10 +105,9 @@ public class UIBase : MonoBehaviour {
 	public virtual bool Deactivate(bool force=false)
 	{
 		//Debug.Log(name + " disabled");
-		if(!active || (!force && !enabled))
+		if(!active /*|| (!force && !enabled)*/)
 			return false;
 
-		enabled = false;
 		active = false;
 
 		movementState = MovementState.EXITED;
@@ -131,55 +126,6 @@ public class UIBase : MonoBehaviour {
 	}
 	#endregion
 
-	#region Update Methods
-	protected virtual void Update()
-	{
-		if(renderTimer <= 0.0f)
-		{
-			if(movementState == MovementState.INITIAL)
-			{
-				moveRate = 1.0f / Vector2.Distance(currentPosition, position) * speed * Time.deltaTime * SMOOTH_FACTOR;
-				SetPosition(Vector2.Lerp(currentPosition, position, moveRate));
-
-				if((currentPosition - position).magnitude <= CLOSE_ENOUGH)
-				{
-					SetPosition(position);
-					movementState = MovementState.IN_PLACE;
-
-					//This is activated here because buttons shouldn't be usable during the
-					//transition in.
-					if(_uiButton)
-						_uiButton.Activate();
-
-					//To reduce processing we try to disable the element if possible.
-					if(CanDisable())
-						enabled = false;
-				}
-
-			} else if(movementState == MovementState.EXITING)
-			{
-				moveRate = 1.0f / Vector2.Distance(currentPosition, exitPosition) * speed * Time.deltaTime * SMOOTH_FACTOR;
-				SetPosition(Vector2.Lerp(currentPosition, exitPosition, moveRate));
-
-				//Debug.Log(name + " exiting");
-
-				if((currentPosition - exitPosition).magnitude <= CLOSE_ENOUGH)
-				{
-					SetPosition(exitPosition);
-
-					Deactivate();
-				}
-			}
-		} else
-			renderTimer -= Time.deltaTime;
-	}
-	/// <summary>
-	/// Determines whether this instance can disabled.
-	/// </summary>
-	/// <returns><c>true</c> if this instance can disable; otherwise, <c>false</c>.</returns>
-	protected virtual bool CanDisable(){return true;}
-	#endregion
-
 	#region Position Methods
 	/// <summary>
 	/// Sets the position. Designed to be overriden such as in UISprite.
@@ -188,6 +134,11 @@ public class UIBase : MonoBehaviour {
 	protected virtual void SetPosition(Vector2 position)
 	{
 		currentPosition = position;
+
+		if(_animates)
+			transform.parent.position = Camera.main.ScreenToWorldPoint(new Vector3(currentPosition.x,currentPosition.y,1f));
+		else
+			transform.position = Camera.main.ScreenToWorldPoint(new Vector3(currentPosition.x,currentPosition.y,1f));
 	}
 	void SetStartPosition()
 	{
@@ -196,7 +147,7 @@ public class UIBase : MonoBehaviour {
 	#endregion
 
 	#region Exit Methods
-	public virtual void Exit(Vector2 exitPos)
+	public virtual void Exit()
 	{
 		if(!active)
 		{
@@ -206,8 +157,7 @@ public class UIBase : MonoBehaviour {
 			return;
 		}
 
-		if(!enabled)
-			enabled = true;
+		SetTrigger("Exit");
 
 		//This is deactivated here because buttons shouldn't be usable during the
 		//transition out.
@@ -215,7 +165,6 @@ public class UIBase : MonoBehaviour {
 			_uiButton.Deactivate();
 
 		movementState = MovementState.EXITING;
-		exitPosition = currentPosition + exitPos;
 	}
 	#endregion
 
@@ -235,12 +184,29 @@ public class UIBase : MonoBehaviour {
 	protected virtual void SetColor(Color color){}
 	#endregion
 
+	#region Animation Methods
+	protected virtual void SetTrigger(string triggerName)
+	{
+		if(_animator && _animator.runtimeAnimatorController)
+			_animator.SetTrigger(triggerName);
+	}
+	protected virtual void Activated()
+	{
+		if(_uiButton)
+			_uiButton.Activate();
+	}
+	public virtual void Exited()
+	{
+		Deactivate();
+	}
+	#endregion
+
 	#region Accessors
 	public bool InPlace
 	{
 		get { return movementState == MovementState.IN_PLACE; }
 	}
-	public bool Exited
+	public bool HasExited
 	{
 		get { return movementState == MovementState.EXITED; }
 	}

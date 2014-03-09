@@ -16,13 +16,81 @@ public class UILabel : UIBase
 	#endregion
 
 	#region Protected Variables
+	protected bool _animating;
+
+	protected float _originalFontSize;
+
+	protected Vector2 _originalDimensions;
+
+	protected Vector3 _scale;
+	protected Vector3 _originalScale;
+
 	protected Rect drawRect;
 	#endregion
 
-	#region Update Methods
-	protected override bool CanDisable()
+	#region Activation, Deactivation, Init Methods
+	public override void Init()
 	{
-		return false;
+		customStyle.SetDefaultStyle("label");
+
+		base.Init();
+
+		size.Scale(UINavigationController.AspectRatio);
+
+		_originalDimensions = size;
+
+		if(customStyle.custom)
+			_originalFontSize = customStyle.style.fontSize;
+		else
+			_originalFontSize = UINavigationController.Skin.FindStyle(customStyle.styleName).fontSize;
+
+		_originalScale = transform.localScale;
+
+		drawRect = new Rect(position.x, position.y, size.x, size.y);
+	}
+	public override bool Activate(MovementState state = MovementState.INITIAL)
+	{
+		if(base.Activate(state))
+		{
+			enabled = true;
+			return true;
+		}
+		else
+			return false;
+	}
+	public override bool Deactivate(bool force =false)
+	{
+		if(base.Deactivate(force))
+		{
+			enabled = false;
+			return true;
+		} else
+			return false;
+	}
+	#endregion
+
+	#region Update
+	void Update()
+	{
+		if(!_animating)
+			return;
+
+		//determine the scale
+		_scale.x = transform.localScale.x / _originalScale.x;
+		_scale.y = transform.localScale.y / _originalScale.y;
+		_scale.z = transform.localScale.z / _originalScale.z;
+
+		//scale font size
+		customStyle.style.fontSize = (int)(_originalFontSize * _scale.x);
+
+		//Get the new position
+		currentPosition = Camera.main.WorldToScreenPoint(transform.position);
+
+		//Set the draw rect
+		drawRect.x = currentPosition.x;
+		drawRect.y = currentPosition.y;
+		drawRect.width = _originalDimensions.x * _scale.x;
+		drawRect.height = _originalDimensions.y * _scale.y;
 	}
 	#endregion
 
@@ -39,19 +107,6 @@ public class UILabel : UIBase
 			GUI.Label(drawRect, text, customStyle.style);
 		else
 			GUI.Label(drawRect, text, customStyle.styleName);
-	}
-	#endregion
-
-	#region Activation, Deactivation, Init Methods
-	public override void Init(Vector2 offset, float speed)
-	{
-		customStyle.SetDefaultStyle("label");
-
-		base.Init(offset,speed);
-
-		size.Scale(UINavigationController.AspectRatio);
-
-		drawRect = new Rect(position.x, position.y, size.x, size.y);
 	}
 	#endregion
 
@@ -74,7 +129,10 @@ public class UILabel : UIBase
 		if(!customStyle.custom)
 		{
 			customStyle.custom = true;
+
 			customStyle.style = new GUIStyle(UINavigationController.Skin.FindStyle(customStyle.styleName));
+
+			_originalFontSize = customStyle.style.fontSize;
 		}
 	}
 	#endregion
@@ -83,6 +141,39 @@ public class UILabel : UIBase
 	public override System.Type GetBaseType()
 	{
 		return typeof(UILabel);
+	}
+	#endregion
+
+	#region Animation Methods
+	protected override void SetTrigger(string triggerName)
+	{
+		if(_animator && _animator.runtimeAnimatorController)
+		{
+			CreateCustomStyle();
+			_animator.SetTrigger(triggerName);
+			AnimationStarted();
+		}
+	}
+	protected override void Activated()
+	{
+		base.Activated();
+
+		AnimationEnded();
+	}
+	public override void Exited()
+	{
+		base.Exited();
+
+		AnimationEnded();
+	}
+
+	void AnimationStarted()
+	{
+		_animating = true;
+	}
+	void AnimationEnded()
+	{
+		_animating = false;
 	}
 	#endregion
 

@@ -22,7 +22,7 @@ public class UIScrollView : UIView {
 	protected override void Initialize()
 	{
 		if(_background)
-			_background.Init(Transition.MovementIn, Transition.Speed);
+			_background.Init();
 
 		base.Initialize();
 	}
@@ -72,7 +72,7 @@ public class UIScrollView : UIView {
 	public override void FlagForExit()
 	{
 		if(_background)
-			_background.Exit(Transition.MovementOut);
+			_background.Exit();
 
 		base.FlagForExit();
 	}

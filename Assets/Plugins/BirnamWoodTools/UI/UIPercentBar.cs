@@ -20,45 +20,33 @@ public class UIPercentBar : UISprite
 	#endregion
 
 	#region Private Variable
-	bool _animate;
-
 	Vector3 _scalePerPercent;
 	Vector3 _newScale;
 	#endregion
 
 	#region Init
-	public override void Init(Vector2 offset,float speed)
+	public override void Init()
 	{
 		Vector3 scale = _maximumScale - new Vector3(transform.localScale.x,transform.localScale.y,transform.localScale.z);
 		scale.Scale(new Vector3(0.01f,0.01f,0.01f));
 
 		_scalePerPercent = scale;
 
-		base.Init(offset,speed);
+		base.Init();
 	}
 	#endregion
 
 	#region Update
-	protected override void Update()
+	void Update()
 	{
-		base.Update();
+		transform.localScale = Vector3.Lerp(transform.localScale, _newScale, Time.deltaTime * 20.0f);
 
-		if(_animate)
+		if((transform.localScale - _newScale).magnitude <= SCALE_CLOSE)
 		{
-			transform.localScale = Vector3.Lerp(transform.localScale, _newScale, Time.deltaTime * 20.0f);
+			transform.localScale = _newScale;
 
-			if((transform.localScale - _newScale).magnitude <= SCALE_CLOSE)
-			{
-				transform.localScale = _newScale;
-
-				_animate = false;
-				enabled = false;
-			}
+			enabled = false;
 		}
-	}
-	protected override bool CanDisable()
-	{
-		return false;
 	}
 	#endregion
 
@@ -82,8 +70,6 @@ public class UIPercentBar : UISprite
 		{
 			if(!enabled)
 				enabled = true;
-
-			_animate = true;
 
 			_newScale = transform.localScale + _scaleToAdd;
 		} else

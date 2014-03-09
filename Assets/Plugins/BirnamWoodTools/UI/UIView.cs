@@ -25,8 +25,6 @@ public class UIView : MonoBehaviour {
 	#region Public Variables
 	public Section section;
 
-	public TransitionSettings Transition;
-
 	public List<UIBase> UIElements;
 	#endregion
 
@@ -38,9 +36,6 @@ public class UIView : MonoBehaviour {
 	// Use this for initialization
 	protected void Awake () 
 	{
-		if(Transition.Speed == 0)
-			Transition.Speed = 1;
-
 		Initialize();
 
 		enabled = false;
@@ -73,7 +68,7 @@ public class UIView : MonoBehaviour {
 			for(int i = 0; i < UIElements.Count; i++)
 			{
 				if(UIElements[i])
-					UIElements[i].Init(Transition.MovementIn,Transition.Speed);
+					UIElements[i].Init();
 			}
 		}
 	}
@@ -190,7 +185,7 @@ public class UIView : MonoBehaviour {
 			for(int i = 0; i < UIElements.Count; i++)
 			{
 				if(UIElements[i])
-					UIElements[i].Exit(Transition.MovementOut);
+					UIElements[i].Exit();
 			}
 		}
 
@@ -208,7 +203,7 @@ public class UIView : MonoBehaviour {
 		{
 			for(int i = 0; i < UIElements.Count; i++)
 			{
-				if(UIElements[i] && !UIElements[i].Exited)
+				if(UIElements[i] && !UIElements[i].HasExited)
 					return false;
 			}
 		}

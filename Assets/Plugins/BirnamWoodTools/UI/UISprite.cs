@@ -5,24 +5,30 @@
 /// </summary>
 public class UISprite : UIBase
 {
-	#region Public Variables
-	//Indicates there is a root object so this can animate relative scale & position
-	public bool _hasRoot;
-	#endregion
-
 	#region Protected Variables
 	protected SpriteRenderer _spriteRenderer;
 
 	protected Animator _spriteAnimator;
 	#endregion
 
-	#region Activation, Deactivation, Init Methods
-	public override void Init(Vector2 offset, float speedParam)
+	/*void Update()
 	{
-		_spriteAnimator = GetComponent<Animator>();
+		if(!_spriteRenderer.enabled)
+		{
+			Debug.Log("re-enabled");
+			_spriteRenderer.enabled = true;
+			enabled = false;
+		}
+	}*/
+
+	#region Activation, Deactivation, Init Methods
+	public override void Init()
+	{
 		_spriteRenderer = GetComponent<SpriteRenderer>();
 
-		base.Init(offset, speedParam);
+		_spriteRenderer.enabled = false;
+
+		base.Init();
 	}
 
 	public override bool Activate(MovementState state=MovementState.INITIAL)
@@ -30,7 +36,8 @@ public class UISprite : UIBase
 		if(base.Activate(state))
 		{
 			//Debug.Log("active");
-			_spriteRenderer.enabled = true;
+			if(state != MovementState.INITIAL)
+				_spriteRenderer.enabled = true;
 			return true;
 		} else
 			return false;
@@ -44,28 +51,6 @@ public class UISprite : UIBase
 			return true;
 		} else
 			return false;
-	}
-	#endregion
-
-	#region Position Methods
-	protected override void SetPosition(Vector2 position)
-	{
-		base.SetPosition(position);
-
-		//Debug.Log(name + " " + currentPosition);
-
-		if(_hasRoot)
-			transform.parent.position = Camera.main.ScreenToWorldPoint(new Vector3(currentPosition.x,Screen.height - currentPosition.y,1f));
-		else
-			transform.position = Camera.main.ScreenToWorldPoint(new Vector3(currentPosition.x,Screen.height - currentPosition.y,1f));
-	}
-	#endregion
-
-	#region Animation Methods
-	public void SetTrigger(string triggerName)
-	{
-		if(_spriteAnimator)
-			_spriteAnimator.SetTrigger(triggerName);
 	}
 	#endregion
 
@@ -84,6 +69,19 @@ public class UISprite : UIBase
 	protected override void SetColor(Color color)
 	{
 		_spriteRenderer.color = color;
+	}
+	#endregion
+
+	#region Animation Methods
+	protected override void SetTrigger(string triggerName)
+	{
+		if(_animator && _animator.runtimeAnimatorController)
+		{
+			//Debug.Log(triggerName);
+			_animator.SetTrigger(triggerName);
+			//enabled = true;
+		} else
+			_spriteRenderer.enabled = true;
 	}
 	#endregion
 
