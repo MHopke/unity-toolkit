@@ -42,6 +42,10 @@ public static class UnityExtensions
 	{
 		transform.localScale = new Vector3(transform.localScale.x + x, transform.localScale.y, transform.localScale.z);
 	}
+    public static void ScaleX(this Transform transform, float x)
+    {
+        transform.localScale = new Vector3(transform.localScale.x * x, transform.localScale.y, transform.localScale.z);
+    }
 	public static void SetYScale(this Transform transform, float y)
 	{
 		transform.localScale = new Vector3(transform.localScale.x, y, transform.localScale.z);
@@ -49,7 +53,12 @@ public static class UnityExtensions
 	public static void AddYScale(this Transform transform, float y)
 	{
 		transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y + y, transform.localScale.z);
-	}public static void SetZScale(this Transform transform, float z)
+	}
+    public static void ScaleY(this Transform transform, float y)
+    {
+        transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y * y, transform.localScale.z);
+    }
+    public static void SetZScale(this Transform transform, float z)
 	{
 		transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y, z);
 	}
@@ -57,6 +66,10 @@ public static class UnityExtensions
 	{
 		transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y, transform.localScale.z + z);
 	}
+    public static void ScaleZ(this Transform transform, float z)
+    {
+        transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y, transform.localScale.z * z);
+    }
 	public static void AddXYScale(this Transform transform, Vector2 vector)
 	{
 		transform.localScale = new Vector3(transform.localScale.x + vector.x, transform.localScale.y + vector.y, transform.localScale.z);

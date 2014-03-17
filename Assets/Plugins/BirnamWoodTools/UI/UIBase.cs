@@ -6,7 +6,7 @@
 public class UIBase : MonoBehaviour {
 
 	#region Enumerations
-	public enum MovementState { INITIAL = 0, IN_PLACE, EXITING, EXITED }
+	public enum MovementState { INITIAL = 0, IN_PLACE, MOVING, EXITING, EXITED }
 	#endregion
 
 	#region Constants
@@ -31,10 +31,13 @@ public class UIBase : MonoBehaviour {
 	//Determines if the element is currently active
 	new protected bool active;
 
+    float movementRate;
+
 	protected MovementState movementState;
 
 	protected Vector2 startPosition;
 	protected Vector2 currentPosition;
+    protected Vector2 _targetPosition;
 
 	public Animator _animator;
 
@@ -48,8 +51,32 @@ public class UIBase : MonoBehaviour {
 	float renderTimer;
 	#endregion
 
-	#region Init, Activation, Deactivation Methods
-	/// <summary>
+    #region Unity Methods
+    void Update()
+    {
+        movementRate = 1.0f / (currentPosition - _targetPosition).magnitude;
+
+        SetPosition(Vector2.Lerp(currentPosition, _targetPosition, movementRate * Time.deltaTime));
+
+        if (Mathf.Abs((currentPosition - _targetPosition).magnitude) <= CLOSE_ENOUGH)
+        {
+            SetPosition(_targetPosition);
+
+            if (CanDisable())
+            {
+                enabled = false;
+            }
+        }
+    }
+
+    protected virtual bool CanDisable()
+    {
+        return true;
+    }
+    #endregion
+
+    #region Init, Activation, Deactivation Methods
+    /// <summary>
 	/// Initialize the element with the specified speed and offset.
 	/// Moves the element to its starting position and links any components.
 	/// </summary>
@@ -85,7 +112,16 @@ public class UIBase : MonoBehaviour {
 
 		if(state == MovementState.INITIAL)
 		{
-			SetStartPosition();
+			//SetStartPosition();
+            if (_animates)
+                transform.parent.position = new Vector3(transform.parent.position.x * UINavigationController.AspectRatio.x, 
+                    transform.parent.position.y * UINavigationController.AspectRatio.y,
+                    transform.parent.position.z);
+            else
+                transform.position = new Vector3(transform.position.x * UINavigationController.AspectRatio.x,
+                    transform.position.y * UINavigationController.AspectRatio.y,
+                    transform.position.z);
+            Debug.Log(name + " " +transform.parent.position);
 			SetTrigger("Activate");
 		}
 		else if(state == MovementState.IN_PLACE && _uiButton)
@@ -144,10 +180,39 @@ public class UIBase : MonoBehaviour {
 	{
 		SetPosition(startPosition);
 	}
+    public void Reposition(Vector2 scale, bool animate=false)
+    {
+        if (animate)
+        {
+            _targetPosition = new Vector2(currentPosition.x * scale.x, currentPosition.y * scale.y);
+
+            movementState = MovementState.MOVING;
+
+            enabled = true;
+        }
+        else
+        {
+            SetPosition(new Vector2(currentPosition.x * scale.x, currentPosition.y * scale.y));
+        }
+    }
 	#endregion
 
-	#region Exit Methods
-	public virtual void Exit()
+    #region Size Methods
+    public void Resize(Vector2 scale, bool animate = false)
+    {
+        if (animate)
+        {
+
+        }
+        else
+        {
+            transform.localScale.Scale(scale);
+        }
+    }
+    #endregion
+
+    #region Exit Methods
+    public virtual void Exit()
 	{
 		if(!active)
 		{

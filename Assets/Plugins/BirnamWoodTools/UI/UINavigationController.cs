@@ -58,10 +58,10 @@ public class UINavigationController : MonoBehaviour
 			//Adjust the camera's orthographic size incase it is a different aspect ratio.
 			//Depending on the orientation you need a different calculation.
 			//Ensures that Sprites remain the correct size.
-			if(Screen.height > Screen.width)
+			/*if(Screen.height > Screen.width)
 				Camera.main.orthographicSize = ((float)Screen.height / (float)Screen.width) * 2.0f;
 			else
-				Camera.main.orthographicSize = ((float)Screen.width / (float)Screen.height) * 2.0f;
+				Camera.main.orthographicSize = ((float)Screen.width / (float)Screen.height) * 2.0f;*/
 
 			instance = this;
 		} else

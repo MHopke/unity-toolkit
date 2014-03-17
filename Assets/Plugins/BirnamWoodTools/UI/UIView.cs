@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 
 /// <summary>
-/// Representation of a collection of UI elements.
+/// This class is a collection of UI elements. Each UIView
+/// has a position and size. Each element's position & size
+/// are relative to the UIView's position & size.
 /// </summary>
 public class UIView : MonoBehaviour {
 
@@ -23,9 +25,10 @@ public class UIView : MonoBehaviour {
 	#endregion
 
 	#region Public Variables
-	public Section section;
+    public Vector2 _position;
+    public Vector2 _size;
 
-	public List<UIBase> UIElements;
+	public List<UIBase> _elements;
 	#endregion
 
 	#region Protected Variables
@@ -63,12 +66,12 @@ public class UIView : MonoBehaviour {
 	#region Activation, Deactivation Methods
 	protected virtual void Initialize()
 	{
-		if(UIElements != null)
+		if(_elements != null)
 		{
-			for(int i = 0; i < UIElements.Count; i++)
+			for(int i = 0; i < _elements.Count; i++)
 			{
-				if(UIElements[i])
-					UIElements[i].Init();
+				if(_elements[i])
+					_elements[i].Init();
 			}
 		}
 	}
@@ -94,12 +97,12 @@ public class UIView : MonoBehaviour {
 	/// </summary>
 	protected virtual void Activation()
 	{
-		if(UIElements != null)
+		if(_elements != null)
 		{
-			for(int i = 0; i < UIElements.Count; i++)
+			for(int i = 0; i < _elements.Count; i++)
 			{
-				if(UIElements[i] && !UIElements[i]._skipUIViewActivation)
-					UIElements[i].Activate();
+				if(_elements[i] && !_elements[i]._skipUIViewActivation)
+					_elements[i].Activate();
 			}
 		}
 
@@ -127,12 +130,12 @@ public class UIView : MonoBehaviour {
 	/// </summary>
 	protected virtual void Deactivation()
 	{
-		if(UIElements != null)
+		if(_elements != null)
 		{
-			for(int i = 0; i < UIElements.Count; i++)
+			for(int i = 0; i < _elements.Count; i++)
 			{
-				if(UIElements[i])
-					UIElements[i].Deactivate();
+				if(_elements[i])
+					_elements[i].Deactivate();
 			}
 		}
 	}
@@ -151,24 +154,43 @@ public class UIView : MonoBehaviour {
 
 	public UIBase RetrieveUIElement(string name)
 	{
-		for(int i = 0; i < UIElements.Count; i++)
+		for(int i = 0; i < _elements.Count; i++)
 		{
-			if(name == UIElements[i].name)
-				return UIElements[i];
+			if(name == _elements[i].name)
+				return _elements[i];
 		}
 
 		return null;
 	}
 	#endregion
 
-	#region Movement Methods
+	#region Position Methods
+    /// <summary>
+    /// Reposition the UI elements according to the newPosition.
+    /// </summary>
+    /// <param name="newPosition"></param>
+    /// <param name="animate">Determines if the UIView animates.</param>
+    public void Reposition(Vector2 newPosition,bool animate=false)
+    {
+        Vector2 scale = new Vector2(newPosition.x / _position.x,newPosition.y / _position.y);
+
+        if (_elements != null)
+        {
+            for (int i = 0; i < _elements.Count; i++)
+            {
+                if (_elements[i])
+                    _elements[i].Reposition(scale);
+            }
+        }
+    }
+
 	public bool IsUIInPlace()
 	{
-		if(UIElements != null)
+		if(_elements != null)
 		{
-			for(int i = 0; i < UIElements.Count; i++)
+			for(int i = 0; i < _elements.Count; i++)
 			{
-				if(UIElements[i] && !UIElements[i].InPlace)
+				if(_elements[i] && !_elements[i].InPlace)
 					return false;
 			}
 		}
@@ -180,12 +202,12 @@ public class UIView : MonoBehaviour {
 	#region Exit Methods
 	public virtual void FlagForExit()
 	{
-		if(UIElements != null)
+		if(_elements != null)
 		{
-			for(int i = 0; i < UIElements.Count; i++)
+			for(int i = 0; i < _elements.Count; i++)
 			{
-				if(UIElements[i])
-					UIElements[i].Exit();
+				if(_elements[i])
+					_elements[i].Exit();
 			}
 		}
 
@@ -199,11 +221,11 @@ public class UIView : MonoBehaviour {
 
 	bool HasUIExited()
 	{
-		if(UIElements != null)
+		if(_elements != null)
 		{
-			for(int i = 0; i < UIElements.Count; i++)
+			for(int i = 0; i < _elements.Count; i++)
 			{
-				if(UIElements[i] && !UIElements[i].HasExited)
+				if(_elements[i] && !_elements[i].HasExited)
 					return false;
 			}
 		}

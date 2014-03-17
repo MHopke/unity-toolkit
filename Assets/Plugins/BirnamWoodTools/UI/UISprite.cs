@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 /// <summary>
 /// Representation of a graphical UI element. Uses Unity 4.3 Sprite System.
@@ -26,7 +26,7 @@ public class UISprite : UIBase
 	{
 		_spriteRenderer = GetComponent<SpriteRenderer>();
 
-		_spriteRenderer.enabled = false;
+		//_spriteRenderer.enabled = false;
 
 		base.Init();
 	}

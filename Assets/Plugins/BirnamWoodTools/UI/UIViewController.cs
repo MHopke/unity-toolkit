@@ -2,28 +2,16 @@
 using System.Collections.Generic;
 
 /// <summary>
-/// Representation of a collection of UIViews. This class controls which UIViews
-/// are currently active.
+/// This class represents a collection of UIViews. Only one
+/// UIViewController can be active at a time.
 /// </summary>
 public class UIViewController : MonoBehaviour 
 {
-	#region Public Variables	
-	//References to current UIViews that are active
-	public UIView header = null;
-	public UIView content = null;
-	public UIView footer = null;
-
+	#region Public Variables
 	public List<UIView> screens;
 	#endregion
 
 	#region Private Variables
-	//Default UIViews to activate when a UIViewController is restored
-	//from being the previous controller.
-	UIView defaultHeader;
-	UIView defaultContent;
-	UIView defaultFooter;
-
-	static UIViewController instance = null;
 	#endregion
 
 	#region Unity Methods

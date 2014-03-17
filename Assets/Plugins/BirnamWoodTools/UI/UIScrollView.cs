@@ -29,13 +29,13 @@ public class UIScrollView : UIView {
 		
 	protected override void Activation()
 	{
-		if(UIElements != null)
+		if(_elements != null)
 		{
 			//Only UI Elements within the _viewRect should be activated
-			for(int i = 0; i < UIElements.Count; i++)
+			for(int i = 0; i < _elements.Count; i++)
 			{
-				if(UIElements[i] != null && ElementInView(UIElements[i].GetBounds()))
-					UIElements[i].Activate();
+				if(_elements[i] != null && ElementInView(_elements[i].GetBounds()))
+					_elements[i].Activate();
 			}
 		}
 
@@ -97,17 +97,17 @@ public class UIScrollView : UIView {
 			else if(_type == ScrollType.VERTICAL)
 				delta.x = 0;
 
-			for(int i = 0; i < UIElements.Count; i++)
+			for(int i = 0; i < _elements.Count; i++)
 			{
-				if(UIElements[i])
+				if(_elements[i])
 				{
-					UIElements[i].CurrentPosition += delta;
+					_elements[i].CurrentPosition += delta;
 					//Debug.Log(UIElements[i].CurrentPosition);
 
-					if(ElementInView(UIElements[i].GetBounds()))
-						UIElements[i].Activate(UIBase.MovementState.IN_PLACE);
+					if(ElementInView(_elements[i].GetBounds()))
+						_elements[i].Activate(UIBase.MovementState.IN_PLACE);
 					else
-						UIElements[i].Deactivate(true);
+						_elements[i].Deactivate(true);
 				}
 			}
 		}
