@@ -29,24 +29,32 @@ public class UILabel : UIBase
 	#endregion
 
 	#region Activation, Deactivation, Init Methods
-	public override void Init()
+	public override bool Init()
 	{
-		customStyle.SetDefaultStyle("label");
+		if(base.Init())
+		{
+			customStyle.SetDefaultStyle("label");
 
-		base.Init();
+			size.Scale(UIScreen.AspectRatio);
 
-		size.Scale(UINavigationController.AspectRatio);
+			_originalDimensions = size;
 
-		_originalDimensions = size;
+			if(customStyle.custom)
+				_originalFontSize = customStyle.style.fontSize;
+			else
+			{
+				if(UINavigationController.Skin)
+					_originalFontSize = UINavigationController.Skin.FindStyle(customStyle.styleName).fontSize;
+				else
+					_originalFontSize = 1;
+			}
 
-		if(customStyle.custom)
-			_originalFontSize = customStyle.style.fontSize;
-		else
-			_originalFontSize = UINavigationController.Skin.FindStyle(customStyle.styleName).fontSize;
+			_originalScale = transform.localScale;
 
-		_originalScale = transform.localScale;
-
-		drawRect = new Rect(position.x, position.y, size.x, size.y);
+			drawRect = new Rect(position.x, position.y, size.x, size.y);
+			return true;
+		} else
+			return false;
 	}
 	public override bool Activate(MovementState state = MovementState.INITIAL)
 	{
@@ -56,6 +64,15 @@ public class UILabel : UIBase
 			return true;
 		}
 		else
+			return false;
+	}
+	public override bool DelayedActivation(bool skipTransition = false)
+	{
+		if(base.DelayedActivation(skipTransition))
+		{
+			enabled = true;
+			return true;
+		} else
 			return false;
 	}
 	public override bool Deactivate(bool force =false)

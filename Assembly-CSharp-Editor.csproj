@@ -46,8 +46,8 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Editor\BirnamWoodTools\UI\UIBaseDrawer.cs" />
-     <None Include="Assets\Plugins\BirnamWoodTools\iOS\BWG_iOS_ReadMe.txt" />
+     <Compile Include="Assets\Editor\AutoAdjustEditor.cs" />
+     <None Include="Assets\Plugins\BirnamWoodTools\iOS Classes\BWG_iOS_ReadMe.txt" />
      <None Include="Assets\Resources\Achievements.xml" />
      <None Include="Assets\Resources\Screens.xml" />
      <None Include="Assets\Resources\ScreenOne.xml" />

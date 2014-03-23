@@ -22,13 +22,16 @@ public class UISprite : UIBase
 	}*/
 
 	#region Activation, Deactivation, Init Methods
-	public override void Init()
+	public override bool Init()
 	{
-		_spriteRenderer = GetComponent<SpriteRenderer>();
+		if(base.Init())
+		{
+			_spriteRenderer = GetComponent<SpriteRenderer>();
 
-		//_spriteRenderer.enabled = false;
-
-		base.Init();
+			_spriteRenderer.enabled = false;
+			return true;
+		} else
+			return false;
 	}
 
 	public override bool Activate(MovementState state=MovementState.INITIAL)
@@ -36,8 +39,17 @@ public class UISprite : UIBase
 		if(base.Activate(state))
 		{
 			//Debug.Log("active");
-			if(state != MovementState.INITIAL)
-				_spriteRenderer.enabled = true;
+			_spriteRenderer.enabled = true;
+			return true;
+		} else
+			return false;
+	}
+	public override bool DelayedActivation(bool skipTransition=false)
+	{
+		if (base.DelayedActivation(skipTransition))
+		{
+			//Debug.Log("active");
+			_spriteRenderer.enabled = true;
 			return true;
 		} else
 			return false;
@@ -99,8 +111,8 @@ public class UISprite : UIBase
 	/// <returns>The bounds.</returns>
 	public override Rect GetBounds()
 	{
-		return new Rect(currentPosition.x, currentPosition.y + (_spriteRenderer.sprite.rect.height / 2.0f) * transform.localScale.y,
-			_spriteRenderer.sprite.rect.height * transform.localScale.y, _spriteRenderer.sprite.rect.width * transform.localScale.x);
+		return new Rect(currentPosition.x, currentPosition.y, _spriteRenderer.sprite.rect.width * transform.localScale.x,
+			_spriteRenderer.sprite.rect.height * transform.localScale.y);
 	}
 	#endregion
 }

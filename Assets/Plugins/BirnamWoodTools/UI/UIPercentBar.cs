@@ -25,14 +25,18 @@ public class UIPercentBar : UISprite
 	#endregion
 
 	#region Init
-	public override void Init()
+	public override bool Init()
 	{
-		Vector3 scale = _maximumScale - new Vector3(transform.localScale.x,transform.localScale.y,transform.localScale.z);
-		scale.Scale(new Vector3(0.01f,0.01f,0.01f));
+		if(base.Init())
+		{
+			Vector3 scale = _maximumScale - new Vector3(transform.localScale.x, transform.localScale.y, transform.localScale.z);
+			scale.Scale(new Vector3(0.01f, 0.01f, 0.01f));
 
-		_scalePerPercent = scale;
+			_scalePerPercent = scale;
 
-		base.Init();
+			return true;
+		} else
+			return false;
 	}
 	#endregion
 

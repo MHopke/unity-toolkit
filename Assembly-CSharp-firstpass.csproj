@@ -19,7 +19,7 @@
 	<DebugType>full</DebugType>
 	<Optimize>false</Optimize>
 	<OutputPath>Temp\bin\Debug\</OutputPath>
-	<DefineConstants>DEBUG;TRACE;UNITY_IPHONE;ENABLE_MICROPHONE;ENABLE_TEXTUREID_MAP;ENABLE_AUDIO_FMOD;ENABLE_MONO;ENABLE_SPRITES;ENABLE_TERRAIN;ENABLE_GENERICS;ENABLE_SUBSTANCE;INCLUDE_WP8SUPPORT;ENABLE_WWW;ENABLE_IMAGEEFFECTS;UNITY_IPHONE_API;ENABLE_WEBCAM;INCLUDE_METROSUPPORT;ENABLE_NETWORK;ENABLE_PHYSICS;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_2D_PHYSICS;ENABLE_GAMECENTER;UNITY_IOS;ENABLE_SHADOWS;ENABLE_AUDIO;ENABLE_NAVMESH_CARVING;ENABLE_SINGLE_INSTANCE_BUILD_SETTING;UNITY_4_3_4;UNITY_4_3;ENABLE_PROFILER;UNITY_EDITOR;UNITY_EDITOR_WIN</DefineConstants>
+	<DefineConstants>DEBUG;TRACE;UNITY_IPHONE;ENABLE_MICROPHONE;ENABLE_TEXTUREID_MAP;ENABLE_AUDIO_FMOD;ENABLE_MONO;ENABLE_SPRITES;ENABLE_TERRAIN;ENABLE_GENERICS;ENABLE_SUBSTANCE;INCLUDE_WP8SUPPORT;ENABLE_WWW;ENABLE_IMAGEEFFECTS;UNITY_IPHONE_API;ENABLE_WEBCAM;INCLUDE_METROSUPPORT;ENABLE_NETWORK;ENABLE_PHYSICS;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_2D_PHYSICS;ENABLE_GAMECENTER;UNITY_IOS;ENABLE_SHADOWS;ENABLE_AUDIO;ENABLE_NAVMESH_CARVING;ENABLE_SINGLE_INSTANCE_BUILD_SETTING;UNITY_4_3_4;UNITY_4_3;ENABLE_PROFILER;UNITY_EDITOR;UNITY_EDITOR_OSX</DefineConstants>
 	<ErrorReport>prompt</ErrorReport>
 	<WarningLevel>4</WarningLevel>
 	<NoWarn>0169</NoWarn>
@@ -39,10 +39,10 @@
 	<Reference Include="System.Core" />
 	<Reference Include="System.Xml.Linq" />
 	<Reference Include="UnityEngine">
-	  <HintPath>C:/Program Files (x86)/Unity/Editor/Data/Managed/UnityEngine.dll</HintPath>
+	  <HintPath>/Applications/Unity/Unity.app/Contents/Frameworks/Managed/UnityEngine.dll</HintPath>
 	</Reference>
 	<Reference Include="UnityEditor">
-	  <HintPath>C:/Program Files (x86)/Unity/Editor/Data/Managed/UnityEditor.dll</HintPath>
+	  <HintPath>/Applications/Unity/Unity.app/Contents/Frameworks/Managed/UnityEditor.dll</HintPath>
 	</Reference>
   </ItemGroup>
   <ItemGroup>
@@ -52,11 +52,11 @@
      <Compile Include="Assets\Plugins\BirnamWoodTools\InputHandler.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\MiniJSON.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\SaveData.cs" />
-     <Compile Include="Assets\Plugins\BirnamWoodTools\UI\ButtonComponent.cs" />
+     <Compile Include="Assets\Plugins\BirnamWoodTools\UI\MaskTransition.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\UI\SpriteRoot.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIBase.cs" />
-     <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIComponents\UIAnimatedButton.cs" />
-     <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIComponents\UIButton.cs" />
+     <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIComponents\AnimatedButton.cs" />
+     <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIComponents\ButtonComponent.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIComponents\UIComponent.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIComponents\UIFadeComponent.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIComponents\UIFlashComponent.cs" />
@@ -68,18 +68,20 @@
      <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIScreen.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIScrollView.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UISprite.cs" />
+     <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIToggle.cs" />
+     <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIToolbar.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIView.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIViewController.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\UnityExtensions.cs" />
-     <Compile Include="Assets\Plugins\BirnamWoodTools\iOS\GameKit\GKTurnBasedMatch.cs" />
-     <Compile Include="Assets\Plugins\BirnamWoodTools\iOS\GameKit\GKUsersList.cs" />
-     <Compile Include="Assets\Plugins\BirnamWoodTools\iOS\GameKit\GameKitBinding.cs" />
-     <Compile Include="Assets\Plugins\BirnamWoodTools\iOS\GameKit\GameKitManager.cs" />
-     <Compile Include="Assets\Plugins\BirnamWoodTools\iOS\GameKit\TurnBasedMatchBinding.cs" />
-     <Compile Include="Assets\Plugins\BirnamWoodTools\iOS\GameKit\TurnBasedMatchManager.cs" />
-     <Compile Include="Assets\Plugins\BirnamWoodTools\iOS\General\iOSBinding.cs" />
-     <Compile Include="Assets\Plugins\BirnamWoodTools\iOS\General\iOSManager.cs" />
-     <None Include="Assets\Plugins\BirnamWoodTools\iOS\BWG_iOS_ReadMe.txt" />
+     <Compile Include="Assets\Plugins\BirnamWoodTools\iOS Classes\GameKit\GKTurnBasedMatch.cs" />
+     <Compile Include="Assets\Plugins\BirnamWoodTools\iOS Classes\GameKit\GKUsersList.cs" />
+     <Compile Include="Assets\Plugins\BirnamWoodTools\iOS Classes\GameKit\GameKitBinding.cs" />
+     <Compile Include="Assets\Plugins\BirnamWoodTools\iOS Classes\GameKit\GameKitManager.cs" />
+     <Compile Include="Assets\Plugins\BirnamWoodTools\iOS Classes\GameKit\TurnBasedMatchBinding.cs" />
+     <Compile Include="Assets\Plugins\BirnamWoodTools\iOS Classes\GameKit\TurnBasedMatchManager.cs" />
+     <Compile Include="Assets\Plugins\BirnamWoodTools\iOS Classes\General\iOSBinding.cs" />
+     <Compile Include="Assets\Plugins\BirnamWoodTools\iOS Classes\General\iOSManager.cs" />
+     <None Include="Assets\Plugins\BirnamWoodTools\iOS Classes\BWG_iOS_ReadMe.txt" />
      <None Include="Assets\Resources\Achievements.xml" />
      <None Include="Assets\Resources\Screens.xml" />
      <None Include="Assets\Resources\ScreenOne.xml" />

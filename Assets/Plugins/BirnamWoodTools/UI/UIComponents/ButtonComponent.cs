@@ -13,40 +13,51 @@ public class ButtonComponent : MonoBehaviour {
 
 	#region Private Variables
 	bool _eventsAdded;
+	bool _active;
 
 	int _fingerId;
 	#endregion
 
-	#region Unity Methods
-	void Start()
-	{
-		enabled = false;
-	}
-	#endregion
-
 	#region Methods
-	public virtual void Activate()
+	public virtual bool Activate()
 	{
-		if(enabled)
-			return;
+		if(_active)
+			return false;
 
-		enabled = true;
+		_active = true;
+
+		Enable();
 
 		AddListeners();
-	}
-	public virtual void Deactivate()
-	{
-		if(!enabled)
-			return;
 
-		enabled = false;
+		return true;
+	}
+	public virtual bool Deactivate()
+	{
+		if(!_active)
+			return false;
+
+		_active = false;
+
+		Disable();
 
 		RemoveListeners();
+
+		return true;
+	}
+
+	public virtual void Enable()
+	{
+		collider2D.enabled = true;
+	}
+	public virtual void Disable()
+	{
+		collider2D.enabled = false;
 	}
 
 	public void AddListeners()
 	{
-		if(!enabled || _eventsAdded)
+		if(!_active || _eventsAdded)
 			return;
 
 		_fingerId = InputHandler.INVALID_FINGER;
@@ -61,7 +72,7 @@ public class ButtonComponent : MonoBehaviour {
 	}
 	public void RemoveListeners()
 	{
-		if(!enabled || !_eventsAdded)
+		if(!_active || !_eventsAdded)
 			return;
 
 		InputHandler.RemoveTouchStart(InputStart);
@@ -85,6 +96,11 @@ public class ButtonComponent : MonoBehaviour {
 	/// </summary>
 	protected void FireClickEvent()
 	{
+		if(audio)
+			audio.Play();
+		else
+			UINavigationController.PlayGenericClick();
+
 		if(clickEvent != null)
 			clickEvent();
 	}

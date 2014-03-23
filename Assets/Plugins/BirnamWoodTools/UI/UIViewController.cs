@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿//#define LOG
+using UnityEngine;
 using System.Collections.Generic;
 
 /// <summary>
@@ -8,167 +9,93 @@ using System.Collections.Generic;
 public class UIViewController : MonoBehaviour 
 {
 	#region Public Variables
-	public List<UIView> screens;
+	public List<UIView> _views;
 	#endregion
 
 	#region Private Variables
-	#endregion
-
-	#region Unity Methods
-	void Awake()
-	{
-		defaultHeader = header;
-		defaultContent = content;
-		defaultFooter = footer;
-	}
+	static UIViewController instance = null;
 	#endregion
 
 	#region Activate, Deactivate Methods
-	public void Activate(bool useDefaults=false)
+	public void Activate()
 	{
-		DirectViewChange(defaultHeader, UIView.Section.HEADER);
-
-		DirectViewChange(defaultContent, UIView.Section.CONTENT);
-
-		DirectViewChange(defaultFooter, UIView.Section.FOOTER);
+		for(int i = 0; i < _views.Count; i++)
+		{
+			if(_views[i] && !_views[i]._skipActivation)
+				_views[i].Activate();
+		}
 
 		instance = this;
+
+		#if LOG
+		Debug.Log(name + " activated.");
+		#endif
 	}
 
 	public void Deactivate()
 	{
-		if(header)
-			header.FlagForExit();
+		for(int i = 0; i < _views.Count; i++)
+		{
+			if(_views[i])
+				_views[i].FlagForExit();
+		}
 
-		if(content)
-			content.FlagForExit();
-
-		if(footer)
-			footer.FlagForExit();
+		#if LOG
+		Debug.Log(name + " deactivated.");
+		#endif
 	}
 	#endregion
 
 	#region Methods
-	public void ChangeView(UIView view)
+	public static void PresentUIView(UIView view)
 	{
-		instance.TriggerSectionExit(view.section);
-
 		view.Activate();
-
-		instance.SetSection(view, view.section);
 	}
-	public void ChangeView(string viewName)
+	public static void PresentUIView(string view)
 	{
-		UIView view = GetUIView(viewName);
+		UIView temp = instance.GetUIView(view);
 
-		if(view)
+		if(temp)
+			temp.Activate();
+	}
+	public static void RemoveUIView(UIView view)
+	{
+		view.Deactivate();
+	}
+	public static void RemoveUIView(string view)
+	{
+		UIView temp = instance.GetUIView(view);
+
+		if(temp)
+			temp.Deactivate();
+	}
+
+	public static UIBase GetElementFromView(string element, string view)
+	{
+		for(int i = 0; i < instance._views.Count; i++)
 		{
-			instance.TriggerSectionExit(view.section);
-
-			view.Activate();
-
-			instance.SetSection(view, view.section);
-		}
-	}
-	/// <summary>
-	/// Changes the view. Allows for transitions to empty UIViews.
-	/// </summary>
-	/// <param name="view">View.</param>
-	/// <param name="section">Section.</param>
-	public void ChangeView(UIView view, UIView.Section section)
-	{
-		if(view == GetUIView(section))
-			return;
-
-		instance.TriggerSectionExit(section);
-
-		if(view)
-			view.Activate();
-
-		instance.SetSection(view, section);
-	}
-
-	void DirectViewChange(UIView view, UIView.Section section)
-	{
-		if(view)
-			view.Activate();
-
-		SetSection(view, section);
-	}
-		
-	public UIBase GetElementFromView(string element, string view)
-	{
-		for(int i = 0; i < instance.screens.Count; i++)
-		{
-			if(instance.screens[i] && view == instance.screens[i].name)
-				return instance.screens[i].RetrieveUIElement(element);
+			if(instance._views[i] && view == instance._views[i].name)
+				return instance._views[i].RetrieveUIElement(element);
 		}
 
 		return null;
-	}
-
-	void TriggerSectionExit(UIView.Section section)
-	{
-		switch(section)
-		{
-		case UIView.Section.HEADER:
-			if(header)
-				header.FlagForExit();
-			break;
-		case UIView.Section.CONTENT:
-			if(content)
-				content.FlagForExit();
-			break;
-		case UIView.Section.FOOTER:
-			if(footer)
-				footer.FlagForExit();
-			break;
-		}
-	}
-
-	void SetSection(UIView screen, UIView.Section section)
-	{
-		switch(section)
-		{
-		case UIView.Section.HEADER:
-			header = screen;
-			break;
-		case UIView.Section.CONTENT:
-			content = screen;
-			break;
-		case UIView.Section.FOOTER:
-			footer = screen;
-			break;
-		}
 	}
 
 	public UIView GetUIView(string name)
 	{
-		for (int i = 0; i < instance.screens.Count; i++)
+		for (int i = 0; i < _views.Count; i++)
 		{
-			if (instance.screens[i] && instance.screens[i].name == name)
-				return instance.screens[i];
+			if (_views[i] && _views[i].name == name)
+				return _views[i];
 		}
 
 		return null;
 	}
 
-	public UIView GetUIView(UIView.Section section)
-	{
-		if(section == UIView.Section.HEADER)
-			return header;
-		else if(section == UIView.Section.CONTENT)
-			return content;
-		else if(section == UIView.Section.FOOTER)
-			return footer;
-		else
-			return null;
-	}
-
 	bool HasUIView(string name)
 	{
-		for (int i = 0; i < screens.Count; i++)
-			if (screens[i] && screens[i].name == name)
+		for (int i = 0; i < _views.Count; i++)
+			if (_views[i] && _views[i].name == name)
 				return true;
 
 		return false;
@@ -176,38 +103,19 @@ public class UIViewController : MonoBehaviour
 
 	public void GainFocus()
 	{
-		if(header)
-			header.GainedFocus();
-
-		if(content)
-			content.GainedFocus();
-
-		if(footer)
-			footer.GainedFocus();
+		for(int i = 0; i < _views.Count; i++)
+		{
+			if(_views[i])
+				_views[i].GainedFocus();
+		}
 	}
 
 	public void LoseFocus()
 	{
-		if(header)
-			header.LostFocus();
-
-		if(content)
-			content.LostFocus();
-
-		if(footer)
-			footer.LostFocus();
-	}
-	#endregion
-
-	#region Audio Methods
-	public void PlayButtonAudio(AudioClip clip=null)
-	{
-		if(audio && !audio.isPlaying)
+		for(int i = 0; i < _views.Count; i++)
 		{
-			if(clip == null)
-				audio.Play();
-			else
-				audio.PlayOneShot(clip);
+			if(_views[i])
+				_views[i].LostFocus();
 		}
 	}
 	#endregion

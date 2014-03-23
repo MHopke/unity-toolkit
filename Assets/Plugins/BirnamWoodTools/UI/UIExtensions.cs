@@ -124,6 +124,7 @@ public class IntField
 /// </summary>
 public class DoubleField
 {
+	#region Private Variables
 	string label;
 	string field;
 
@@ -134,7 +135,9 @@ public class DoubleField
 
 	Rect rect;
 	Rect labelRect;
+	#endregion
 
+	#region Constructor
 	public DoubleField(Rect labelRectParam, Rect rectParam, string labelParam, double maxParam=double.MaxValue, double minParam=double.MinValue)
 	{
 		label = labelParam;
@@ -147,7 +150,9 @@ public class DoubleField
 
 		value = 0.0;
 	}
+	#endregion
 
+	#region Methods
 	public double Draw(double valueParam,GUIStyle labelStyle,GUIStyle fieldStyle=null)
 	{
 		GUI.Label(labelRect, label,labelStyle);
@@ -165,11 +170,14 @@ public class DoubleField
 			return value;
 		}
 	}
+	#endregion
 
+	#region Accessors
 	public Rect Area
 	{
 		get { return rect; }
 	}
+	#endregion
 }
 #endregion
 
@@ -217,30 +225,24 @@ public class CustomStyle
 /// Wrapper class for variables used in UI Transitions.
 /// </summary>
 [System.Serializable]
-public class TransitionSettings
+public class Transition
 {
 	#region Public Variables
 	//In pixels per second
-	public float Speed;
+	public float _speed;
 	//public float TargetScale;
 
 	//How much the screen moves upon entry
-	public Vector2 MovementIn;
-	//How much the screen moves upon exit
-	public Vector2 MovementOut;
-
-	public MovementType Type;
+	public Vector2 _targetPosition;
 	#endregion
 
 	#region Constructors
-	public TransitionSettings(){}
+	public Transition(){}
 
-	public TransitionSettings(Vector2 start, Vector2 end, float speed, MovementType type)
+	public Transition(Vector2 targetPosition, float speed)
 	{
-		MovementIn = start;
-		MovementOut = end;
-		Speed = speed;
-		Type = type;
+		_targetPosition =targetPosition;
+		_speed = speed;
 	}
 	#endregion
 }
@@ -269,72 +271,6 @@ public class FadeSettings
 		Delay = delay;
 		TargetColor = target;
 		Triggered = triggered;
-	}
-	#endregion
-}
-
-/// <summary>
-/// Wrapper class for used in UIButton components.
-/// </summary>
-[System.Serializable]
-public class ButtonSettings
-{
-	#region Events
-	public event System.Action clickEvent;
-	#endregion
-
-	#region Public Variables
-	public string ControllerId;
-
-	public ChangeUIView Header;
-	public ChangeUIView Content;
-	public ChangeUIView Footer;
-
-	public UIBase[] _elementsToActivate;
-	public UIBase[] _elementsToDeactivate;
-	#endregion
-
-	#region Click Methods
-	public void Click()
-	{
-		if(ControllerId == "")
-		{
-			//Change UIScreens
-			Header.ChangeScreen(UIView.Section.HEADER);
-			Content.ChangeScreen(UIView.Section.CONTENT);
-			Footer.ChangeScreen(UIView.Section.FOOTER);
-		} else
-			UINavigationController.NavigateToController(ControllerId);
-
-		int i = 0;
-		for(i=0; i < _elementsToActivate.Length; i++)
-			_elementsToActivate[i].Activate();
-		for(i = 0; i < _elementsToDeactivate.Length; i++)
-			_elementsToDeactivate[i].Deactivate(true);
-
-		//Send click event
-		if(clickEvent != null)
-			clickEvent();
-	}
-	#endregion
-}
-
-/// <summary>
-/// Wrapper class for variables involved in chaning a UIView.
-/// </summary>
-[System.Serializable]
-public class ChangeUIView
-{
-	#region Public Variables
-	public bool Change;
-	public UIView View;
-	#endregion
-
-	#region Change Methods
-	public void ChangeScreen(UIView.Section section)
-	{
-		if(Change)
-			UINavigationController.CurrentController.ChangeView(View, section);
 	}
 	#endregion
 }

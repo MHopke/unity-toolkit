@@ -15,7 +15,16 @@ public class UIScrollView : UIView {
 
 	public ScrollType _type;
 
+	public Vector2 _scrollBounds;
+
 	public Rect _viewRect; //The original view position
+	#endregion
+
+	#region Private Variables
+	Vector2 _scrollPosition; //used to determine if the scroll has reached its bounds
+
+	Rect _startViewRect;
+	Rect _currentViewRect;
 	#endregion
 
 	#region Overriden Method
@@ -23,6 +32,12 @@ public class UIScrollView : UIView {
 	{
 		if(_background)
 			_background.Init();
+
+		_viewRect.Scale(UIScreen.AspectRatio);
+
+		_startViewRect = _viewRect;
+
+		_currentViewRect = _startViewRect;
 
 		base.Initialize();
 	}
@@ -42,6 +57,8 @@ public class UIScrollView : UIView {
 		if(_background)
 			_background.Activate();
 
+		_scrollPosition = Vector2.zero;
+
 		movementState = MovementState.INITIAL;
 
 		InputHandler.AddTouchMoving(TouchMoving);
@@ -55,6 +72,20 @@ public class UIScrollView : UIView {
 
 		InputHandler.RemoveTouchMoving(TouchMoving);
 	}
+
+	protected override void InPlace()
+	{
+		_currentViewRect = _viewRect;
+
+		for(int i = 0; i < _elements.Count; i++)
+		{
+			if(_elements[i] != null)
+				_elements[i].SetToPosition();
+		}
+
+		base.InPlace();
+	}
+
 
 	public override void LostFocus()
 	{
@@ -81,8 +112,8 @@ public class UIScrollView : UIView {
 	#region Methods
 	bool ElementInView(Rect bounds)
 	{
-		return bounds.x >= _viewRect.x && bounds.xMax <= _viewRect.xMax && bounds.y >= _viewRect.y
-			&& bounds.yMax <= _viewRect.yMax;
+		return bounds.xMax >= _currentViewRect.x && bounds.x <= _currentViewRect.xMax && bounds.yMax >= _currentViewRect.y
+			&& bounds.y <= _currentViewRect.yMax;
 	}
 	#endregion
 
@@ -96,6 +127,16 @@ public class UIScrollView : UIView {
 				delta.y = 0;
 			else if(_type == ScrollType.VERTICAL)
 				delta.x = 0;
+
+			_scrollPosition += delta;
+
+			if(_scrollPosition.y <= -_scrollBounds.y || _scrollPosition.y > 0)
+				delta.y = 0;
+			if(_scrollPosition.x <= -_scrollBounds.x || _scrollPosition.x > 0)
+				delta.x = 0;
+
+			if(delta == Vector2.zero)
+				return;
 
 			for(int i = 0; i < _elements.Count; i++)
 			{

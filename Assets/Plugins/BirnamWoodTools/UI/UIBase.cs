@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿//#define LOG
+using UnityEngine;
 
 /// <summary>
 /// The base class for UI elements. You should not use this class unless inheriting from it.
@@ -25,6 +26,11 @@ public class UIBase : MonoBehaviour {
 
 	//Position in pixels. Top Left is (0,0)
 	public Vector2 position;
+
+	//Components (if a component is not present it will be null)
+	public ButtonComponent _uiButton;
+	public UIFadeComponent _fadeComponent;
+	public UIFlashComponent _flashComponent;
 	#endregion
 
 	#region Protected Variables
@@ -40,15 +46,10 @@ public class UIBase : MonoBehaviour {
     protected Vector2 _targetPosition;
 
 	public Animator _animator;
-
-	//Components (if a component is not present it will be null)
-	protected UIButton _uiButton;
-	protected UIFadeComponent _fadeComponent;
-	protected UIFlashComponent _flashComponent;
 	#endregion
 
 	#region Private Variables
-	float renderTimer;
+	bool _initialized;
 	#endregion
 
     #region Unity Methods
@@ -75,33 +76,36 @@ public class UIBase : MonoBehaviour {
     }
     #endregion
 
-    #region Init, Activation, Deactivation Methods
+	#region Init, Activation, Deactivation Methods
     /// <summary>
 	/// Initialize the element with the specified speed and offset.
 	/// Moves the element to its starting position and links any components.
 	/// </summary>
 	/// <param name="offset">Offset.</param>
 	/// <param name="speedParam">Speed parameter.</param>
-	public virtual void Init()
+	public virtual bool Init()
 	{
-		position.Scale(UINavigationController.AspectRatio);
+		if(!_initialized)
+		{
+			position.Scale(UIScreen.AspectRatio);
 
-		startPosition = position;
+			startPosition = position;
 
-		//SetStartPosition();
+			transform.Scale(UIScreen.AspectRatio.x, UIScreen.AspectRatio.y, 1);
 
-		_animator = GetComponent<Animator>();
+			_animator = GetComponent<Animator>();
 
-		//Link & initialize components (if they exist).
-		_uiButton = GetComponent<UIButton>();
+			//Initialize components (if they exist).
+			if(_fadeComponent)
+				_fadeComponent.Init(this);
+			if(_flashComponent)
+				_flashComponent.Init(this);
 
-		_fadeComponent = GetComponent<UIFadeComponent>();
-		if(_fadeComponent)
-			_fadeComponent.Init(this);
+			_initialized = true;
 
-		_flashComponent = GetComponent<UIFlashComponent>();
-		if(_flashComponent)
-			_flashComponent.Init(this);
+			return true;
+		} else
+			return false;
 	}
 	public virtual bool Activate(MovementState state=MovementState.INITIAL)
 	{
@@ -112,17 +116,14 @@ public class UIBase : MonoBehaviour {
 
 		if(state == MovementState.INITIAL)
 		{
-			//SetStartPosition();
-            if (_animates)
-                transform.parent.position = new Vector3(transform.parent.position.x * UINavigationController.AspectRatio.x, 
-                    transform.parent.position.y * UINavigationController.AspectRatio.y,
-                    transform.parent.position.z);
-            else
-                transform.position = new Vector3(transform.position.x * UINavigationController.AspectRatio.x,
-                    transform.position.y * UINavigationController.AspectRatio.y,
-                    transform.position.z);
-            Debug.Log(name + " " +transform.parent.position);
-			SetTrigger("Activate");
+			SetStartPosition();
+
+			if(_animates)
+				SetTrigger("Activate");
+			else
+				Activated();
+
+			//Debug.Log(name + " " +transform.parent.position);
 		}
 		else if(state == MovementState.IN_PLACE && _uiButton)
 			_uiButton.Activate();
@@ -136,13 +137,61 @@ public class UIBase : MonoBehaviour {
 		if(_flashComponent)
 			_flashComponent.Activate();
 
+		#if LOG
+		Debug.Log(name + "activated");
+		#endif
+
 		return true;
 	}
+
+	public virtual bool DelayedActivation(bool skipTransition=false)
+	{
+		if (active)
+			return false;
+
+		if(skipTransition)
+		{
+			SetPosition(position);
+
+			movementState = MovementState.IN_PLACE;
+
+			if(_uiButton)
+				_uiButton.Activate();
+		}
+		else
+		{
+			movementState = MovementState.INITIAL;
+			SetStartPosition();
+
+			enabled = true;
+
+			if(_animates)
+				SetTrigger("Activate");
+			else
+				Activated();
+		}
+
+		active = true;
+
+		//Activate components
+		if(_fadeComponent)
+			_fadeComponent.Activate();
+
+		if(_flashComponent)
+			_flashComponent.Activate();
+
+		return true;
+	}
+
 	public virtual bool Deactivate(bool force=false)
 	{
 		//Debug.Log(name + " disabled");
 		if(!active /*|| (!force && !enabled)*/)
 			return false;
+
+		#if LOG
+		Debug.Log(name + " deactivated");
+		#endif
 
 		active = false;
 
@@ -172,9 +221,9 @@ public class UIBase : MonoBehaviour {
 		currentPosition = position;
 
 		if(_animates)
-			transform.parent.position = Camera.main.ScreenToWorldPoint(new Vector3(currentPosition.x,currentPosition.y,1f));
+			transform.parent.position = Camera.main.ScreenToWorldPoint(new Vector3(currentPosition.x,Screen.height - currentPosition.y,3f));
 		else
-			transform.position = Camera.main.ScreenToWorldPoint(new Vector3(currentPosition.x,currentPosition.y,1f));
+			transform.position = Camera.main.ScreenToWorldPoint(new Vector3(currentPosition.x,Screen.height - currentPosition.y,3f));
 	}
 	void SetStartPosition()
 	{
@@ -194,7 +243,30 @@ public class UIBase : MonoBehaviour {
         {
             SetPosition(new Vector2(currentPosition.x * scale.x, currentPosition.y * scale.y));
         }
-    }
+	}
+	public void SetToPosition()
+	{
+		SetPosition(position);
+	}
+	public void SetX(float x)
+	{
+		currentPosition.x = x;
+		SetPosition(currentPosition);
+	}
+	public void SetY(float y)
+	{
+		currentPosition.y = y;
+		SetPosition(currentPosition);
+	}
+	public void SetStartX(float x)
+	{
+		startPosition.x = x;
+	}
+
+	public void SetStartY(float y)
+	{
+		startPosition.y = y;
+	}
 	#endregion
 
     #region Size Methods
@@ -206,12 +278,12 @@ public class UIBase : MonoBehaviour {
         }
         else
         {
-            transform.localScale.Scale(scale);
+			transform.Scale(scale.x,scale.y,1);
         }
     }
     #endregion
 
-    #region Exit Methods
+	#region Exit Methods
     public virtual void Exit()
 	{
 		if(!active)
@@ -222,14 +294,18 @@ public class UIBase : MonoBehaviour {
 			return;
 		}
 
-		SetTrigger("Exit");
+		if(_animates)
+		{
+			movementState = MovementState.EXITING;
+			SetTrigger("Exit");
+		}
+		else
+			Exited();
 
 		//This is deactivated here because buttons shouldn't be usable during the
 		//transition out.
 		if(_uiButton)
 			_uiButton.Deactivate();
-
-		movementState = MovementState.EXITING;
 	}
 	#endregion
 
@@ -291,6 +367,10 @@ public class UIBase : MonoBehaviour {
 	{
 		get { return currentPosition; }
 		set { SetPosition(value); }
+	}
+	public Vector2 StartPosition
+	{
+		get { return startPosition; }
 	}
 
 	public Color CurrentColor

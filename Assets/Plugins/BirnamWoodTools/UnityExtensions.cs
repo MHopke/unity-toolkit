@@ -86,6 +86,10 @@ public static class UnityExtensions
 	{
 		transform.localScale = vector;
 	}
+	public static void Scale(this Transform transform,float x,float y,float z)
+	{
+		transform.localScale = new Vector3(transform.localScale.x * x, transform.localScale.y * y, transform.localScale.z * z);
+	}
 	#endregion
 	#endregion
 
@@ -98,6 +102,10 @@ public static class UnityExtensions
 	#endregion
 
 	#region Vector2 Extensions
+	public static Vector2 ReturnScale(this Vector2 vector, Vector2 scale)
+	{
+		return new Vector2(vector.x * scale.x, vector.y * scale.y);
+	}
 	public static Vector2 Parse(string str)
 	{
 		string[] arr = str.Split(',');
@@ -114,6 +122,16 @@ public static class UnityExtensions
 		}
 
 		return new Vector2(x, y);
+	}
+	#endregion
+
+	#region Rect Extensions
+	public static void Scale(this Rect rect, Vector2 scale)
+	{
+		rect.x *= scale.x;
+		rect.y *= scale.y;
+		rect.width *= scale.x;
+		rect.height *= scale.y;
 	}
 	#endregion
 }

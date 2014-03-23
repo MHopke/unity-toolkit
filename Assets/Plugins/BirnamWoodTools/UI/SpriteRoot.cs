@@ -8,19 +8,22 @@ using System.Collections;
 public class SpriteRoot : MonoBehaviour {
 
 	#region Public Variables
+	public float _zDepth;
 	public Vector2 _startPosition;
 	#endregion
 
 	// Use this for initialization
-	void Start () 
+	protected void Start () 
 	{
-		_startPosition.Scale(UINavigationController.AspectRatio);
+		_startPosition.Scale(UIScreen.AspectRatio);
+
+		transform.Scale(UIScreen.AspectRatio.x, UIScreen.AspectRatio.y, 1);
 
 		SetPosition(_startPosition);
 	}
 
 	public void SetPosition(Vector2 position)
 	{
-		transform.position = Camera.main.ScreenToWorldPoint(new Vector3(position.x,position.y,1f));
+		transform.position = Camera.main.ScreenToWorldPoint(new Vector3(position.x,Screen.height - position.y,_zDepth));
 	}
 }

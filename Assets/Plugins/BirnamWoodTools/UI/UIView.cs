@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿//#define LOG
+using UnityEngine;
 using System.Collections.Generic;
 
 /// <summary>
@@ -25,6 +26,8 @@ public class UIView : MonoBehaviour {
 	#endregion
 
 	#region Public Variables
+	public bool _skipActivation;
+
     public Vector2 _position;
     public Vector2 _size;
 
@@ -53,12 +56,7 @@ public class UIView : MonoBehaviour {
 
 		} else if(IsUIInPlace())
 		{
-			enabled = false;
-
-			movementState = MovementState.IN_PLACE;
-
-			if(transitionInEvent != null)
-				transitionInEvent();
+			InPlace();
 		}
 	}
 	#endregion
@@ -89,7 +87,9 @@ public class UIView : MonoBehaviour {
 		if(activatedEvent != null)
 			activatedEvent();
 
-		//Debug.Log(name + " activate");
+		#if LOG
+		Debug.Log(name + " activated.");
+		#endif
 	}
 
 	/// <summary>
@@ -123,6 +123,10 @@ public class UIView : MonoBehaviour {
 		if(deactivatedEvent != null)
 			deactivatedEvent();
 		//Resources.UnloadUnusedAssets();
+
+		#if LOG
+		Debug.Log(name + " deactivated.");
+		#endif
 	}
 
 	/// <summary>
@@ -144,12 +148,20 @@ public class UIView : MonoBehaviour {
 	#region Interaction Methods
 	public virtual void LostFocus()
 	{
-		UIButton.DisableUIButtons();
+		for(int i = 0; i < _elements.Count; i++)
+		{
+			if(_elements[i] && _elements[i]._uiButton)
+				_elements[i]._uiButton.Disable();
+		}
 	}
 
 	public virtual void GainedFocus()
 	{
-		UIButton.EnableUIButtons();
+		for(int i = 0; i < _elements.Count; i++)
+		{
+			if(_elements[i] && _elements[i]._uiButton)
+				_elements[i]._uiButton.Enable();
+		}
 	}
 
 	public UIBase RetrieveUIElement(string name)
@@ -197,6 +209,15 @@ public class UIView : MonoBehaviour {
 
 		return true;
 	}
+	protected virtual void InPlace()
+	{
+		enabled = false;
+
+		movementState = MovementState.IN_PLACE;
+
+		if(transitionInEvent != null)
+			transitionInEvent();
+	}
 	#endregion
 
 	#region Exit Methods
@@ -226,7 +247,14 @@ public class UIView : MonoBehaviour {
 			for(int i = 0; i < _elements.Count; i++)
 			{
 				if(_elements[i] && !_elements[i].HasExited)
+					#if LOG
+					{
+						Debug.Log(_elements[i].name);
+						return false;
+					}
+					#else
 					return false;
+					#endif
 			}
 		}
 
