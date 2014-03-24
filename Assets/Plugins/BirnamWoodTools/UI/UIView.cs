@@ -28,8 +28,7 @@ public class UIView : MonoBehaviour {
 	#region Public Variables
 	public bool _skipActivation;
 
-    public Vector2 _position;
-    public Vector2 _size;
+	public Rect _viewRect;
 
 	public List<UIBase> _elements;
 	#endregion
@@ -184,7 +183,7 @@ public class UIView : MonoBehaviour {
     /// <param name="animate">Determines if the UIView animates.</param>
     public void Reposition(Vector2 newPosition,bool animate=false)
     {
-        Vector2 scale = new Vector2(newPosition.x / _position.x,newPosition.y / _position.y);
+		Vector2 scale = new Vector2(newPosition.x / _viewRect.x,newPosition.y / _viewRect.y);
 
         if (_elements != null)
         {
