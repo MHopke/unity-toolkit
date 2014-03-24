@@ -58,6 +58,27 @@ public class UIView : MonoBehaviour {
 			InPlace();
 		}
 	}
+		
+	void OnGUI()
+	{
+		//Only draw on repaint
+		if(Event.current.type == EventType.Repaint)
+		{
+			GUI.BeginGroup(_viewRect);
+			DrawContent();
+			GUI.EndGroup();
+		}
+	}
+
+	/// <summary>
+	/// Draws the content with in the view.
+	/// </summary>
+	protected virtual void DrawContent()
+	{
+		for(int i = 0; i < _elements.Count; i++)
+			_elements[i].Draw();
+	}
+
 	#endregion
 
 	#region Activation, Deactivation Methods
@@ -149,8 +170,8 @@ public class UIView : MonoBehaviour {
 	{
 		for(int i = 0; i < _elements.Count; i++)
 		{
-			if(_elements[i] && _elements[i]._uiButton)
-				_elements[i]._uiButton.Disable();
+			if(_elements[i])
+				_elements[i].Disable();
 		}
 	}
 
@@ -158,8 +179,8 @@ public class UIView : MonoBehaviour {
 	{
 		for(int i = 0; i < _elements.Count; i++)
 		{
-			if(_elements[i] && _elements[i]._uiButton)
-				_elements[i]._uiButton.Enable();
+			if(_elements[i])
+				_elements[i].Enable();
 		}
 	}
 

@@ -11,13 +11,13 @@ public class UIScrollView : UIView {
 	#endregion
 
 	#region Public Variables
-	public UISprite _background;
+	public UITexture _background;
 
 	public ScrollType _type;
 
 	public Vector2 _scrollBounds;
 
-	public Rect _viewRect; //The original view position
+	public Rect _scrollAreaRect; //The original view position
 	#endregion
 
 	#region Private Variables
@@ -33,9 +33,9 @@ public class UIScrollView : UIView {
 		if(_background)
 			_background.Init();
 
-		_viewRect.Scale(UIScreen.AspectRatio);
+		_scrollAreaRect.Scale(UIScreen.AspectRatio);
 
-		_startViewRect = _viewRect;
+		_startViewRect = _scrollAreaRect;
 
 		_currentViewRect = _startViewRect;
 
@@ -73,9 +73,16 @@ public class UIScrollView : UIView {
 		InputHandler.RemoveTouchMoving(TouchMoving);
 	}
 
+	protected override void DrawContent()
+	{
+		GUI.BeginGroup(_scrollAreaRect);
+		base.DrawContent();
+		GUI.EndGroup();
+	}
+
 	protected override void InPlace()
 	{
-		_currentViewRect = _viewRect;
+		_currentViewRect = _scrollAreaRect;
 
 		for(int i = 0; i < _elements.Count; i++)
 		{

@@ -19,23 +19,23 @@ public class UIBase : MonoBehaviour {
 	//Allows the UI element to skip activation from a UIView.
 	//Used in situations when an element should be hidden by default
 	public bool _skipUIViewActivation;
-	public bool _animates;
 
 	//Time in seconds to delay rendering
 	public float renderDelay;
 
-	//Position in pixels. Top Left is (0,0)
-	public Vector2 position;
+	//Rectangle to draw the element. (in pixels)
+	public Rect _drawRect;
 
-	//Components (if a component is not present it will be null)
-	public ButtonComponent _uiButton;
-	public UIFadeComponent _fadeComponent;
-	public UIFlashComponent _flashComponent;
+	//The customStyle to apply to the base component of any UI element.
+	//If an element uses multiple styles you will need to add more.
+	public CustomStyle customStyle;
 	#endregion
 
 	#region Protected Variables
 	//Determines if the element is currently active
 	new protected bool active;
+
+	protected bool _disabled;
 
     float movementRate;
 
@@ -44,8 +44,6 @@ public class UIBase : MonoBehaviour {
 	protected Vector2 startPosition;
 	protected Vector2 currentPosition;
     protected Vector2 _targetPosition;
-
-	public Animator _animator;
 	#endregion
 
 	#region Private Variables
@@ -63,16 +61,11 @@ public class UIBase : MonoBehaviour {
         {
             SetPosition(_targetPosition);
 
-            if (CanDisable())
+			/*if (CanDisable())
             {
                 enabled = false;
-            }
+			}*/
         }
-    }
-
-    protected virtual bool CanDisable()
-    {
-        return true;
     }
     #endregion
 
@@ -87,19 +80,12 @@ public class UIBase : MonoBehaviour {
 	{
 		if(!_initialized)
 		{
-			position.Scale(UIScreen.AspectRatio);
+			_drawRect.x *= UIScreen.AspectRatio.x;
+			_drawRect.y *= UIScreen.AspectRatio.y;
 
-			startPosition = position;
+			startPosition = new Vector2(_drawRect.x,_drawRect.y);
 
 			transform.Scale(UIScreen.AspectRatio.x, UIScreen.AspectRatio.y, 1);
-
-			_animator = GetComponent<Animator>();
-
-			//Initialize components (if they exist).
-			if(_fadeComponent)
-				_fadeComponent.Init(this);
-			if(_flashComponent)
-				_flashComponent.Init(this);
 
 			_initialized = true;
 
@@ -117,25 +103,12 @@ public class UIBase : MonoBehaviour {
 		if(state == MovementState.INITIAL)
 		{
 			SetStartPosition();
-
-			if(_animates)
-				SetTrigger("Activate");
-			else
-				Activated();
+			enabled = true;
 
 			//Debug.Log(name + " " +transform.parent.position);
 		}
-		else if(state == MovementState.IN_PLACE && _uiButton)
-			_uiButton.Activate();
 
 		active = true;
-
-		//Activate components
-		if(_fadeComponent)
-			_fadeComponent.Activate();
-
-		if(_flashComponent)
-			_flashComponent.Activate();
 
 		#if LOG
 		Debug.Log(name + "activated");
@@ -151,12 +124,9 @@ public class UIBase : MonoBehaviour {
 
 		if(skipTransition)
 		{
-			SetPosition(position);
+			SetToPosition();
 
 			movementState = MovementState.IN_PLACE;
-
-			if(_uiButton)
-				_uiButton.Activate();
 		}
 		else
 		{
@@ -164,21 +134,9 @@ public class UIBase : MonoBehaviour {
 			SetStartPosition();
 
 			enabled = true;
-
-			if(_animates)
-				SetTrigger("Activate");
-			else
-				Activated();
 		}
 
 		active = true;
-
-		//Activate components
-		if(_fadeComponent)
-			_fadeComponent.Activate();
-
-		if(_flashComponent)
-			_flashComponent.Activate();
 
 		return true;
 	}
@@ -197,18 +155,23 @@ public class UIBase : MonoBehaviour {
 
 		movementState = MovementState.EXITED;
 
-		if(_uiButton)
-			_uiButton.Deactivate();
-
-		//Deactivate components
-		if(_fadeComponent)
-			_fadeComponent.Deactivate();
-
-		if(_flashComponent)
-			_flashComponent.Deactivate();
-
 		return true;
 	}
+
+	//used for disabling interactive elements
+	public void Disable()
+	{
+		_disabled = true;
+	}
+
+	public void Enable()
+	{
+		_disabled = false;
+	}
+	#endregion
+
+	#region Draw Methods
+	public virtual void Draw(){}
 	#endregion
 
 	#region Position Methods
@@ -219,11 +182,6 @@ public class UIBase : MonoBehaviour {
 	protected virtual void SetPosition(Vector2 position)
 	{
 		currentPosition = position;
-
-		if(_animates)
-			transform.parent.position = Camera.main.ScreenToWorldPoint(new Vector3(currentPosition.x,Screen.height - currentPosition.y,3f));
-		else
-			transform.position = Camera.main.ScreenToWorldPoint(new Vector3(currentPosition.x,Screen.height - currentPosition.y,3f));
 	}
 	void SetStartPosition()
 	{
@@ -246,7 +204,7 @@ public class UIBase : MonoBehaviour {
 	}
 	public void SetToPosition()
 	{
-		SetPosition(position);
+		SetPosition(new Vector2(_drawRect.x,_drawRect.y));
 	}
 	public void SetX(float x)
 	{
@@ -293,19 +251,7 @@ public class UIBase : MonoBehaviour {
 
 			return;
 		}
-
-		if(_animates)
-		{
-			movementState = MovementState.EXITING;
-			SetTrigger("Exit");
-		}
-		else
-			Exited();
-
-		//This is deactivated here because buttons shouldn't be usable during the
-		//transition out.
-		if(_uiButton)
-			_uiButton.Deactivate();
+		Deactivate();
 	}
 	#endregion
 
@@ -320,27 +266,6 @@ public class UIBase : MonoBehaviour {
 	}
 	#endregion
 
-	#region Color Methods
-	protected virtual Color GetColor(){return Color.white;}
-	protected virtual void SetColor(Color color){}
-	#endregion
-
-	#region Animation Methods
-	protected virtual void SetTrigger(string triggerName)
-	{
-		if(_animator && _animator.runtimeAnimatorController)
-			_animator.SetTrigger(triggerName);
-	}
-	protected virtual void Activated()
-	{
-		if(_uiButton)
-			_uiButton.Activate();
-	}
-	public virtual void Exited()
-	{
-		Deactivate();
-	}
-	#endregion
 
 	#region Accessors
 	public bool InPlace
@@ -361,7 +286,7 @@ public class UIBase : MonoBehaviour {
 	/// Gets the bounding area of the element (in pixels).
 	/// </summary>
 	/// <returns>The bounds.</returns>
-	public virtual Rect GetBounds(){return new Rect();}
+	public virtual Rect GetBounds(){return _drawRect;}
 
 	public Vector2 CurrentPosition
 	{
@@ -371,12 +296,6 @@ public class UIBase : MonoBehaviour {
 	public Vector2 StartPosition
 	{
 		get { return startPosition; }
-	}
-
-	public Color CurrentColor
-	{
-		get { return GetColor(); }
-		set { SetColor(value); }
 	}
 	#endregion
 }

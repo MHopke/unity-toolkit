@@ -5,11 +5,7 @@ public class Vim : MonoBehaviour {
 
 	#region Constants
 	const string ACHIEVEMENT_KEY = "Achievements";
-	#endregion
-
-	public ButtonComponent button;
-
-	public UIFadeComponent _fade;
+   	#endregion
 
 	Animator animator;
 	// Use this for initialization
@@ -18,9 +14,6 @@ public class Vim : MonoBehaviour {
 		/*AchievementManager.LoadAchievements(PlayerPrefs.GetString(ACHIEVEMENT_KEY, ""));
 
 		PlayerPrefs.SetString(ACHIEVEMENT_KEY,AchievementManager.SaveAchievements());*/
-
-		button.Activate();
-		button.clickEvent += Click;
 
 
 		//iOSBinding.PopAlertWithHeaderAndText("header", "text!");
@@ -49,6 +42,6 @@ public class Vim : MonoBehaviour {
 
 	void Click()
 	{
-		_fade.FadeOut();
+		//_fade.FadeOut();
 	}
 }

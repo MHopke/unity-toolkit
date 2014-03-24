@@ -55,11 +55,7 @@
      <Compile Include="Assets\Plugins\BirnamWoodTools\UI\MaskTransition.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\UI\SpriteRoot.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIBase.cs" />
-     <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIComponents\AnimatedButton.cs" />
-     <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIComponents\ButtonComponent.cs" />
-     <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIComponents\UIComponent.cs" />
-     <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIComponents\UIFadeComponent.cs" />
-     <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIComponents\UIFlashComponent.cs" />
+     <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIButton.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIExtensions.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIFadeTransition.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UILabel.cs" />
@@ -67,7 +63,7 @@
      <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIPercentBar.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIScreen.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIScrollView.cs" />
-     <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UISprite.cs" />
+     <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UITexture.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIToggle.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIToolbar.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIView.cs" />

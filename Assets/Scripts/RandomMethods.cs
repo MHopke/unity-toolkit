@@ -3,14 +3,11 @@ using System.Collections;
 
 public class RandomMethods : MonoBehaviour 
 {
-	public ButtonComponent _blinkButton;
 	public Sprite _texture;
 
 	void Start()
 	{
-		_blinkButton.clickEvent += BlinkClick;
-
-		Debug.Log(_texture.textureRect + " " +_texture.textureRectOffset);
+		//_blinkButton.clickEvent += BlinkClick;
 	}
 
 	void BlinkClick ()

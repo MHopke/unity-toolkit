@@ -9,10 +9,6 @@ public class UILabel : UIBase
 	public int depth;
 
 	public string text;
-
-	public Vector2 size;
-
-	public CustomStyle customStyle;
 	#endregion
 
 	#region Protected Variables
@@ -24,8 +20,6 @@ public class UILabel : UIBase
 
 	protected Vector3 _scale;
 	protected Vector3 _originalScale;
-
-	protected Rect drawRect;
 	#endregion
 
 	#region Activation, Deactivation, Init Methods
@@ -35,9 +29,7 @@ public class UILabel : UIBase
 		{
 			customStyle.SetDefaultStyle("label");
 
-			size.Scale(UIScreen.AspectRatio);
-
-			_originalDimensions = size;
+			_originalDimensions = new Vector2(_drawRect.width,_drawRect.height);
 
 			if(customStyle.custom)
 				_originalFontSize = customStyle.style.fontSize;
@@ -50,8 +42,6 @@ public class UILabel : UIBase
 			}
 
 			_originalScale = transform.localScale;
-
-			drawRect = new Rect(position.x, position.y, size.x, size.y);
 			return true;
 		} else
 			return false;
@@ -104,15 +94,15 @@ public class UILabel : UIBase
 		currentPosition = Camera.main.WorldToScreenPoint(transform.position);
 
 		//Set the draw rect
-		drawRect.x = currentPosition.x;
-		drawRect.y = currentPosition.y;
-		drawRect.width = _originalDimensions.x * _scale.x;
-		drawRect.height = _originalDimensions.y * _scale.y;
+		_drawRect.x = currentPosition.x;
+		_drawRect.y = currentPosition.y;
+		_drawRect.width = _originalDimensions.x * _scale.x;
+		_drawRect.height = _originalDimensions.y * _scale.y;
 	}
 	#endregion
 
 	#region Draw Methods
-	protected virtual void OnGUI()
+	public override void Draw()
 	{
 		useGUILayout = false;
 
@@ -121,9 +111,9 @@ public class UILabel : UIBase
 		GUI.depth = depth;
 
 		if(customStyle.custom)
-			GUI.Label(drawRect, text, customStyle.style);
+			GUI.Label(_drawRect, text, customStyle.style);
 		else
-			GUI.Label(drawRect, text, customStyle.styleName);
+			GUI.Label(_drawRect, text, customStyle.styleName);
 	}
 	#endregion
 
@@ -132,8 +122,8 @@ public class UILabel : UIBase
 	{
 		base.SetPosition(position);
 
-		drawRect.x = position.x;
-		drawRect.y = position.y;
+		_drawRect.x = position.x;
+		_drawRect.y = position.y;
 	}
 	#endregion
 
@@ -158,57 +148,6 @@ public class UILabel : UIBase
 	public override System.Type GetBaseType()
 	{
 		return typeof(UILabel);
-	}
-	#endregion
-
-	#region Animation Methods
-	protected override void SetTrigger(string triggerName)
-	{
-		if(_animator && _animator.runtimeAnimatorController)
-		{
-			CreateCustomStyle();
-			_animator.SetTrigger(triggerName);
-			AnimationStarted();
-		}
-	}
-	protected override void Activated()
-	{
-		base.Activated();
-
-		AnimationEnded();
-	}
-	public override void Exited()
-	{
-		base.Exited();
-
-		AnimationEnded();
-	}
-
-	void AnimationStarted()
-	{
-		_animating = true;
-	}
-	void AnimationEnded()
-	{
-		_animating = false;
-	}
-	#endregion
-
-	#region Color Methods
-	protected override Color GetColor()
-	{
-		return customStyle.style.normal.textColor;
-	}
-	protected override void SetColor(Color color)
-	{
-		customStyle.style.normal.textColor = color;
-	}
-	#endregion
-
-	#region Accessors
-	public override Rect GetBounds()
-	{
-		return new Rect(currentPosition.x, currentPosition.y, size.x, size.y);
 	}
 	#endregion
 }

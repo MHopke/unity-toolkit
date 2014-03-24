@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Editor\AutoAdjustEditor.cs" />
+     <Compile Include="Assets\Editor\UIButtonEditor.cs" />
      <None Include="Assets\Plugins\BirnamWoodTools\iOS Classes\BWG_iOS_ReadMe.txt" />
      <None Include="Assets\Resources\Achievements.xml" />
      <None Include="Assets\Resources\Screens.xml" />

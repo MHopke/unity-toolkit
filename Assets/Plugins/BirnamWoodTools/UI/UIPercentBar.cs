@@ -3,7 +3,7 @@
 /// <summary>
 /// Representation of a percent bar.
 /// </summary>
-public class UIPercentBar : UISprite 
+public class UIPercentBar : UITexture 
 {
 	#region Constants
 	float SCALE_CLOSE = 0.1f;
