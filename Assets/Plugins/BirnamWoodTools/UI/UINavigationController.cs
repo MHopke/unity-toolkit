@@ -5,6 +5,7 @@
 /// will automatically load & unload UIViewControllers from memory.
 /// </summary>
 [RequireComponent(typeof(InputHandler))]
+[RequireComponent(typeof(UIScreen))]
 public class UINavigationController : MonoBehaviour 
 {
 	#region Events
@@ -53,7 +54,7 @@ public class UINavigationController : MonoBehaviour
 		if(_skin != null)
 		{
 			for(int i = 0; i < _skin.customStyles.Length; i++)
-				_skin.customStyles[i].fontSize = Mathf.RoundToInt(UIScreen.AspectRatio.x * (float)_skin.customStyles[i].fontSize);
+			_skin.customStyles[i].fontSize = Mathf.RoundToInt(UIScreen.AspectRatio.x * (float)_skin.customStyles[i].fontSize);
 
 			//_skin.label.fontSize = Mathf.RoundToInt((AspectRatio.x * (float)_skin.label.fontSize));
 		}

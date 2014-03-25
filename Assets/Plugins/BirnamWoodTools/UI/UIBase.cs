@@ -28,7 +28,7 @@ public class UIBase : MonoBehaviour {
 
 	//The customStyle to apply to the base component of any UI element.
 	//If an element uses multiple styles you will need to add more.
-	public CustomStyle customStyle;
+	public CustomStyle _primaryStyle;
 	#endregion
 
 	#region Protected Variables
@@ -50,25 +50,6 @@ public class UIBase : MonoBehaviour {
 	bool _initialized;
 	#endregion
 
-    #region Unity Methods
-    void Update()
-    {
-        movementRate = 1.0f / (currentPosition - _targetPosition).magnitude;
-
-        SetPosition(Vector2.Lerp(currentPosition, _targetPosition, movementRate * Time.deltaTime));
-
-        if (Mathf.Abs((currentPosition - _targetPosition).magnitude) <= CLOSE_ENOUGH)
-        {
-            SetPosition(_targetPosition);
-
-			/*if (CanDisable())
-            {
-                enabled = false;
-			}*/
-        }
-    }
-    #endregion
-
 	#region Init, Activation, Deactivation Methods
     /// <summary>
 	/// Initialize the element with the specified speed and offset.
@@ -80,12 +61,9 @@ public class UIBase : MonoBehaviour {
 	{
 		if(!_initialized)
 		{
-			_drawRect.x *= UIScreen.AspectRatio.x;
-			_drawRect.y *= UIScreen.AspectRatio.y;
+			UIScreen.AdjustForResolution(ref _drawRect);
 
 			startPosition = new Vector2(_drawRect.x,_drawRect.y);
-
-			transform.Scale(UIScreen.AspectRatio.x, UIScreen.AspectRatio.y, 1);
 
 			_initialized = true;
 
@@ -103,7 +81,7 @@ public class UIBase : MonoBehaviour {
 		if(state == MovementState.INITIAL)
 		{
 			SetStartPosition();
-			enabled = true;
+			//enabled = true;
 
 			//Debug.Log(name + " " +transform.parent.position);
 		}
@@ -133,7 +111,7 @@ public class UIBase : MonoBehaviour {
 			movementState = MovementState.INITIAL;
 			SetStartPosition();
 
-			enabled = true;
+			//enabled = true;
 		}
 
 		active = true;

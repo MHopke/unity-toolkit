@@ -21,12 +21,23 @@ public class UIView : MonoBehaviour {
 	#endregion
 
 	#region Enums
-	public enum Section { NONE = 0, HEADER, CONTENT, FOOTER }
-	protected enum MovementState { INITIAL = 0, IN_PLACE, EXITING }
+	protected enum MovementState { INITIAL = 0, IN_PLACE, EXITING, EXITED }
+	#endregion
+
+	#region Constants
+	const float CLOSE_ENOUGH = 30.0f;
+	const float SPEED_MOD = 100.0f;
 	#endregion
 
 	#region Public Variables
 	public bool _skipActivation;
+
+	//used to determine if useGUILayout should be used
+	//views that need to utilize GUI.depth should have this turned on
+	public bool _useGUILayout;
+
+	//lower numbers are drawn on top of higher numbers
+	public int _depth;
 
 	public Rect _viewRect;
 
@@ -34,7 +45,16 @@ public class UIView : MonoBehaviour {
 	#endregion
 
 	#region Protected Variables
+	protected bool _transitioning;
+
+	protected float movementRate;
+
 	protected MovementState movementState;
+
+	protected Vector2 _currentPosition;
+	protected Vector2 _startPosition;
+
+	protected Transition _currentTransition;
 	#endregion
 
 	#region Unity Methods
@@ -44,30 +64,58 @@ public class UIView : MonoBehaviour {
 		Initialize();
 
 		enabled = false;
+
+		if(!_useGUILayout)
+			useGUILayout = false;
 	}
 	
 	protected void Update()
 	{
-		if(movementState == MovementState.EXITING)
+		if(movementState == MovementState.INITIAL)
 		{
-			if(HasUIExited())
-				Deactivate();
+			movementRate = 1.0f / (_currentPosition - _currentTransition._targetPosition).magnitude;
 
-		} else if(IsUIInPlace())
+			SetPosition(Vector2.Lerp(_currentPosition, _currentTransition._targetPosition, movementRate * _currentTransition._speed * SPEED_MOD * Time.deltaTime));
+
+			if(Mathf.Abs((_currentPosition - _currentTransition._targetPosition).magnitude) <= CLOSE_ENOUGH)
+			{
+				SetPosition(_currentTransition._targetPosition);
+
+				movementState = MovementState.IN_PLACE;
+
+				if(transitionInEvent != null)
+					transitionInEvent();
+			}
+		} else if(movementState == MovementState.EXITING)
 		{
-			InPlace();
-		}
+			movementRate = 1.0f / (_currentPosition - _currentTransition._targetPosition).magnitude;
+
+			SetPosition(Vector2.Lerp(_currentPosition, _currentTransition._targetPosition, movementRate * _currentTransition._speed * SPEED_MOD * Time.deltaTime));
+
+			if(Mathf.Abs((_currentPosition - _currentTransition._targetPosition).magnitude) <= CLOSE_ENOUGH)
+			{
+				SetPosition(_currentTransition._targetPosition);
+
+				movementState = MovementState.EXITED;
+
+				if(transitionOutEvent != null)
+					transitionOutEvent();
+
+				Deactivate();
+			}
+		} 
 	}
 		
 	void OnGUI()
 	{
-		//Only draw on repaint
-		if(Event.current.type == EventType.Repaint)
-		{
-			GUI.BeginGroup(_viewRect);
-			DrawContent();
-			GUI.EndGroup();
-		}
+		GUI.depth = _depth;
+
+		if(UINavigationController.Skin)
+			GUI.skin = UINavigationController.Skin;
+
+		GUI.BeginGroup(_viewRect);
+		DrawContent();
+		GUI.EndGroup();
 	}
 
 	/// <summary>
@@ -76,7 +124,10 @@ public class UIView : MonoBehaviour {
 	protected virtual void DrawContent()
 	{
 		for(int i = 0; i < _elements.Count; i++)
-			_elements[i].Draw();
+		{
+			if(_elements[i])
+				_elements[i].Draw();
+		}
 	}
 
 	#endregion
@@ -84,6 +135,16 @@ public class UIView : MonoBehaviour {
 	#region Activation, Deactivation Methods
 	protected virtual void Initialize()
 	{
+		_viewRect.x *= UIScreen.AspectRatio.x;
+		_viewRect.y *= UIScreen.AspectRatio.y;
+		_viewRect.width *= UIScreen.AspectRatio.x;
+		_viewRect.height *= UIScreen.AspectRatio.y;
+
+		_startPosition.x = _viewRect.x;
+		_startPosition.y = _viewRect.y;
+
+		_currentPosition = _startPosition;
+
 		if(_elements != null)
 		{
 			for(int i = 0; i < _elements.Count; i++)
@@ -100,16 +161,19 @@ public class UIView : MonoBehaviour {
 
 		//background = (Texture2D)Resources.Load(BackgroundName);
 
+		_currentTransition = new Transition(_currentPosition, 1f);
+
 		Activation();
+	}
 
-		enabled = true;
+	public void Activate(Transition transition)
+	{
+		if(enabled)	return;
 
-		if(activatedEvent != null)
-			activatedEvent();
+		_currentTransition = transition;
+		_currentTransition._targetPosition.Scale(UIScreen.AspectRatio);
 
-		#if LOG
-		Debug.Log(name + " activated.");
-		#endif
+		Activation();
 	}
 
 	/// <summary>
@@ -126,7 +190,18 @@ public class UIView : MonoBehaviour {
 			}
 		}
 
+		enabled = true;
+
+		if(activatedEvent != null)
+			activatedEvent();
+
+		SetPosition(_startPosition);
+
 		movementState = MovementState.INITIAL;
+
+		#if LOG
+		Debug.Log(name + " activated.");
+		#endif
 	}
 
 	public void Deactivate() 
@@ -143,10 +218,6 @@ public class UIView : MonoBehaviour {
 		if(deactivatedEvent != null)
 			deactivatedEvent();
 		//Resources.UnloadUnusedAssets();
-
-		#if LOG
-		Debug.Log(name + " deactivated.");
-		#endif
 	}
 
 	/// <summary>
@@ -162,6 +233,10 @@ public class UIView : MonoBehaviour {
 					_elements[i].Deactivate();
 			}
 		}
+
+		#if LOG
+		Debug.Log(name + " deactivated.");
+		#endif
 	}
 	#endregion
 
@@ -238,10 +313,26 @@ public class UIView : MonoBehaviour {
 		if(transitionInEvent != null)
 			transitionInEvent();
 	}
+
+	void SetPosition(Vector2 position)
+	{
+		_currentPosition.x = position.x;
+		_currentPosition.y = position.y;
+
+		_viewRect.x = position.x;
+		_viewRect.y = position.y;
+	}
 	#endregion
 
 	#region Exit Methods
-	public virtual void FlagForExit()
+	public void FlagForExit()
+	{
+		_currentTransition = new Transition(_currentPosition, 1f);
+
+		Exit();
+	}
+
+	public virtual void Exit()
 	{
 		if(_elements != null)
 		{
@@ -252,12 +343,17 @@ public class UIView : MonoBehaviour {
 			}
 		}
 
-		enabled = true;
-
 		movementState = MovementState.EXITING;
 
 		if(transitionOutEvent != null)
 			transitionOutEvent();
+	}
+
+	public void FlagForExit(Transition transition)
+	{
+		_currentTransition = transition;
+
+		Exit();
 	}
 
 	bool HasUIExited()

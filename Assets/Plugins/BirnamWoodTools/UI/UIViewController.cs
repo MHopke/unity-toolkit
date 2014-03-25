@@ -47,6 +47,7 @@ public class UIViewController : MonoBehaviour
 	#endregion
 
 	#region Methods
+	//Present view methods
 	public static void PresentUIView(UIView view)
 	{
 		view.Activate();
@@ -58,16 +59,31 @@ public class UIViewController : MonoBehaviour
 		if(temp)
 			temp.Activate();
 	}
+	public static void PresentUIViewWithTransition(string view, Transition transition)
+	{
+		UIView temp = instance.GetUIView(view);
+
+		if(temp)
+			temp.Activate(transition);
+	}
+	//Remove view methods
 	public static void RemoveUIView(UIView view)
 	{
-		view.Deactivate();
+		view.FlagForExit();
 	}
 	public static void RemoveUIView(string view)
 	{
 		UIView temp = instance.GetUIView(view);
 
 		if(temp)
-			temp.Deactivate();
+			temp.FlagForExit();
+	}
+	public static void RemoveUIViewWithTransition(string view, Transition transition)
+	{
+		UIView temp = instance.GetUIView(view);
+
+		if(temp)
+			temp.FlagForExit(transition);
 	}
 
 	public static UIBase GetElementFromView(string element, string view)

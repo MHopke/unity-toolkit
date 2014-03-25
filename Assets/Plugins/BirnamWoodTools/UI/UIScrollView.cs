@@ -15,16 +15,7 @@ public class UIScrollView : UIView {
 
 	public ScrollType _type;
 
-	public Vector2 _scrollBounds;
-
 	public Rect _scrollAreaRect; //The original view position
-	#endregion
-
-	#region Private Variables
-	Vector2 _scrollPosition; //used to determine if the scroll has reached its bounds
-
-	Rect _startViewRect;
-	Rect _currentViewRect;
 	#endregion
 
 	#region Overriden Method
@@ -35,34 +26,19 @@ public class UIScrollView : UIView {
 
 		_scrollAreaRect.Scale(UIScreen.AspectRatio);
 
-		_startViewRect = _scrollAreaRect;
-
-		_currentViewRect = _startViewRect;
-
 		base.Initialize();
 	}
 		
 	protected override void Activation()
 	{
-		if(_elements != null)
-		{
-			//Only UI Elements within the _viewRect should be activated
-			for(int i = 0; i < _elements.Count; i++)
-			{
-				if(_elements[i] != null && ElementInView(_elements[i].GetBounds()))
-					_elements[i].Activate();
-			}
-		}
-
 		if(_background)
 			_background.Activate();
 
-		_scrollPosition = Vector2.zero;
-
-		movementState = MovementState.INITIAL;
-
 		InputHandler.AddTouchMoving(TouchMoving);
+
+		base.Activation();
 	}
+
 	protected override void Deactivation()
 	{
 		if(_background)
@@ -75,6 +51,9 @@ public class UIScrollView : UIView {
 
 	protected override void DrawContent()
 	{
+		if(_background)
+			_background.Draw();
+
 		GUI.BeginGroup(_scrollAreaRect);
 		base.DrawContent();
 		GUI.EndGroup();
@@ -82,8 +61,6 @@ public class UIScrollView : UIView {
 
 	protected override void InPlace()
 	{
-		_currentViewRect = _scrollAreaRect;
-
 		for(int i = 0; i < _elements.Count; i++)
 		{
 			if(_elements[i] != null)
@@ -107,20 +84,29 @@ public class UIScrollView : UIView {
 		base.GainedFocus();
 	}
 
-	public override void FlagForExit()
+	public override void Exit()
 	{
+		base.Exit();
+
 		if(_background)
 			_background.Exit();
-
-		base.FlagForExit();
 	}
 	#endregion
 
 	#region Methods
-	bool ElementInView(Rect bounds)
+	void CheckHorizontalBorders()
 	{
-		return bounds.xMax >= _currentViewRect.x && bounds.x <= _currentViewRect.xMax && bounds.yMax >= _currentViewRect.y
-			&& bounds.y <= _currentViewRect.yMax;
+		if(_scrollAreaRect.x <= -_scrollAreaRect.width)
+			_scrollAreaRect.x = -_scrollAreaRect.width;
+		else if(_scrollAreaRect.x >= 0.0f)
+			_scrollAreaRect.x = 0.0f;
+	}
+	void CheckVerticalBorders()
+	{
+		if(_scrollAreaRect.y <= -_scrollAreaRect.height)
+			_scrollAreaRect.y = -_scrollAreaRect.height;
+		else if(_scrollAreaRect.y >= 0.0f)
+			_scrollAreaRect.y = 0.0f;
 	}
 	#endregion
 
@@ -129,34 +115,25 @@ public class UIScrollView : UIView {
 	{
 		if(movementState == MovementState.IN_PLACE/* && ViewRect.Contains(new Vector2(pos.x,Screen.height - pos.y))*/)
 		{
-			//Ensure that movement is locked if it should be
+			//Adjust movement for each type
 			if(_type == ScrollType.HORIZONTAL)
-				delta.y = 0;
-			else if(_type == ScrollType.VERTICAL)
-				delta.x = 0;
-
-			_scrollPosition += delta;
-
-			if(_scrollPosition.y <= -_scrollBounds.y || _scrollPosition.y > 0)
-				delta.y = 0;
-			if(_scrollPosition.x <= -_scrollBounds.x || _scrollPosition.x > 0)
-				delta.x = 0;
-
-			if(delta == Vector2.zero)
-				return;
-
-			for(int i = 0; i < _elements.Count; i++)
 			{
-				if(_elements[i])
-				{
-					_elements[i].CurrentPosition += delta;
-					//Debug.Log(UIElements[i].CurrentPosition);
+				_scrollAreaRect.x += delta.x;
 
-					if(ElementInView(_elements[i].GetBounds()))
-						_elements[i].Activate(UIBase.MovementState.IN_PLACE);
-					else
-						_elements[i].Deactivate(true);
-				}
+				CheckHorizontalBorders();
+			} else if(_type == ScrollType.VERTICAL)
+			{
+				_scrollAreaRect.y += delta.y;
+
+				CheckVerticalBorders();
+
+			} else
+			{
+				_scrollAreaRect.x += delta.x;
+				_scrollAreaRect.y += delta.y;
+
+				CheckHorizontalBorders();
+				CheckVerticalBorders();
 			}
 		}
 	}

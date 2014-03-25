@@ -83,14 +83,6 @@ extern "C"
             //[GetAppController() popAlertWithHeader:"Sorry" andText:"You can't post a status right now, make sure your device has an internet connection and you have at least one Facebook account setup"];
         }
     }
-    
-    void iTextToSpeech(string text)
-    {
-        //[GetAppController() speakWithText:text];
-        AVSpeechSynthesizer *speechSynth = [[[AVSpeechSynthesizer alloc]init] autorelease];
-        AVSpeechUtterance *utterance = [AVSpeechUtterance speechUtteranceWithString:[[[NSString alloc] initWithCString:text encoding:NSASCIIStringEncoding] autorelease]];
-        [speechSynth speakUtterance:utterance];
-    }
 }
 
 @end
