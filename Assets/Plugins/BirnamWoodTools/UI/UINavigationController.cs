@@ -56,7 +56,8 @@ public class UINavigationController : MonoBehaviour
 			for(int i = 0; i < _skin.customStyles.Length; i++)
 			_skin.customStyles[i].fontSize = Mathf.RoundToInt(UIScreen.AspectRatio.x * (float)_skin.customStyles[i].fontSize);
 
-			//_skin.label.fontSize = Mathf.RoundToInt((AspectRatio.x * (float)_skin.label.fontSize));
+			//Add any standard skins that you utilize as well such as the example below
+			//_skin.label.fontSize = Mathf.RoundToInt((UIScreen.AspectRatio.x * (float)_skin.label.fontSize));
 		}
 		#endif
 

@@ -28,12 +28,7 @@ public class UIButton : UIBase
 		if(base.Init())
 		{
 			if(_type == ButtonType.BOTH)
-			{
-				_textRect.x *= UIScreen.AspectRatio.x;
-				_textRect.y *= UIScreen.AspectRatio.y;
-				_textRect.width *= UIScreen.AspectRatio.x;
-				_textRect.height *= UIScreen.AspectRatio.y;
-			}
+				UIScreen.AdjustForResolution(ref _textRect);
 
 			return true;
 		} else

@@ -1,16 +1,13 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Plugins/BirnamWoodTools/UI/UIInputField.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Plugins/BirnamWoodTools/UI/UINavigationController.cs">
     <Files>
-      <File FileName="Assets/Plugins/BirnamWoodTools/UI/UIBase.cs" Line="136" Column="6" />
-      <File FileName="Assets/Plugins/BirnamWoodTools/UI/UIView.cs" Line="330" Column="19" />
-      <File FileName="Assets/Plugins/BirnamWoodTools/UI/UIScrollView.cs" Line="89" Column="12" />
-      <File FileName="Assets/Scripts/RandomMethods.cs" Line="29" Column="49" />
-      <File FileName="Assets/Plugins/BirnamWoodTools/UI/UIButton.cs" Line="13" Column="2" />
-      <File FileName="Assets/Plugins/BirnamWoodTools/UI/UILabel.cs" Line="12" Column="2" />
-      <File FileName="Assets/Plugins/BirnamWoodTools/UI/UIExtensions.cs" Line="187" Column="15" />
-      <File FileName="Assets/Plugins/BirnamWoodTools/UI/UIViewController.cs" Line="86" Column="4" />
-      <File FileName="Assets/Plugins/BirnamWoodTools/UI/UIInputField.cs" Line="1" Column="1" />
+      <File FileName="Assets/Plugins/BirnamWoodTools/UI/UIBase.cs" Line="79" Column="25" />
+      <File FileName="Assets/Plugins/BirnamWoodTools/UI/UIView.cs" Line="138" Column="47" />
+      <File FileName="Assets/Plugins/BirnamWoodTools/UI/UIScrollView.cs" Line="21" Column="2" />
+      <File FileName="Assets/Plugins/BirnamWoodTools/UI/UIScreen.cs" Line="59" Column="28" />
+      <File FileName="Assets/Plugins/BirnamWoodTools/UI/UINavigationController.cs" Line="58" Column="3" />
+      <File FileName="Assets/Plugins/BirnamWoodTools/UI/UIButton.cs" Line="31" Column="49" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

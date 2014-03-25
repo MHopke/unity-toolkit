@@ -135,10 +135,7 @@ public class UIView : MonoBehaviour {
 	#region Activation, Deactivation Methods
 	protected virtual void Initialize()
 	{
-		_viewRect.x *= UIScreen.AspectRatio.x;
-		_viewRect.y *= UIScreen.AspectRatio.y;
-		_viewRect.width *= UIScreen.AspectRatio.x;
-		_viewRect.height *= UIScreen.AspectRatio.y;
+		UIScreen.AdjustForResolution(ref _viewRect);
 
 		_startPosition.x = _viewRect.x;
 		_startPosition.y = _viewRect.y;
