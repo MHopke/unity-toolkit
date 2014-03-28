@@ -56,7 +56,9 @@
      <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIButton.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIExtensions.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIFadeTransition.cs" />
+     <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIHistoryView.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIInputField.cs" />
+     <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIInputPassword.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UILabel.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UINavigationController.cs" />
      <Compile Include="Assets\Plugins\BirnamWoodTools\UI\UIPercentBar.cs" />

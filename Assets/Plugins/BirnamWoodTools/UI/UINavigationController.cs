@@ -149,14 +149,14 @@ public class UINavigationController : MonoBehaviour
 	void TransitionInFinished()
 	{
 		SwitchControllers();
-		UINavigationController.CurrentController.LoseFocus();
+		UIViewController.LoseFocus();
 
 		if(transitionInStartedEvent != null)
 			transitionInStartedEvent(_targetControllerId);
 	}
 	void TransitionOutFinished()
 	{
-		UINavigationController.CurrentController.GainFocus();
+		UIViewController.GainFocus();
 
 		if(transitionDidFinishEvent != null)
 			transitionDidFinishEvent(_targetControllerId);

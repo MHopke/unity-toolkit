@@ -41,7 +41,7 @@ public class UIButton : UIBase
 	{
 		if(_type == ButtonType.IMAGE)
 		{
-			if(GUI.Button(_drawRect, _texture) && !_disabled)
+			if(GUI.Button(_drawRect, _texture,GUIStyle.none) && !_disabled)
 				FireClickEvent();
 		} else if(_type == ButtonType.TEXT)
 		{

@@ -103,8 +103,12 @@ public class UIView : MonoBehaviour {
 
 				Deactivate();
 			}
-		} 
+		}
+
+		OnUpdate();
 	}
+
+	protected virtual void OnUpdate(){}
 		
 	void OnGUI()
 	{
@@ -125,7 +129,7 @@ public class UIView : MonoBehaviour {
 	{
 		for(int i = 0; i < _elements.Count; i++)
 		{
-			if(_elements[i])
+			if(_elements[i] && _elements[i].Active)
 				_elements[i].Draw();
 		}
 	}

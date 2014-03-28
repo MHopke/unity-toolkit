@@ -246,6 +246,11 @@ public class UIBase : MonoBehaviour {
 
 
 	#region Accessors
+	public bool Active
+	{
+		get { return active; }
+		set { active = value; }
+	}
 	public bool InPlace
 	{
 		get { return movementState == MovementState.IN_PLACE; }

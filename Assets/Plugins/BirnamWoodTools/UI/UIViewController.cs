@@ -117,21 +117,21 @@ public class UIViewController : MonoBehaviour
 		return false;
 	}
 
-	public void GainFocus()
+	public static  void GainFocus()
 	{
-		for(int i = 0; i < _views.Count; i++)
+		for(int i = 0; i < instance._views.Count; i++)
 		{
-			if(_views[i])
-				_views[i].GainedFocus();
+			if(instance._views[i])
+				instance._views[i].GainedFocus();
 		}
 	}
 
-	public void LoseFocus()
+	public static void LoseFocus()
 	{
-		for(int i = 0; i < _views.Count; i++)
+		for(int i = 0; i < instance._views.Count; i++)
 		{
-			if(_views[i])
-				_views[i].LostFocus();
+			if(instance._views[i])
+				instance._views[i].LostFocus();
 		}
 	}
 	#endregion
