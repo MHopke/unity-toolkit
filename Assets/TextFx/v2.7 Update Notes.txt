@@ -1,0 +1,11 @@
+Please Note:
+
+If you have updated your TextFx package from an older version, it is recommended that you rerun your existing textfx animations in the editor and resave/reapply your prefabs, in order to:
+- Update the effect implementation to the newest format, and avoid running any backwards compatibility steps at runtime.
+- Test that your old effects work exactly the same as they used to (which they should!)
+
+If you have any problems updating your TextFx project to v2.7, please contact us at fenderrio@gmail.com
+
+Thanks, and enjoy the update!
+
+- Fenderrio Games

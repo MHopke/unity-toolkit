@@ -1,0 +1,8 @@
++ Added support for Shuriken ParticleSystems integration
++ Improved Audio/Particle effects setup; added new functionality options
++ Added Bezier curve text positioning support
++ Added 'EasedCustom' progression option, for defining custom easing functions using animation curves
++ Added Baseline text anchoring option
++ Added clean publicly accessible scripting methods for easier dynamic tweaking of effects at runtime
++ Added methods for retrieving letter position/rotation/scale during runtime
++ Fixed dynamic font display issues

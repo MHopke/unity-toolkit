@@ -1,3 +1,4 @@
+//#define DRAW
 using UnityEngine;
 
 /// <summary>
@@ -5,64 +6,28 @@ using UnityEngine;
 /// </summary>
 public class UISprite : UIBase
 {
+	#region Public Variables
+	public bool _hasRoot;
+
+	public float _zDepth = 3;
+	#endregion
+
 	#region Protected Variables
 	protected SpriteRenderer _spriteRenderer;
 
 	protected Animator _spriteAnimator;
 	#endregion
 
-	/*void Update()
-	{
-		if(!_spriteRenderer.enabled)
-		{
-			Debug.Log("re-enabled");
-			_spriteRenderer.enabled = true;
-			enabled = false;
-		}
-	}*/
-
 	#region Activation, Deactivation, Init Methods
-	public override bool Init()
+	protected override void OnInit()
 	{
-		if(base.Init())
-		{
-			_spriteRenderer = GetComponent<SpriteRenderer>();
+		base.OnInit();
 
-			_spriteRenderer.enabled = false;
-			return true;
-		} else
-			return false;
-	}
+		_spriteRenderer = GetComponent<SpriteRenderer>();
 
-	public override bool Activate(MovementState state=MovementState.INITIAL)
-	{
-		if(base.Activate(state))
-		{
-			//Debug.Log("active");
-			_spriteRenderer.enabled = true;
-			return true;
-		} else
-			return false;
-	}
-	public override bool DelayedActivation(bool skipTransition=false)
-	{
-		if (base.DelayedActivation(skipTransition))
-		{
-			//Debug.Log("active");
-			_spriteRenderer.enabled = true;
-			return true;
-		} else
-			return false;
-	}
-	public override bool Deactivate(bool force=false)
-	{
-		if(base.Deactivate(force))
-		{
-			_spriteRenderer.enabled = false;
+		_spriteAnimator = GetComponent<Animator>();
 
-			return true;
-		} else
-			return false;
+		_spriteRenderer.enabled = false;
 	}
 	#endregion
 
@@ -73,27 +38,55 @@ public class UISprite : UIBase
 	}
 	#endregion
 
+	#if DRAW
+	public override void Draw()
+	{
+		GUI.Box(_drawRect, "");
+		//base.Draw();
+	}
+	#endif
+
+	#region Position Method
+	protected override void SetPosition(Vector2 position)
+	{
+		base.SetPosition(position);
+
+		if(_hasRoot)
+			transform.parent.position = Camera.main.ScreenToWorldPoint(new Vector3(_currentPosition.x,Screen.height - _currentPosition.y,_zDepth));
+		else
+			transform.position = Camera.main.ScreenToWorldPoint(new Vector3(_currentPosition.x,Screen.height - _currentPosition.y,_zDepth));
+	}
+	#endregion
+
 	#region Color Methods
-	protected override Color GetColor()
+	protected Color GetColor()
 	{
 		return _spriteRenderer.color;
 	}
-	protected override void SetColor(Color color)
+	protected void SetColor(Color color)
 	{
 		_spriteRenderer.color = color;
 	}
 	#endregion
 
 	#region Animation Methods
-	protected override void SetTrigger(string triggerName)
+	public void SetTrigger(string triggerName)
 	{
-		if(_animator && _animator.runtimeAnimatorController)
+		if(_spriteAnimator && _spriteAnimator.runtimeAnimatorController)
 		{
 			//Debug.Log(triggerName);
-			_animator.SetTrigger(triggerName);
+			_spriteAnimator.SetTrigger(triggerName);
 			//enabled = true;
 		} else
 			_spriteRenderer.enabled = true;
+	}
+	public void SetBool(string name, bool value)
+	{
+		if(_spriteAnimator && _spriteAnimator.runtimeAnimatorController)
+		{
+			_spriteAnimator.SetBool(name,value);
+			//enabled = true;
+		}
 	}
 	#endregion
 
@@ -103,6 +96,11 @@ public class UISprite : UIBase
 		get { return _spriteRenderer.sprite; }
 		set { _spriteRenderer.sprite = value; }
 	}
+	public SpriteRenderer Renderer
+	{
+		get { return _spriteRenderer; }
+		set { _spriteRenderer = value; }
+	}
 
 	/// <summary>
 	/// Gets the bounding area of the element (in pixels). Assumes the Sprite's
@@ -111,8 +109,13 @@ public class UISprite : UIBase
 	/// <returns>The bounds.</returns>
 	public override Rect GetBounds()
 	{
-		return new Rect(currentPosition.x, currentPosition.y, _spriteRenderer.sprite.rect.width * transform.localScale.x,
-			_spriteRenderer.sprite.rect.height * transform.localScale.y);
+		Vector2 max = Camera.main.WorldToScreenPoint(_spriteRenderer.sprite.bounds.max);
+		Vector2 min = Camera.main.WorldToScreenPoint(_spriteRenderer.sprite.bounds.min);
+
+		float width = max.x - min.x;
+		float height = max.y - min.y;
+
+		return new Rect(_currentPosition.x - width / 2f, _currentPosition.y - height / 2f, max.x - min.x, (max.y - min.y));
 	}
 	#endregion
 }

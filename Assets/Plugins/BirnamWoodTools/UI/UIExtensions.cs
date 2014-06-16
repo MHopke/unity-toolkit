@@ -6,7 +6,7 @@
 /// </summary>
 public static class AutoSized
 {
-	public static Vector2 designedSize = new Vector2(640,960);
+	public static Vector2 designedSize = new Vector2(1024,768);
 
 	public static Rect CreateRect(float x, float y, float width, float height)
 	{
@@ -215,8 +215,14 @@ public class CustomStyle
 	#region Initialization Methods
 	public void SetDefaultStyle(string name)
 	{
-		if(!custom && styleName == "")
-			styleName = name;
+		if(!custom)
+		{
+			if(styleName == "")
+				styleName = name;
+
+			custom = true;
+			style = new GUIStyle(UINavigationController.Skin.FindStyle(styleName));
+		}
 	}
 	#endregion
 }

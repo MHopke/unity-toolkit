@@ -19,34 +19,4 @@ public static class iOSBinding
 		Debug.Log(header + ": " + text);
 		#endif
 	}
-
-	[DllImport ("__Internal")]
-	static extern void iPostToTwitter(string message);
-
-	public static void PostToTwitter(string message)
-	{
-		#if !UNITY_EDITOR
-		iPostToTwitter(message);
-		#endif
-	}
-
-	[DllImport ("__Internal")]
-	static extern void iPostToFacebook(string message);
-
-	public static void PostToFacebook(string message)
-	{
-		#if !UNITY_EDITOR
-		iPostToFacebook(message);
-		#endif
-	}
-
-	[DllImport ("__Internal")]
-	static extern void iTextToSpeech(string text);
-
-	public static void SpeakText(string text)
-	{
-		#if !UNITY_EDITOR
-		iTextToSpeech(text);
-		#endif
-	}
 }

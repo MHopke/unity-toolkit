@@ -24,6 +24,9 @@ public class InputHandler : MonoBehaviour
 
 	//Fired when a pinch is detected. False indicates a pull
 	public static event Action<bool> pinchEvent;
+
+	//Fired when there has been no input for _inActiveTime
+	public static event Action userInActive;
 	#endregion
 
 	#region Constants
@@ -36,14 +39,18 @@ public class InputHandler : MonoBehaviour
 	bool _shaken;
 	bool _checkShake;
 	bool _checkPinch;
+	bool _moditorActivity;
 
 	//Used to determine if the monobehaviour can be disabled
 	//when input checks such as shake, or pinch are disabled;
 	int _checkState = 0;
+	int _maxTouches = 1;
 
 	float _shakeResetTime;
 	float _oldDistance;
 	float _shakeTimer;
+	float _inActiveTime;
+	float _inputTimer;
 
 	Vector3 _oldAcceleration;
 	Vector3 _shakeThreshold;
@@ -71,8 +78,11 @@ public class InputHandler : MonoBehaviour
 	}
 	
     // Update is called once per frame
-    void Update()
+	void Update()
     {
+		if(_moditorActivity)
+			_inputTimer += Time.deltaTime;
+
 		#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBPLAYER
 		if(Input.GetMouseButtonDown(0))
 		{
@@ -82,12 +92,16 @@ public class InputHandler : MonoBehaviour
 
 			if(touchStartEvent != null)
 				touchStartEvent(Input.mousePosition,0);
+
+			MarkInput();
 		}
 		else if(Input.GetMouseButtonUp(0))
 		{
 			_mouseDown = false;
 			if(touchEndEvent != null)
 				touchEndEvent(Input.mousePosition,0);
+
+			MarkInput();
 		}
 		else if(_mouseDown)
 		{
@@ -103,6 +117,8 @@ public class InputHandler : MonoBehaviour
 			}
 
 			_oldMousePosition = Input.mousePosition;
+
+			MarkInput();
 		}
 
 		if(_checkShake && Input.GetMouseButtonDown(1) && shakeEvent != null)
@@ -124,6 +140,8 @@ public class InputHandler : MonoBehaviour
 				{
 					shakeEvent();
 					_shaken = true;
+
+					MarkInput();
 				}
 			}
 			else
@@ -140,7 +158,9 @@ public class InputHandler : MonoBehaviour
 			_oldAcceleration = acc;
 		}
 
-		for(int i = 0; i < Input.touchCount; i++)
+		_maxTouches = Mathf.Min(1,Input.touchCount);
+
+		for(int i = 0; i < _maxTouches; i++)
 		{
 			Touch touch = Input.GetTouch(i);
 
@@ -175,6 +195,9 @@ public class InputHandler : MonoBehaviour
 					swipeEvent(false);
 				}
 			}
+
+			if(i == 0)
+				MarkInput();
 		}
 
 		if(_checkPinch && pinchEvent != null && Input.touchCount == 2)
@@ -187,8 +210,18 @@ public class InputHandler : MonoBehaviour
 				pinchEvent(true);
 
 			_oldDistance = distance;
+
+			MarkInput();
 		}
 		#endif
+
+		if(_moditorActivity && _inputTimer >= _inActiveTime && userInActive != null)
+		{
+			_inputTimer = 0f;
+
+			userInActive();
+		}
+
     }
 	#endregion
 
@@ -250,49 +283,49 @@ public class InputHandler : MonoBehaviour
 	}
 
 	#region TouchEvent Hooks
-	public static void AddTouchStart(TouchInfo method)
+	public static void AddInputStart(TouchInfo method)
 	{
 		touchStartEvent += method;
 
 		_instance._checkState++;
 	}
-	public static void RemoveTouchStart(TouchInfo method)
+	public static void RemoveInputStart(TouchInfo method)
 	{
 		touchStartEvent -= method;
 
 		_instance.CheckToDisable();
 	}
-	public static void AddTouchStationary(TouchInfo method)
+	public static void AddInputStationary(TouchInfo method)
 	{
 		touchStationaryEvent += method;
 
 		_instance._checkState++;
 	}
-	public static void RemoveTouchStationary(TouchInfo method)
+	public static void RemoveInputStationary(TouchInfo method)
 	{
 		touchStationaryEvent -= method;
 
 		_instance.CheckToDisable();
 	}
-	public static void AddTouchEnd(TouchInfo method)
+	public static void AddInputEnd(TouchInfo method)
 	{
 		touchEndEvent += method;
 
 		_instance._checkState++;
 	}
-	public static void RemoveTouchEnd(TouchInfo method)
+	public static void RemoveInputEnd(TouchInfo method)
 	{
 		touchEndEvent -= method;
 
 		_instance.CheckToDisable();
 	}
-	public static void AddTouchMoving(TouchMoving method)
+	public static void AddInputMoving(TouchMoving method)
 	{
 		touchMovingEvent += method;
 
 		_instance._checkState++;
 	}
-	public static void RemoveTouchMoving(TouchMoving method)
+	public static void RemoveInputMoving(TouchMoving method)
 	{
 		touchMovingEvent -= method;
 
@@ -304,6 +337,27 @@ public class InputHandler : MonoBehaviour
 	{
 		if(_checkState-- == 0)
 			enabled = false;
+	}
+	#endregion
+
+	#region Other Methods
+	public static void MarkInput()
+	{
+		_instance._inputTimer = 0f;
+	}
+	public static void SetInActiveTime(float time, bool monitor=true)
+	{
+		_instance._inActiveTime = time;
+
+		MonitorActivity = monitor;
+	}
+	#endregion
+
+	#region Methods
+	public static bool MonitorActivity
+	{
+		get { return _instance._moditorActivity; }
+		set { _instance._moditorActivity = value; }
 	}
 	#endregion
 }

@@ -1,0 +1,796 @@
+fileFormatVersion: 2
+guid: 382060f7c3b91434dba2ed0be0e7cd40
+TextureImporter:
+  serializedVersion: 2
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    linearTexture: 0
+    correctGamma: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: .25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 0
+  seamlessCubemap: 0
+  textureFormat: -1
+  maxTextureSize: 1024
+  textureSettings:
+    filterMode: -1
+    aniso: 1
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 0
+  alignment: 0
+  spritePivot: {x: .5, y: .5}
+  spritePixelsToUnits: 100
+  alphaIsTransparency: 1
+  textureType: 5
+  buildTargetSettings:
+  - buildTarget: iPhone
+    maxTextureSize: 2048
+    textureFormat: 33
+    compressionQuality: 100
+  spriteSheet:
+    sprites:
+    - name: Board
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 912
+        width: 640
+        height: 1136
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Start_On
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 384
+        width: 384
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Start_Off
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 256
+        width: 384
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Challenge_On
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 128
+        width: 384
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Challenge_Off
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 0
+        width: 384
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Simple_Off
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 384
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Simple_On
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 128
+        width: 384
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Pick_Numbers
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 1232
+        width: 384
+        height: 47
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Pick_Operators
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 1152
+        width: 401
+        height: 64
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Equals
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 383
+        width: 425
+        height: 25
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Title
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 695
+        width: 530
+        height: 195
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Simple_Footer
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 512
+        width: 385
+        height: 34
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Challenge_Footer
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 604
+        width: 431
+        height: 34
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Divider
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 507
+        width: 498
+        height: 5
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Home
+      rect:
+        serializedVersion: 2
+        x: 660
+        y: 1278
+        width: 108
+        height: 85
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Game_0
+      rect:
+        serializedVersion: 2
+        x: 1536
+        y: 512
+        width: 256
+        height: 256
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Game_1
+      rect:
+        serializedVersion: 2
+        x: 1280
+        y: 1024
+        width: 256
+        height: 256
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Game_2
+      rect:
+        serializedVersion: 2
+        x: 1536
+        y: 1024
+        width: 256
+        height: 256
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Game_3
+      rect:
+        serializedVersion: 2
+        x: 1792
+        y: 1024
+        width: 256
+        height: 256
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Game_7
+      rect:
+        serializedVersion: 2
+        x: 1792
+        y: 768
+        width: 256
+        height: 256
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Game_6
+      rect:
+        serializedVersion: 2
+        x: 1536
+        y: 768
+        width: 256
+        height: 256
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Game_5
+      rect:
+        serializedVersion: 2
+        x: 1280
+        y: 768
+        width: 256
+        height: 256
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Game_4
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 768
+        width: 256
+        height: 256
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Game_9
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 512
+        width: 256
+        height: 256
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Game_8
+      rect:
+        serializedVersion: 2
+        x: 1280
+        y: 512
+        width: 256
+        height: 256
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: 0_Off
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 1920
+        width: 128
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: 1_Off
+      rect:
+        serializedVersion: 2
+        x: 1280
+        y: 1920
+        width: 128
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: 0_On
+      rect:
+        serializedVersion: 2
+        x: 1152
+        y: 1920
+        width: 128
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: 1_On
+      rect:
+        serializedVersion: 2
+        x: 1408
+        y: 1920
+        width: 128
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: SpriteSheet_29
+      rect:
+        serializedVersion: 2
+        x: 782
+        y: 476
+        width: 1
+        height: 1
+      alignment: 0
+      pivot: {x: .5, y: .5}
+    - name: 2_Off
+      rect:
+        serializedVersion: 2
+        x: 1536
+        y: 1920
+        width: 128
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: 2_On
+      rect:
+        serializedVersion: 2
+        x: 1664
+        y: 1920
+        width: 128
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: 3_Off
+      rect:
+        serializedVersion: 2
+        x: 1792
+        y: 1920
+        width: 128
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: 3_ON
+      rect:
+        serializedVersion: 2
+        x: 1920
+        y: 1920
+        width: 128
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: 4_OFF
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 1792
+        width: 128
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: 4_ON
+      rect:
+        serializedVersion: 2
+        x: 1152
+        y: 1792
+        width: 128
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: 5_OFF
+      rect:
+        serializedVersion: 2
+        x: 1280
+        y: 1792
+        width: 128
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: 5_ON
+      rect:
+        serializedVersion: 2
+        x: 1408
+        y: 1792
+        width: 128
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: 6_OFF
+      rect:
+        serializedVersion: 2
+        x: 1536
+        y: 1792
+        width: 128
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: 6_ON
+      rect:
+        serializedVersion: 2
+        x: 1664
+        y: 1792
+        width: 128
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: 7_OFF
+      rect:
+        serializedVersion: 2
+        x: 1792
+        y: 1792
+        width: 128
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: 7_ON
+      rect:
+        serializedVersion: 2
+        x: 1920
+        y: 1792
+        width: 128
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: 8_OFF
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 1664
+        width: 128
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: 8_ON
+      rect:
+        serializedVersion: 2
+        x: 1152
+        y: 1664
+        width: 128
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: 9_OFF
+      rect:
+        serializedVersion: 2
+        x: 1280
+        y: 1664
+        width: 128
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: 9_ON
+      rect:
+        serializedVersion: 2
+        x: 1408
+        y: 1664
+        width: 128
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: 10_OFF
+      rect:
+        serializedVersion: 2
+        x: 1536
+        y: 1664
+        width: 128
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: 10_ON
+      rect:
+        serializedVersion: 2
+        x: 1664
+        y: 1664
+        width: 128
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: 11_OFF
+      rect:
+        serializedVersion: 2
+        x: 1792
+        y: 1664
+        width: 128
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: 11_ON
+      rect:
+        serializedVersion: 2
+        x: 1920
+        y: 1664
+        width: 128
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: 12_OFF
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 1536
+        width: 128
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: 12_ON
+      rect:
+        serializedVersion: 2
+        x: 1152
+        y: 1536
+        width: 128
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Multiply_OFF
+      rect:
+        serializedVersion: 2
+        x: 1280
+        y: 1536
+        width: 128
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Multiply_ON
+      rect:
+        serializedVersion: 2
+        x: 1408
+        y: 1536
+        width: 128
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Addition_OFF
+      rect:
+        serializedVersion: 2
+        x: 1536
+        y: 1536
+        width: 128
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Addition_ON
+      rect:
+        serializedVersion: 2
+        x: 1664
+        y: 1536
+        width: 128
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Division_OFF
+      rect:
+        serializedVersion: 2
+        x: 1792
+        y: 1536
+        width: 128
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Division_ON
+      rect:
+        serializedVersion: 2
+        x: 1920
+        y: 1536
+        width: 128
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: All_OFF
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 1408
+        width: 128
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: All_ON
+      rect:
+        serializedVersion: 2
+        x: 1152
+        y: 1408
+        width: 128
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Subtraction_OFF
+      rect:
+        serializedVersion: 2
+        x: 1280
+        y: 1408
+        width: 128
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Subtraction_ON
+      rect:
+        serializedVersion: 2
+        x: 1408
+        y: 1408
+        width: 128
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Division
+      rect:
+        serializedVersion: 2
+        x: 1536
+        y: 1408
+        width: 128
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Multiply
+      rect:
+        serializedVersion: 2
+        x: 1664
+        y: 1408
+        width: 128
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Subtraction
+      rect:
+        serializedVersion: 2
+        x: 1792
+        y: 1408
+        width: 128
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Addition
+      rect:
+        serializedVersion: 2
+        x: 1920
+        y: 1408
+        width: 128
+        height: 128
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Title_Mode
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 1086
+        width: 406
+        height: 66
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Hold_OFF
+      rect:
+        serializedVersion: 2
+        x: 904
+        y: 402
+        width: 506
+        height: 110
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Hold_ON
+      rect:
+        serializedVersion: 2
+        x: 904
+        y: 273
+        width: 506
+        height: 110
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Title_Menu
+      rect:
+        serializedVersion: 2
+        x: 1550
+        y: 20
+        width: 498
+        height: 108
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Video_ON
+      rect:
+        serializedVersion: 2
+        x: 898
+        y: 0
+        width: 506
+        height: 82
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Video_OFF
+      rect:
+        serializedVersion: 2
+        x: 898
+        y: 87
+        width: 506
+        height: 82
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: SoundOn_ON
+      rect:
+        serializedVersion: 2
+        x: 1805
+        y: 432
+        width: 243
+        height: 80
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: SoundOn_OFF
+      rect:
+        serializedVersion: 2
+        x: 1805
+        y: 345
+        width: 243
+        height: 79
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: SoundOff_ON
+      rect:
+        serializedVersion: 2
+        x: 1805
+        y: 256
+        width: 243
+        height: 79
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: SoundOff_OFF
+      rect:
+        serializedVersion: 2
+        x: 1805
+        y: 177
+        width: 243
+        height: 79
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Title_Buy
+      rect:
+        serializedVersion: 2
+        x: 526
+        y: 532
+        width: 498
+        height: 108
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Menu
+      rect:
+        serializedVersion: 2
+        x: 718
+        y: 1493
+        width: 50
+        height: 43
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Title_Help
+      rect:
+        serializedVersion: 2
+        x: 1034
+        y: 1300
+        width: 508
+        height: 108
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Help_OFF
+      rect:
+        serializedVersion: 2
+        x: 666
+        y: 1931
+        width: 357
+        height: 117
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Help_ON
+      rect:
+        serializedVersion: 2
+        x: 666
+        y: 1804
+        width: 357
+        height: 117
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: Buy_ON
+      rect:
+        serializedVersion: 2
+        x: 666
+        y: 1676
+        width: 357
+        height: 117
+      alignment: 1
+      pivot: {x: 0, y: 1}
+    - name: BUY_OFF
+      rect:
+        serializedVersion: 2
+        x: 666
+        y: 1548
+        width: 357
+        height: 117
+      alignment: 1
+      pivot: {x: 0, y: 1}
+  spritePackingTag: 
+  userData: 

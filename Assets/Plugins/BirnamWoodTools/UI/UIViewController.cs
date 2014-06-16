@@ -47,6 +47,7 @@ public class UIViewController : MonoBehaviour
 	#endregion
 
 	#region Methods
+	//Present view methods
 	public static void PresentUIView(UIView view)
 	{
 		view.Activate();
@@ -58,16 +59,31 @@ public class UIViewController : MonoBehaviour
 		if(temp)
 			temp.Activate();
 	}
+	public static void PresentUIViewWithTransition(string view, Transition transition)
+	{
+		UIView temp = instance.GetUIView(view);
+
+		if(temp)
+			temp.Activate(transition);
+	}
+	//Remove view methods
 	public static void RemoveUIView(UIView view)
 	{
-		view.Deactivate();
+		view.FlagForExit();
 	}
 	public static void RemoveUIView(string view)
 	{
 		UIView temp = instance.GetUIView(view);
 
 		if(temp)
-			temp.Deactivate();
+			temp.FlagForExit();
+	}
+	public static void RemoveUIViewWithTransition(string view, Transition transition)
+	{
+		UIView temp = instance.GetUIView(view);
+
+		if(temp)
+			temp.FlagForExit(transition);
 	}
 
 	public static UIBase GetElementFromView(string element, string view)
@@ -79,6 +95,17 @@ public class UIViewController : MonoBehaviour
 		}
 
 		return null;
+	}
+
+	public static bool ElementPersists(string element)
+	{
+		for(int i = 0; i < instance._views.Count; i++)
+		{
+			if(instance._views[i] && !instance._views[i]._skipActivation && instance._views[i].HasUIElement(element))
+				return true;
+		}
+
+		return false;
 	}
 
 	public UIView GetUIView(string name)
@@ -101,21 +128,21 @@ public class UIViewController : MonoBehaviour
 		return false;
 	}
 
-	public void GainFocus()
+	public static  void GainFocus()
 	{
-		for(int i = 0; i < _views.Count; i++)
+		for(int i = 0; i < instance._views.Count; i++)
 		{
-			if(_views[i])
-				_views[i].GainedFocus();
+			if(instance._views[i])
+				instance._views[i].GainedFocus();
 		}
 	}
 
-	public void LoseFocus()
+	public static void LoseFocus()
 	{
-		for(int i = 0; i < _views.Count; i++)
+		for(int i = 0; i < instance._views.Count; i++)
 		{
-			if(_views[i])
-				_views[i].LostFocus();
+			if(instance._views[i])
+				instance._views[i].LostFocus();
 		}
 	}
 	#endregion

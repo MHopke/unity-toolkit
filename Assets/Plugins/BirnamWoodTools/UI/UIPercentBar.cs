@@ -3,7 +3,7 @@
 /// <summary>
 /// Representation of a percent bar.
 /// </summary>
-public class UIPercentBar : UISprite 
+public class UIPercentBar : UITexture 
 {
 	#region Constants
 	float SCALE_CLOSE = 0.1f;
@@ -25,18 +25,14 @@ public class UIPercentBar : UISprite
 	#endregion
 
 	#region Init
-	public override bool Init()
+	protected override void OnInit()
 	{
-		if(base.Init())
-		{
-			Vector3 scale = _maximumScale - new Vector3(transform.localScale.x, transform.localScale.y, transform.localScale.z);
-			scale.Scale(new Vector3(0.01f, 0.01f, 0.01f));
+		base.OnInit();
 
-			_scalePerPercent = scale;
+		Vector3 scale = _maximumScale - new Vector3(transform.localScale.x, transform.localScale.y, transform.localScale.z);
+		scale.Scale(new Vector3(0.01f, 0.01f, 0.01f));
 
-			return true;
-		} else
-			return false;
+		_scalePerPercent = scale;
 	}
 	#endregion
 

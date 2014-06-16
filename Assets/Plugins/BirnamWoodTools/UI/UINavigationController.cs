@@ -5,6 +5,7 @@
 /// will automatically load & unload UIViewControllers from memory.
 /// </summary>
 [RequireComponent(typeof(InputHandler))]
+[RequireComponent(typeof(UIScreen))]
 public class UINavigationController : MonoBehaviour 
 {
 	#region Events
@@ -53,9 +54,16 @@ public class UINavigationController : MonoBehaviour
 		if(_skin != null)
 		{
 			for(int i = 0; i < _skin.customStyles.Length; i++)
+			{
 				_skin.customStyles[i].fontSize = Mathf.RoundToInt(UIScreen.AspectRatio.x * (float)_skin.customStyles[i].fontSize);
+				_skin.customStyles[i].contentOffset.Scale(UIScreen.AspectRatio);
+				//Debug.Log(_skin.customStyles[i].name + " " +_skin.customStyles[i].fontSize);
+			}
 
-			//_skin.label.fontSize = Mathf.RoundToInt((AspectRatio.x * (float)_skin.label.fontSize));
+			//Add any standard skins that you utilize as well such as the example below
+			_skin.label.fontSize = Mathf.RoundToInt((UIScreen.AspectRatio.x * (float)_skin.label.fontSize));
+
+			_skin.textField.fontSize = Mathf.RoundToInt((UIScreen.AspectRatio.x * (float)_skin.textField.fontSize));
 		}
 		#endif
 
@@ -147,14 +155,14 @@ public class UINavigationController : MonoBehaviour
 	void TransitionInFinished()
 	{
 		SwitchControllers();
-		UINavigationController.CurrentController.LoseFocus();
+		UIViewController.LoseFocus();
 
 		if(transitionInStartedEvent != null)
 			transitionInStartedEvent(_targetControllerId);
 	}
 	void TransitionOutFinished()
 	{
-		UINavigationController.CurrentController.GainFocus();
+		UIViewController.GainFocus();
 
 		if(transitionDidFinishEvent != null)
 			transitionDidFinishEvent(_targetControllerId);
@@ -164,7 +172,7 @@ public class UINavigationController : MonoBehaviour
 	#region Audio Methods
 	public static void PlayGenericClick()
 	{
-		if(instance.audio && !instance.audio.isPlaying)
+		if(DataManager.AudioOn && instance.audio && !instance.audio.isPlaying)
 			instance.audio.Play();
 	}
 	#endregion

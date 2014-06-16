@@ -10,21 +10,66 @@ public class UIScrollView : UIView {
 	public enum ScrollType { HORIZONTAL = 0, VERTICAL, BOTH }
 	#endregion
 
+	#region Constants
+	const float BASE_SCROLL_VELOCITY = 1.0f;
+	const float BASE_SCROLL_VELOCITY_DECAY = 40.0f;
+	const float BASE_MIN_SCROLL_MOVEMENT_FOR_VELOCITY = 5.0f;
+	#endregion
+
 	#region Public Variables
-	public UISprite _background;
+	public UITexture _background;
 
 	public ScrollType _type;
 
-	public Vector2 _scrollBounds;
-
-	public Rect _viewRect; //The original view position
+	public Rect _scrollAreaRect; //The original view position
 	#endregion
 
-	#region Private Variables
-	Vector2 _scrollPosition; //used to determine if the scroll has reached its bounds
+	#region Private Vars
+	bool _eventsAdded;
+	bool _scrollActivated;
 
-	Rect _startViewRect;
-	Rect _currentViewRect;
+	float _scrollVelocity;
+	float _velocity;
+	float _scrollVelocityDecay;
+	float _lastDelta;
+	#endregion
+
+	#region Unity Methods
+	void Start()
+	{
+		_velocity = 0.0f;
+	}
+
+	void Update()
+	{
+		if (_scrollActivated) {
+			if (_velocity != 0.0f) {
+				if(_type == ScrollType.VERTICAL)
+				{
+					_scrollAreaRect.y -= _velocity;
+					CheckVerticalBorders();
+				}
+				else if (_type == ScrollType.HORIZONTAL)
+				{
+					_scrollAreaRect.x -= _velocity;
+					CheckHorizontalBorders();
+				}
+
+				if (_velocity > 0.0f) {
+					_velocity -= Time.deltaTime * _scrollVelocityDecay;
+					if (_velocity < 0.0f)
+						_velocity = 0.0f;
+				}
+				else {
+					_velocity += Time.deltaTime * _scrollVelocityDecay;
+					if (_velocity > 0.0f)
+						_velocity = 0.0f;
+				}
+			}
+		}
+
+		base.Update();
+	}
 	#endregion
 
 	#region Overriden Method
@@ -33,50 +78,62 @@ public class UIScrollView : UIView {
 		if(_background)
 			_background.Init();
 
-		_viewRect.Scale(UIScreen.AspectRatio);
+		_scrollAreaRect.Scale(UIScreen.AspectRatio);
 
-		_startViewRect = _viewRect;
-
-		_currentViewRect = _startViewRect;
+		if(_type == ScrollType.VERTICAL)
+		{
+			_scrollVelocity = BASE_SCROLL_VELOCITY * UIScreen.AspectRatio.y;
+			_scrollVelocityDecay = BASE_SCROLL_VELOCITY_DECAY * UIScreen.AspectRatio.y;
+		}
+		else if (_type == ScrollType.HORIZONTAL)
+		{
+			_scrollVelocity = BASE_SCROLL_VELOCITY * UIScreen.AspectRatio.x;
+			_scrollVelocityDecay = BASE_SCROLL_VELOCITY_DECAY * UIScreen.AspectRatio.x;
+		}
+		_velocity = 0.0f;
 
 		base.Initialize();
 	}
 		
 	protected override void Activation()
 	{
-		if(_elements != null)
-		{
-			//Only UI Elements within the _viewRect should be activated
-			for(int i = 0; i < _elements.Count; i++)
-			{
-				if(_elements[i] != null && ElementInView(_elements[i].GetBounds()))
-					_elements[i].Activate();
-			}
-		}
-
 		if(_background)
 			_background.Activate();
 
-		_scrollPosition = Vector2.zero;
+		CheckHorizontalBorders();
+		CheckVerticalBorders();
 
-		movementState = MovementState.INITIAL;
+		AddEvents();
 
-		InputHandler.AddTouchMoving(TouchMoving);
+		_scrollActivated = true;
+
+		base.Activation();
 	}
+
 	protected override void Deactivation()
 	{
 		if(_background)
 			_background.Deactivate();
 
-		base.Deactivation();
+		RemoveEvents();
 
-		InputHandler.RemoveTouchMoving(TouchMoving);
+		_scrollActivated = false;
+
+		base.Deactivation();
+	}
+
+	protected override void DrawContent()
+	{
+		if(_background)
+			_background.Draw();
+
+		GUI.BeginGroup(_scrollAreaRect);
+		base.DrawContent();
+		GUI.EndGroup();
 	}
 
 	protected override void InPlace()
 	{
-		_currentViewRect = _viewRect;
-
 		for(int i = 0; i < _elements.Count; i++)
 		{
 			if(_elements[i] != null)
@@ -89,68 +146,109 @@ public class UIScrollView : UIView {
 
 	public override void LostFocus()
 	{
-		InputHandler.RemoveTouchMoving(TouchMoving);
+		InputHandler.RemoveInputMoving(TouchMoving);
 
 		base.LostFocus();
 	}
 	public override void GainedFocus()
 	{
-		InputHandler.AddTouchMoving(TouchMoving);
+		InputHandler.AddInputMoving(TouchMoving);
 
 		base.GainedFocus();
 	}
 
-	public override void FlagForExit()
+	public override void Exit()
 	{
+		base.Exit();
+
 		if(_background)
 			_background.Exit();
-
-		base.FlagForExit();
 	}
 	#endregion
 
 	#region Methods
-	bool ElementInView(Rect bounds)
+	void CheckHorizontalBorders()
 	{
-		return bounds.xMax >= _currentViewRect.x && bounds.x <= _currentViewRect.xMax && bounds.yMax >= _currentViewRect.y
-			&& bounds.y <= _currentViewRect.yMax;
+		if(_scrollAreaRect.x <= -_scrollAreaRect.width)
+			_scrollAreaRect.x = -_scrollAreaRect.width;
+		else if(_scrollAreaRect.x >= 0.0f)
+			_scrollAreaRect.x = 0.0f;
+	}
+
+	void CheckVerticalBorders()
+	{
+		if(_scrollAreaRect.y <= -(_scrollAreaRect.height - _viewRect.height))
+			_scrollAreaRect.y = -(_scrollAreaRect.height - _viewRect.height);
+		else if(_scrollAreaRect.y >= 0.0f)
+			_scrollAreaRect.y = 0.0f;
+	}
+
+	void AddEvents()
+	{
+		if (_eventsAdded)
+			return;
+
+		InputHandler.AddInputStart(TouchStart);
+		InputHandler.AddInputMoving(TouchMoving);
+		InputHandler.AddInputEnd(TouchEnd);
+		_eventsAdded = true;
+	}
+
+	void RemoveEvents()
+	{
+		if (!_eventsAdded)
+			return;
+
+		InputHandler.RemoveInputStart(TouchStart);
+		InputHandler.RemoveInputMoving(TouchMoving);
+		InputHandler.RemoveInputEnd(TouchEnd);
+		_eventsAdded = false;
 	}
 	#endregion
 
 	#region Touch Events
+	void TouchStart(Vector2 position, int id)
+	{
+		if (_scrollActivated)
+			_velocity = 0.0f;
+	}
+
 	void TouchMoving(Vector2 pos, Vector2 delta, int id)
 	{
-		if(movementState == MovementState.IN_PLACE/* && ViewRect.Contains(new Vector2(pos.x,Screen.height - pos.y))*/)
-		{
-			//Ensure that movement is locked if it should be
-			if(_type == ScrollType.HORIZONTAL)
-				delta.y = 0;
-			else if(_type == ScrollType.VERTICAL)
-				delta.x = 0;
+		if (_scrollActivated) {
+			if (movementState == MovementState.IN_PLACE) {
+				//Adjust movement for each type
+				if (_type == ScrollType.HORIZONTAL) {
+					_scrollAreaRect.x -= delta.x;
 
-			_scrollPosition += delta;
+					_lastDelta = delta.x;
 
-			if(_scrollPosition.y <= -_scrollBounds.y || _scrollPosition.y > 0)
-				delta.y = 0;
-			if(_scrollPosition.x <= -_scrollBounds.x || _scrollPosition.x > 0)
-				delta.x = 0;
+					CheckHorizontalBorders();
+				}
+				else if (_type == ScrollType.VERTICAL) {
+					_scrollAreaRect.y -= delta.y;
 
-			if(delta == Vector2.zero)
-				return;
+					_lastDelta = delta.y;
 
-			for(int i = 0; i < _elements.Count; i++)
-			{
-				if(_elements[i])
-				{
-					_elements[i].CurrentPosition += delta;
-					//Debug.Log(UIElements[i].CurrentPosition);
+					CheckVerticalBorders();
 
-					if(ElementInView(_elements[i].GetBounds()))
-						_elements[i].Activate(UIBase.MovementState.IN_PLACE);
-					else
-						_elements[i].Deactivate(true);
+				}
+				else {
+					_scrollAreaRect.x += delta.x;
+					_scrollAreaRect.y += delta.y;
+
+					CheckHorizontalBorders();
+					CheckVerticalBorders();
 				}
 			}
+		}
+	}
+
+	void TouchEnd(Vector2 position, int id)
+	{
+		if(_scrollActivated)
+		{
+			_velocity = _lastDelta * _scrollVelocity;
 		}
 	}
 	#endregion

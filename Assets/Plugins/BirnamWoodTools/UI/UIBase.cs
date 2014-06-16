@@ -19,62 +19,38 @@ public class UIBase : MonoBehaviour {
 	//Allows the UI element to skip activation from a UIView.
 	//Used in situations when an element should be hidden by default
 	public bool _skipUIViewActivation;
-	public bool _animates;
 
 	//Time in seconds to delay rendering
 	public float renderDelay;
 
-	//Position in pixels. Top Left is (0,0)
-	public Vector2 position;
+	//Rectangle to draw the element. (in pixels)
+	public Rect _drawRect;
 
-	//Components (if a component is not present it will be null)
-	public ButtonComponent _uiButton;
-	public UIFadeComponent _fadeComponent;
-	public UIFlashComponent _flashComponent;
+	//The customStyle to apply to the base component of any UI element.
+	//If an element uses multiple styles you will need to add more.
+	public CustomStyle _primaryStyle;
+
+	public ButtonComponent _button;
 	#endregion
 
 	#region Protected Variables
 	//Determines if the element is currently active
-	new protected bool active;
+	protected bool _active;
 
-    float movementRate;
+	protected bool _disabled;
 
-	protected MovementState movementState;
+	protected float _movementRate;
 
-	protected Vector2 startPosition;
-	protected Vector2 currentPosition;
+	protected MovementState _movementState;
+
+	protected Vector2 _startPosition;
+	protected Vector2 _currentPosition;
     protected Vector2 _targetPosition;
-
-	public Animator _animator;
 	#endregion
 
 	#region Private Variables
 	bool _initialized;
 	#endregion
-
-    #region Unity Methods
-    void Update()
-    {
-        movementRate = 1.0f / (currentPosition - _targetPosition).magnitude;
-
-        SetPosition(Vector2.Lerp(currentPosition, _targetPosition, movementRate * Time.deltaTime));
-
-        if (Mathf.Abs((currentPosition - _targetPosition).magnitude) <= CLOSE_ENOUGH)
-        {
-            SetPosition(_targetPosition);
-
-            if (CanDisable())
-            {
-                enabled = false;
-            }
-        }
-    }
-
-    protected virtual bool CanDisable()
-    {
-        return true;
-    }
-    #endregion
 
 	#region Init, Activation, Deactivation Methods
     /// <summary>
@@ -83,132 +59,120 @@ public class UIBase : MonoBehaviour {
 	/// </summary>
 	/// <param name="offset">Offset.</param>
 	/// <param name="speedParam">Speed parameter.</param>
-	public virtual bool Init()
+	public void Init()
 	{
 		if(!_initialized)
 		{
-			position.Scale(UIScreen.AspectRatio);
+			OnInit();
 
-			startPosition = position;
-
-			transform.Scale(UIScreen.AspectRatio.x, UIScreen.AspectRatio.y, 1);
-
-			_animator = GetComponent<Animator>();
-
-			//Initialize components (if they exist).
-			if(_fadeComponent)
-				_fadeComponent.Init(this);
-			if(_flashComponent)
-				_flashComponent.Init(this);
-
+			//_primaryStyle.style.fontSize = UIScreen.AspectRatio.x
 			_initialized = true;
-
-			return true;
-		} else
-			return false;
-	}
-	public virtual bool Activate(MovementState state=MovementState.INITIAL)
-	{
-		if(active)
-			return false;
-
-		movementState = state;
-
-		if(state == MovementState.INITIAL)
-		{
-			SetStartPosition();
-
-			if(_animates)
-				SetTrigger("Activate");
-			else
-				Activated();
-
-			//Debug.Log(name + " " +transform.parent.position);
 		}
-		else if(state == MovementState.IN_PLACE && _uiButton)
-			_uiButton.Activate();
+	}
 
-		active = true;
+	protected virtual void OnInit()
+	{
+		if(!_button)
+			_button = GetComponent<ButtonComponent>();
 
-		//Activate components
-		if(_fadeComponent)
-			_fadeComponent.Activate();
+		UIScreen.AdjustForResolution(ref _drawRect);
 
-		if(_flashComponent)
-			_flashComponent.Activate();
+		_startPosition = new Vector2(_drawRect.x,_drawRect.y);
+
+		_currentPosition = _startPosition;
+
+		_primaryStyle.style.contentOffset.Scale(UIScreen.AspectRatio);
+	}
+
+	public void Activate(MovementState state=MovementState.INITIAL)
+	{
+		if(_active)
+			return;
+
+		_active = true;
+
+		OnActivate(state);
 
 		#if LOG
 		Debug.Log(name + "activated");
 		#endif
-
-		return true;
 	}
 
-	public virtual bool DelayedActivation(bool skipTransition=false)
+	protected virtual void OnActivate(MovementState moveState)
 	{
-		if (active)
-			return false;
+		_movementState = moveState;
 
-		if(skipTransition)
-		{
-			SetPosition(position);
-
-			movementState = MovementState.IN_PLACE;
-
-			if(_uiButton)
-				_uiButton.Activate();
-		}
-		else
-		{
-			movementState = MovementState.INITIAL;
+		if(moveState == MovementState.INITIAL)
 			SetStartPosition();
+		else if(moveState == MovementState.IN_PLACE)
+			SetToPosition();
 
-			enabled = true;
+		if(renderer)
+			renderer.enabled = true;
 
-			if(_animates)
-				SetTrigger("Activate");
-			else
-				Activated();
-		}
-
-		active = true;
-
-		//Activate components
-		if(_fadeComponent)
-			_fadeComponent.Activate();
-
-		if(_flashComponent)
-			_flashComponent.Activate();
-
-		return true;
+		if(_button)
+			_button.Activate();
 	}
 
-	public virtual bool Deactivate(bool force=false)
+	public void Deactivate()
 	{
-		//Debug.Log(name + " disabled");
-		if(!active /*|| (!force && !enabled)*/)
-			return false;
+		if(!_active)
+			return;
+
+		_active = false;
+
+		OnDeactivate();
 
 		#if LOG
 		Debug.Log(name + " deactivated");
 		#endif
-
-		active = false;
-
-		movementState = MovementState.EXITED;
-
-		if(_uiButton)
-			_uiButton.Deactivate();
-
-		//Deactivate components
-		if(_fadeComponent)
-			_fadeComponent.Deactivate();
-
-		if(_flashComponent)
-			_flashComponent.Deactivate();
-
-		return true;
 	}
+	protected virtual void OnDeactivate()
+	{
+		_movementState = MovementState.EXITED;
+
+		if(renderer)
+			renderer.enabled = false;
+
+		if(_button)
+			_button.Deactivate();
+	}
+
+	//used for disabling interactive elements
+	public void Disable()
+	{
+		if(!_active)
+			return;
+
+		_disabled = true;
+
+		Disabled();
+	}
+
+	protected virtual void Disabled()
+	{
+		if(_button)
+			_button.Disable();
+	}
+
+	public void Enable()
+	{
+		if(!_active)
+			return;
+
+		_disabled = false;
+
+		Enabled();
+	}
+	protected virtual void Enabled()
+	{
+		if(_button)
+			_button.Enable();
+	}
+	#endregion
+
+	#region Draw Methods
+	public virtual void Draw(){}
 	#endregion
 
 	#region Position Methods
@@ -218,54 +182,51 @@ public class UIBase : MonoBehaviour {
 	/// <param name="position">Position.</param>
 	protected virtual void SetPosition(Vector2 position)
 	{
-		currentPosition = position;
-
-		if(_animates)
-			transform.parent.position = Camera.main.ScreenToWorldPoint(new Vector3(currentPosition.x,Screen.height - currentPosition.y,3f));
-		else
-			transform.position = Camera.main.ScreenToWorldPoint(new Vector3(currentPosition.x,Screen.height - currentPosition.y,3f));
+		_currentPosition = position;
+		_drawRect.x = position.x;
+		_drawRect.y = position.y;
 	}
-	void SetStartPosition()
+	public void SetStartPosition()
 	{
-		SetPosition(startPosition);
+		SetPosition(_startPosition);
 	}
     public void Reposition(Vector2 scale, bool animate=false)
     {
         if (animate)
         {
-            _targetPosition = new Vector2(currentPosition.x * scale.x, currentPosition.y * scale.y);
+            _targetPosition = new Vector2(_currentPosition.x * scale.x, _currentPosition.y * scale.y);
 
-            movementState = MovementState.MOVING;
+            _movementState = MovementState.MOVING;
 
             enabled = true;
         }
         else
         {
-            SetPosition(new Vector2(currentPosition.x * scale.x, currentPosition.y * scale.y));
+            SetPosition(new Vector2(_currentPosition.x * scale.x, _currentPosition.y * scale.y));
         }
 	}
 	public void SetToPosition()
 	{
-		SetPosition(position);
+		SetPosition(new Vector2(_drawRect.x,_drawRect.y));
 	}
 	public void SetX(float x)
 	{
-		currentPosition.x = x;
-		SetPosition(currentPosition);
+		_currentPosition.x = x;
+		SetPosition(_currentPosition);
 	}
 	public void SetY(float y)
 	{
-		currentPosition.y = y;
-		SetPosition(currentPosition);
+		_currentPosition.y = y;
+		SetPosition(_currentPosition);
 	}
 	public void SetStartX(float x)
 	{
-		startPosition.x = x;
+		_startPosition.x = x;
 	}
 
 	public void SetStartY(float y)
 	{
-		startPosition.y = y;
+		_startPosition.y = y;
 	}
 	#endregion
 
@@ -286,26 +247,14 @@ public class UIBase : MonoBehaviour {
 	#region Exit Methods
     public virtual void Exit()
 	{
-		if(!active)
+		if(!_active)
 		{
 			if(_skipUIViewActivation)
-				movementState = MovementState.EXITED;
+				_movementState = MovementState.EXITED;
 
 			return;
 		}
-
-		if(_animates)
-		{
-			movementState = MovementState.EXITING;
-			SetTrigger("Exit");
-		}
-		else
-			Exited();
-
-		//This is deactivated here because buttons shouldn't be usable during the
-		//transition out.
-		if(_uiButton)
-			_uiButton.Deactivate();
+		Deactivate();
 	}
 	#endregion
 
@@ -320,36 +269,19 @@ public class UIBase : MonoBehaviour {
 	}
 	#endregion
 
-	#region Color Methods
-	protected virtual Color GetColor(){return Color.white;}
-	protected virtual void SetColor(Color color){}
-	#endregion
-
-	#region Animation Methods
-	protected virtual void SetTrigger(string triggerName)
-	{
-		if(_animator && _animator.runtimeAnimatorController)
-			_animator.SetTrigger(triggerName);
-	}
-	protected virtual void Activated()
-	{
-		if(_uiButton)
-			_uiButton.Activate();
-	}
-	public virtual void Exited()
-	{
-		Deactivate();
-	}
-	#endregion
-
 	#region Accessors
+	public bool Active
+	{
+		get { return _active; }
+		set { _active = value; }
+	}
 	public bool InPlace
 	{
-		get { return movementState == MovementState.IN_PLACE; }
+		get { return _movementState == MovementState.IN_PLACE; }
 	}
 	public bool HasExited
 	{
-		get { return movementState == MovementState.EXITED; }
+		get { return _movementState == MovementState.EXITED; }
 	}
 
 	/// <summary>
@@ -361,22 +293,16 @@ public class UIBase : MonoBehaviour {
 	/// Gets the bounding area of the element (in pixels).
 	/// </summary>
 	/// <returns>The bounds.</returns>
-	public virtual Rect GetBounds(){return new Rect();}
+	public virtual Rect GetBounds(){return _drawRect;}
 
 	public Vector2 CurrentPosition
 	{
-		get { return currentPosition; }
+		get { return _currentPosition; }
 		set { SetPosition(value); }
 	}
 	public Vector2 StartPosition
 	{
-		get { return startPosition; }
-	}
-
-	public Color CurrentColor
-	{
-		get { return GetColor(); }
-		set { SetColor(value); }
+		get { return _startPosition; }
 	}
 	#endregion
 }

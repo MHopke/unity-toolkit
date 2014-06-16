@@ -31,6 +31,10 @@ public static class UnityExtensions
 	{
 		transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z + z);
 	}
+	public static void SetXYPosition(this Transform transform, float x, float y)
+	{
+		transform.position = new Vector3(x, y, transform.position.z);
+	}
 	#endregion
 
 	#region Scale
@@ -78,6 +82,10 @@ public static class UnityExtensions
 	{
 		transform.localScale = new Vector3(transform.localScale.x + x, transform.localScale.y + y, transform.localScale.z);
 	}
+	public static void SetScaleXY(this Transform transform, float x, float y)
+	{
+		transform.localScale = new Vector3(x, y, transform.localScale.z);
+	}
 	public static void AddXYZScale(this Transform transform, Vector3 vector)
 	{
 		transform.localScale = new Vector3(transform.localScale.x + vector.x, transform.localScale.y + vector.y, transform.localScale.z + vector.z);
@@ -93,11 +101,26 @@ public static class UnityExtensions
 	#endregion
 	#endregion
 
+	#region Renderer Extensions
+	public static Rect GetScreenRect(this Renderer renderer)
+	{
+		Vector2 pos = Camera.main.WorldToScreenPoint(renderer.bounds.min);
+		Vector2 max = Camera.main.WorldToScreenPoint(renderer.bounds.max);
+		Vector2 min = Camera.main.WorldToScreenPoint(renderer.bounds.min);
+
+		return new Rect(min.x, Screen.height - min.y - (max.y - min.y), max.x - min.x, (max.y - min.y));
+	}
+	#endregion
+
 	#region Color Extensions
 	public static bool CloseTo(this Color color, Color otherColor, float closeness=0.03f)
 	{
 		return (Mathf.Abs(color.r - otherColor.r) <= closeness && Mathf.Abs(color.g - otherColor.g) <= closeness
 			&& Mathf.Abs(color.b - otherColor.b) <= closeness && Mathf.Abs(color.a - otherColor.a) <= closeness);
+	}
+	public static void SetAlpha(this Color color, float alpha)
+	{
+		color = new Color(color.r, color.g, color.b, alpha);
 	}
 	#endregion
 

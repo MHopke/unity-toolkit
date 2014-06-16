@@ -9,7 +9,7 @@ public class Vim : MonoBehaviour {
 
 	public ButtonComponent button;
 
-	public UIFadeComponent _fade;
+	//public UIFadeComponent _fade;
 
 	Animator animator;
 	// Use this for initialization
@@ -49,6 +49,6 @@ public class Vim : MonoBehaviour {
 
 	void Click()
 	{
-		_fade.FadeOut();
+		//_fade.FadeOut();
 	}
 }
