@@ -26,11 +26,13 @@ public class UIBase : MonoBehaviour {
 	//Rectangle to draw the element. (in pixels)
 	public Rect _drawRect;
 
+	public ButtonComponent _button;
+
+	public ScreenSetting _screenSetting;
+
 	//The customStyle to apply to the base component of any UI element.
 	//If an element uses multiple styles you will need to add more.
 	public CustomStyle _primaryStyle;
-
-	public ButtonComponent _button;
 	#endregion
 
 	#region Protected Variables
@@ -72,16 +74,17 @@ public class UIBase : MonoBehaviour {
 
 	protected virtual void OnInit()
 	{
-		if(!_button)
-			_button = GetComponent<ButtonComponent>();
-
-		UIScreen.AdjustForResolution(ref _drawRect);
+		UIScreen.AdjustForResolution(transform,_screenSetting);
+		UIScreen.AdjustForResolution(ref _drawRect, _screenSetting);
 
 		_startPosition = new Vector2(_drawRect.x,_drawRect.y);
 
 		_currentPosition = _startPosition;
 
 		_primaryStyle.style.contentOffset.Scale(UIScreen.AspectRatio);
+
+		if(!_button)
+			_button = GetComponent<ButtonComponent>();
 	}
 
 	public void Activate(MovementState state=MovementState.INITIAL)
@@ -303,6 +306,12 @@ public class UIBase : MonoBehaviour {
 	public Vector2 StartPosition
 	{
 		get { return _startPosition; }
+	}
+		
+	public ButtonComponent Button
+	{
+		get { return _button; }
+		set { _button = value; }
 	}
 	#endregion
 }

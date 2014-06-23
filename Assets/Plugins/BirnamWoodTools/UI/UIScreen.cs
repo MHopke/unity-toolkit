@@ -9,6 +9,8 @@ public class UIScreen : MonoBehaviour {
 	#region Public Variables
 	public bool _portrait;
 
+	public float DesignedCameraSize;
+
     public Vector2 DesignedResolution;
 
 	[HideInInspector]
@@ -16,6 +18,7 @@ public class UIScreen : MonoBehaviour {
 	#endregion
 
 	#region Private Variables
+	float _cameraRatio;
 	static UIScreen instance = null;
 	#endregion
 
@@ -28,6 +31,12 @@ public class UIScreen : MonoBehaviour {
 			_aspectRatio = new Vector2((float)Screen.width / DesignedResolution.x,
 				(float)Screen.height / DesignedResolution.y);
 
+			Camera.main.orthographicSize = (Screen.height / 2.0f) / 100f;/*(100f * ((_portrait) ? _aspectRatio.y : _aspectRatio.x))*/;
+
+			_cameraRatio = Camera.main.orthographicSize / DesignedCameraSize;
+
+			//animation.clip.
+
 			instance = this;
 		} else
 			Destroy(gameObject);
@@ -35,20 +44,35 @@ public class UIScreen : MonoBehaviour {
 	#endregion
 
 	#region Methods
-	public static void AdjustForResolution(ref Rect rect)
+	public static void AdjustForResolution(ref Rect rect, ScreenSetting setting)
 	{
 		rect.x *= AspectRatio.x;
 		rect.y *= AspectRatio.y;
 
-		if(UIScreen.Portrait)
-		{
-			rect.width *= AspectRatio.y;
-			rect.height *= AspectRatio.y;
-		} else
-		{
+		if(setting.StretchX)
 			rect.width *= AspectRatio.x;
-			rect.height *= AspectRatio.x;
-		}
+		else
+			rect.width *= instance._cameraRatio;
+
+		if(setting.StretchY)
+			rect.height *= AspectRatio.y;
+		else
+			rect.height *= instance._cameraRatio;
+	}
+	public static void AdjustForResolution(Transform transform, ScreenSetting setting)
+	{
+		if(setting.UseParent)
+			return;
+
+		if(setting.StretchX)
+			transform.ScaleX(AspectRatio.x);
+		else
+			transform.ScaleX(instance._cameraRatio);
+
+		if(setting.StretchY)
+			transform.ScaleY(AspectRatio.y);
+		else
+			transform.ScaleY(instance._cameraRatio);
 	}
 	#endregion
 
@@ -61,5 +85,17 @@ public class UIScreen : MonoBehaviour {
 	{
 		get { return instance._aspectRatio; }
 	}
+	public static float CameraRatio
+	{
+		get { return instance._cameraRatio; }
+	}
 	#endregion
+}
+
+[System.Serializable]
+public class ScreenSetting
+{
+	public bool UseParent;
+	public bool StretchX;
+	public bool StretchY;
 }

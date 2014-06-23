@@ -31,9 +31,12 @@ public static class UnityExtensions
 	{
 		transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z + z);
 	}
-	public static void SetXYPosition(this Transform transform, float x, float y)
+	#endregion
+
+	#region Local Position
+	public static void SetLocalX(this Transform transform, float x)
 	{
-		transform.position = new Vector3(x, y, transform.position.z);
+		transform.localPosition = new Vector3(x, transform.localPosition.y, transform.localPosition.z);
 	}
 	#endregion
 

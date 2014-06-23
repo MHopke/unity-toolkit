@@ -3,7 +3,7 @@
 /// <summary>
 /// The UI representation of a label. Uses OnGUI to render the text.
 /// </summary>
-public class UILabel : UIBase 
+public class GUILabel : UIBase 
 {
 	#region Public Variables
 	public string text;
@@ -13,6 +13,8 @@ public class UILabel : UIBase
 	protected override void OnInit()
 	{
 		base.OnInit();
+
+		text = text.Replace("<br>", "\n");
 
 		_primaryStyle.SetDefaultStyle("label");
 	}
@@ -46,7 +48,7 @@ public class UILabel : UIBase
 	#region Type Methods
 	public override System.Type GetBaseType()
 	{
-		return typeof(UILabel);
+		return typeof(GUILabel);
 	}
 	#endregion
 }

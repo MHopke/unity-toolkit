@@ -69,14 +69,14 @@ public class UIViewController : MonoBehaviour
 	//Remove view methods
 	public static void RemoveUIView(UIView view)
 	{
-		view.FlagForExit();
+		view.Deactivate();
 	}
 	public static void RemoveUIView(string view)
 	{
 		UIView temp = instance.GetUIView(view);
 
 		if(temp)
-			temp.FlagForExit();
+			temp.Deactivate();
 	}
 	public static void RemoveUIViewWithTransition(string view, Transition transition)
 	{

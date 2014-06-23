@@ -3,7 +3,7 @@ using UnityEngine;
 /// <summary>
 /// Representation of a graphical UI element. Uses Unity 4.3 Sprite System.
 /// </summary>
-public class UITexture : UIBase
+public class GUITexture : UIBase
 {
 	#region Public Variables
 	public Texture2D _texture;
@@ -20,7 +20,7 @@ public class UITexture : UIBase
 	#region Type Methods
 	public override System.Type GetBaseType()
 	{
-		return typeof(UITexture);
+		return typeof(GUITexture);
 	}
 	#endregion
 }

@@ -43,6 +43,8 @@ public class UIView : MonoBehaviour {
 
 	public Rect _viewRect;
 
+	public ScreenSetting _screenSetting;
+
 	public List<UIBase> _elements;
 	#endregion
 
@@ -149,7 +151,7 @@ public class UIView : MonoBehaviour {
 	#region Activation, Deactivation Methods
 	protected virtual void Initialize()
 	{
-		UIScreen.AdjustForResolution(ref _viewRect);
+		UIScreen.AdjustForResolution(ref _viewRect,_screenSetting);
 
 		_startPosition.x = _viewRect.x;
 		_startPosition.y = _viewRect.y;

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class UIButton : UIBase 
+public class GUIButton : UIBase 
 {
 	#region Events
 	public event System.Action clickEvent;
@@ -26,7 +26,7 @@ public class UIButton : UIBase
 		base.OnInit();
 
 		if(_type == ButtonType.BOTH)
-			UIScreen.AdjustForResolution(ref _textRect);
+			UIScreen.AdjustForResolution(ref _textRect,_screenSetting);
 
 		_primaryStyle.SetDefaultStyle("button");
 	}

@@ -17,7 +17,7 @@ public class UIScrollView : UIView {
 	#endregion
 
 	#region Public Variables
-	public UITexture _background;
+	public GUITexture _background;
 
 	public ScrollType _type;
 

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
+using System.Collections;
 
-public class UIInputField : UIBase 
+public class UIInputField : UIEffectText 
 {
 	#region Events 
 	public static event System.Action clearKeyboards;
@@ -13,9 +14,11 @@ public class UIInputField : UIBase
 	public bool _autoCorrect = true;
 	public bool _multiLine = false;
 	public bool _autoCapitalize = true;
+
+	public int _characterLimit = -1;
+
 	public TouchScreenKeyboardType _type;
 
-	public string _text;
 	public string _defaultText;
 	#endregion
 
@@ -28,37 +31,88 @@ public class UIInputField : UIBase
 	TouchScreenKeyboard _keyBoard;
 	#endregion
 
+	#region Unity Methods
+	void Update()
+	{
+		if (_keyBoard != null) 
+		{
+			if(_keyBoard.active)
+			{
+				//_text = _keyBoard.text;
+
+				if(_characterLimit > 0 && _keyBoard.text.Length > _characterLimit)
+					_keyBoard.text = _keyBoard.text.Remove(_characterLimit);
+
+				if(_secure && _secureText.Length != _effect.Text.Length)
+					_secureText = new string('*', _effect.Text.Length);
+			}
+			else if(_keyBoard.done && !_keyBoard.wasCanceled && !_filtered)
+			{
+				if(_characterLimit > 0 && _keyBoard.text.Length > _characterLimit)
+					_keyBoard.text = _keyBoard.text.Remove(_characterLimit);
+
+				_effect.Text = _keyBoard.text;
+
+				if(_effect.Text == "")
+					_effect.Text = _defaultText;
+
+				if(_textChanged != null && _effect.Text != _previousText)
+					_textChanged(_effect.Text);
+
+				_previousText = _effect.Text;
+
+				//Filter();
+
+				//Debug.Log("filtered");
+			}
+		}
+	}
+	#endregion
+
 	#region Overriden Methods
 	protected override void OnInit()
 	{
 		base.OnInit();
 
-		_primaryStyle.SetDefaultStyle("textfield");
+		if(_effect.Text == "")
+			_effect.Text = _defaultText;
 
-		if(_text == "")
-			_text = _defaultText;
+		_previousText = _effect.Text;
 
-		_previousText = _text;
-
-		if(_secure && _secureText.Length != _text.Length)
-			_secureText = new string('*', _text.Length);
+		if(_secure && _secureText.Length != _effect.Text.Length)
+			_secureText = new string('*', _effect.Text.Length);
 	}
 
-	protected override void OnActivate(MovementState state)
+	protected override void OnActivate(MovementState moveState)
 	{
-		base.Activate(state);
+		base.OnActivate(moveState);
 
 		clearKeyboards += Close;
+
+		if(_button)
+			_button.clickEvent += Open;
 	}
 	protected override void OnDeactivate()
 	{
 		base.OnDeactivate();
 		Close();
 		clearKeyboards -= Close;
+
+		if(_button)
+			_button.clickEvent -= Open;
 	}
 	#endregion
 
 	#region Methods
+	public void Open()
+	{
+		ClearKeyboard();
+		_filtered = false;
+		_keyBoard = TouchScreenKeyboard.Open(_effect.Text, _type,_autoCorrect,_multiLine,_secure);
+
+		enabled = true;
+	}
+
 	public void Close()
 	{
 		//Debug.Log(name + "close keyboard");
@@ -66,12 +120,14 @@ public class UIInputField : UIBase
 		if(_keyBoard != null)
 		{
 			if(_secure)
-				_text = _keyBoard.text;
+				_effect.Text = _keyBoard.text;
 
 			Filter();
 
 			_keyBoard.active = false;
 			_keyBoard = null;
+
+			enabled = false;
 		}
 	}
 
@@ -84,67 +140,10 @@ public class UIInputField : UIBase
 	void Filter()
 	{
 		if(_autoCapitalize)
-			_text = _text[0].ToString().ToLower() + _text.Substring(1);
+			_effect.Text = _effect.Text[0].ToString().ToLower() + _effect.Text.Substring(1);
 
 		_filtered = true;
 	}
-
-	public override void Draw()
-	{
-		#if UNITY_EDITOR
-		GUI.SetNextControlName(GetHashCode().ToString());
-
-		if(_primaryStyle.custom)
-			_text = GUI.TextField(_drawRect, _text, _primaryStyle.style);
-		else
-			_text = GUI.TextField(_drawRect, _text, _primaryStyle.styleName);
-
-		if(GUI.GetNameOfFocusedControl() != name && _text == "")
-			_text = _defaultText;
-			
-		if(_textChanged != null && GUI.GetNameOfFocusedControl() != GetHashCode().ToString())
-		{
-			if(_text != _previousText)
-				_textChanged(_text);
-
-			_previousText = _text;
-		}
-		#else
-		if(GUI.Button(_drawRect, (_secure) ? _secureText : _text, (_primaryStyle.custom) ? _primaryStyle.style : _primaryStyle.styleName))
-		{
-			ClearKeyboard();
-			_filtered = false;
-			_keyBoard = TouchScreenKeyboard.Open(_text, _type,_autoCorrect,_multiLine,_secure);
-		}
-
-		if (_keyBoard != null) 
-		{
-			if(_keyBoard.active)
-			{
-				//_text = _keyBoard.text;
-
-				if(_secure && _secureText.Length != _text.Length)
-					_secureText = new string('*', _text.Length);
-			}
-			else if(_keyBoard.done && !_keyBoard.wasCanceled && !_filtered)
-			{
-				_text = _keyBoard.text;
-
-				if(_text == "")
-					_text = _defaultText;
-
-				if(_textChanged != null && _text != _previousText)
-					_textChanged(_text);
-
-				_previousText = _text;
-
-				Filter();
-
-				//Debug.Log("filtered");
-			}
-		}
-		#endif
-	} 
 	#endregion
 
 	#region Type Methods

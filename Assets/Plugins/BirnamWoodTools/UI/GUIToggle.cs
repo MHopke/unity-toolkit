@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class UIToggle : UIBase 
+public class GUIToggle : UIBase 
 {
 	#region Events
 	public event System.Action<bool> toggledEvent;

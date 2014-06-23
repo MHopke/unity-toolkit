@@ -10,22 +10,34 @@ public class UISprite : UIBase
 	public bool _hasRoot;
 
 	public float _zDepth = 3;
-	#endregion
 
-	#region Protected Variables
-	protected SpriteRenderer _spriteRenderer;
+	public SpriteRenderer _spriteRenderer;
 
-	protected Animator _spriteAnimator;
+	public Animator _spriteAnimator;
 	#endregion
 
 	#region Activation, Deactivation, Init Methods
 	protected override void OnInit()
 	{
+		if(!_spriteRenderer)
+			_spriteRenderer = GetComponent<SpriteRenderer>();
+
+		if(!_spriteAnimator)
+			_spriteAnimator = GetComponent<Animator>();
+
+		_spriteRenderer.enabled = false;
+
 		base.OnInit();
+	}
+	protected override void OnActivate(MovementState moveState)
+	{
+		base.OnActivate(moveState);
 
-		_spriteRenderer = GetComponent<SpriteRenderer>();
-
-		_spriteAnimator = GetComponent<Animator>();
+		_spriteRenderer.enabled = true;
+	}
+	protected override void OnDeactivate()
+	{
+		base.OnDeactivate();
 
 		_spriteRenderer.enabled = false;
 	}
@@ -100,6 +112,11 @@ public class UISprite : UIBase
 	{
 		get { return _spriteRenderer; }
 		set { _spriteRenderer = value; }
+	}
+	public Animator SpriteAnimator
+	{
+		get { return _spriteAnimator; }
+		set { _spriteAnimator = value; }
 	}
 
 	/// <summary>

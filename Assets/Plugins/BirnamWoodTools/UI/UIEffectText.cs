@@ -21,6 +21,8 @@ public class UIEffectText : UIBase
 	protected override void OnActivate(MovementState moveState)
 	{
 		base.OnActivate(moveState);
+
+		_effect.SetText(_effect.Text, true);
 	}
 	protected override void OnDeactivate()
 	{
@@ -47,7 +49,7 @@ public class UIEffectText : UIBase
 	public string Text
 	{
 		get { return _effect.Text; }
-		set { _effect.SetText(value); }
+		set { _effect.SetText(value,true); }
 	}
 	#endregion
 }

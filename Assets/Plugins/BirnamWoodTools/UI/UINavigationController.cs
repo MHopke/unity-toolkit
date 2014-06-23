@@ -23,6 +23,9 @@ public class UINavigationController : MonoBehaviour
 	//The Custom GUISkin used by the game's UI.
 	public GUISkin _skin;
 
+	public AudioClip _buttonDown;
+	public AudioClip _buttonUp;
+
 	public UIFadeTransition _fadeTransition;
 
 	public UIViewController currentController;
@@ -41,6 +44,25 @@ public class UINavigationController : MonoBehaviour
 	{
 		if(!instance)
 		{
+			//Scale fonts to proper size. This can't be done in editor because it will persist
+			//after the game has run.
+			#if !UNITY_EDITOR
+			if(_skin != null)
+			{
+			for(int i = 0; i < _skin.customStyles.Length; i++)
+			{
+			_skin.customStyles[i].fontSize = Mathf.RoundToInt(UIScreen.AspectRatio.x * (float)_skin.customStyles[i].fontSize);
+			_skin.customStyles[i].contentOffset.Scale(UIScreen.AspectRatio);
+			//Debug.Log(_skin.customStyles[i].name + " " +_skin.customStyles[i].fontSize);
+			}
+
+			//Add any standard skins that you utilize as well such as the example below
+			_skin.label.fontSize = Mathf.RoundToInt((UIScreen.AspectRatio.x * (float)_skin.label.fontSize));
+
+			_skin.textField.fontSize = Mathf.RoundToInt((UIScreen.AspectRatio.x * (float)_skin.textField.fontSize));
+			}
+			#endif
+
 			instance = this;
 		} else
 			Destroy(gameObject);
@@ -48,25 +70,6 @@ public class UINavigationController : MonoBehaviour
 
 	void Start()
 	{
-		//Scale fonts to proper size. This can't be done in editor because it will persist
-		//after the game has run.
-		#if !UNITY_EDITOR
-		if(_skin != null)
-		{
-			for(int i = 0; i < _skin.customStyles.Length; i++)
-			{
-				_skin.customStyles[i].fontSize = Mathf.RoundToInt(UIScreen.AspectRatio.x * (float)_skin.customStyles[i].fontSize);
-				_skin.customStyles[i].contentOffset.Scale(UIScreen.AspectRatio);
-				//Debug.Log(_skin.customStyles[i].name + " " +_skin.customStyles[i].fontSize);
-			}
-
-			//Add any standard skins that you utilize as well such as the example below
-			_skin.label.fontSize = Mathf.RoundToInt((UIScreen.AspectRatio.x * (float)_skin.label.fontSize));
-
-			_skin.textField.fontSize = Mathf.RoundToInt((UIScreen.AspectRatio.x * (float)_skin.textField.fontSize));
-		}
-		#endif
-
 		UIFadeTransition.transitionInFinished += TransitionInFinished;
 		UIFadeTransition.transitionOutFinished += TransitionOutFinished;
 
@@ -170,10 +173,22 @@ public class UINavigationController : MonoBehaviour
 	#endregion
 
 	#region Audio Methods
+	public static void PlayButtonDown()
+	{
+		//if(/*DataManager.AudioOn &&*/ instance.audio && !instance.audio.isPlaying)
+		//instance.audio.PlayOneShot(instance._buttonDown);
+	}
+
+	public static void PlayButtonUp()
+	{
+		//if(/*DataManager.AudioOn &&*/ instance.audio && !instance.audio.isPlaying)
+		//instance.audio.PlayOneShot(instance._buttonUp);
+	}
+
 	public static void PlayGenericClick()
 	{
-		if(DataManager.AudioOn && instance.audio && !instance.audio.isPlaying)
-			instance.audio.Play();
+		//if(DataManager.AudioOn && instance.audio && !instance.audio.isPlaying)
+		//instance.audio.Play();
 	}
 	#endregion
 

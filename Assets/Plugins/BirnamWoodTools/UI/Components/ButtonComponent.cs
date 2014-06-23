@@ -8,6 +8,12 @@ public class ButtonComponent : MonoBehaviour
 {
 	#region Events
 	public event System.Action clickEvent;
+	public static event System.Action<int> indexedClickEvent;
+	#endregion
+
+	#region Public Vars
+	public bool _indexedButton;
+	public int _index;
 	#endregion
 
 	#region Private Variables
@@ -17,7 +23,7 @@ public class ButtonComponent : MonoBehaviour
 	protected int _fingerId;
 	#endregion
 
-	#region UnityMethods
+	#region Unity Methods
 	void OnDestroy()
 	{
 		RemoveListeners();
@@ -111,6 +117,9 @@ public class ButtonComponent : MonoBehaviour
 		else
 			UINavigationController.PlayGenericClick();
 
+		if(_indexedButton && indexedClickEvent != null)
+			indexedClickEvent(_index);
+
 		if(clickEvent != null)
 			clickEvent();
 	}
@@ -135,9 +144,13 @@ public class ButtonComponent : MonoBehaviour
 	//End
 	void InputEnd(Vector2 touch, int id)
 	{
-		if(_fingerId != InputHandler.INVALID_FINGER && CheckEnd(touch, id))
+		if(_fingerId != InputHandler.INVALID_FINGER)
 		{
-			SendClickEvent();
+			if(CheckEnd(touch, id))
+				SendClickEvent();
+
+			_fingerId = InputHandler.INVALID_FINGER;
+
 			ButtonUp();
 		}
 	}

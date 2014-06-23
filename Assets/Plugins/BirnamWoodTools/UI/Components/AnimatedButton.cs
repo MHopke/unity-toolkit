@@ -3,20 +3,24 @@
 public class AnimatedButton : ButtonComponent 
 {
 	#region Enumerations
-	public enum DownStateType {NONE = 0, SPRITE, HIGHLIGHT, ALPHA, SCALE };
+	public enum DownStateType {NONE = 0, SPRITE, HIGHLIGHT, ALPHA, SCALE, DOWN_SHIFT };
 	#endregion
 
 	#region Public Variables
 	public bool _switchOnExit;
 	public bool _recalculateHighlight;
+	public bool _deactivatedState;
 
 	public float _downScale;
 	public float _alpha;
+	public float _downShift;
 
 	public DownStateType _downStateType;
 
 	public Sprite _pressedSprite;
 	public Animator _animator;
+
+	public AnimatedButton _partnerButton;
 	#endregion
 
 	#region Private Variables
@@ -26,8 +30,9 @@ public class AnimatedButton : ButtonComponent
 
 	Rect _highlightRect;
 
+	static Color _deactivated;
+
 	Texture2D _highlight;
-	Texture2D _nonFunctional;
 
 	Sprite _originalSprite;
 	SpriteRenderer _renderer;
@@ -38,19 +43,18 @@ public class AnimatedButton : ButtonComponent
 	{
 		_originalScale = transform.localScale;
 
-		if(_downStateType == DownStateType.HIGHLIGHT || _downStateType == DownStateType.ALPHA)
+		if(_downStateType != DownStateType.NONE)
 		{
 			_renderer = renderer as SpriteRenderer;
-			_originalSprite = _renderer.sprite;
-			_originalAlpha = _renderer.color.a;
+
+			if(_renderer)
+			{
+				_originalSprite = _renderer.sprite;
+				_originalAlpha = _renderer.color.a;
+			}
 		}
 
-		if(_nonFunctional == null)
-		{
-			_nonFunctional = new Texture2D(1, 1);
-			_nonFunctional.SetPixel(0, 0, new Color(0f, 0f, 0f, 0.3f));
-			_nonFunctional.Apply();
-		}
+		_deactivated = new Color(1f, 1f, 1f,0.3f);
 
 		enabled = false;
 	}
@@ -62,9 +66,20 @@ public class AnimatedButton : ButtonComponent
 	#endregion
 
 	#region Activate/Deactivate
+	protected override void OnActivate()
+	{
+		base.OnActivate();
+
+		if(_deactivatedState)
+			_renderer.color = Color.white;
+	}
+
 	protected override void OnDeactivate()
 	{
 		base.OnDeactivate();
+
+		if(_deactivatedState)
+			_renderer.color = _deactivated;
 
 		if(enabled)
 			enabled = false;
@@ -91,60 +106,78 @@ public class AnimatedButton : ButtonComponent
 	#region Animation Methods
 	public void SetToPressed()
 	{
-		if(_downStateType == DownStateType.SPRITE)
-			_renderer.sprite = _pressedSprite;
-		else if(_downStateType == DownStateType.HIGHLIGHT || _downStateType == DownStateType.SCALE)
+		switch(_downStateType)
 		{
+		case DownStateType.SPRITE:
+			_renderer.sprite = _pressedSprite;
+			break;
+		case DownStateType.HIGHLIGHT:
 			transform.SetScaleXY(_originalScale.x * _downScale, _originalScale.y * _downScale);
 
 			if(_highlight == null)
 			{
-				Vector2 pos = Camera.main.WorldToScreenPoint(transform.position);
-				Vector2 max = Camera.main.WorldToScreenPoint(renderer.bounds.max);
-				Vector2 min = Camera.main.WorldToScreenPoint(renderer.bounds.min);
-
-				_highlightRect = new Rect(min.x, Screen.height - pos.y - (max.y - min.y) / 2f, max.x - min.x, (max.y - min.y));
+				CalculateRect();
 
 				_highlight = new Texture2D(1, 1);
 				_highlight.SetPixel(0, 0, new Color(1f, 1f, 1f, 0.2f));
 				_highlight.Apply();
 			}
 			else if(_recalculateHighlight)
-			{
-				Vector2 pos = Camera.main.WorldToScreenPoint(transform.position);
-				Vector2 max = Camera.main.WorldToScreenPoint(renderer.bounds.max);
-				Vector2 min = Camera.main.WorldToScreenPoint(renderer.bounds.min);
+				CalculateRect();
 
-				_highlightRect = new Rect(min.x, Screen.height - pos.y - (max.y - min.y) / 2f, max.x - min.x, (max.y - min.y));
-			}
-
-			if(_downStateType == DownStateType.HIGHLIGHT)
-				enabled = true;
-		}
-		else if(_downStateType == DownStateType.ALPHA)
-		{
+			enabled = true;
+			break;
+		case DownStateType.ALPHA:
 			transform.SetScaleXY(_originalScale.x * _downScale, _originalScale.y * _downScale);
-			if (_renderer != null)
-				_renderer.color = new Color(_renderer.color.r,_renderer.color.g,_renderer.color.b, _originalAlpha * _alpha);
+			if(_renderer != null)
+				_renderer.color = new Color(_renderer.color.r, _renderer.color.g, _renderer.color.b, _originalAlpha * _alpha);
+			break;
+		case DownStateType.SCALE:
+			transform.SetScaleXY(_originalScale.x * _downScale, _originalScale.y * _downScale);
+			break;
+		case DownStateType.DOWN_SHIFT:
+			transform.AddYPosition(_downShift);
+
+			if(_pressedSprite)
+				_renderer.sprite = _pressedSprite;
+			break;
 		}
 	}
 	public void SetToNormal()
 	{
-		if(_downStateType == DownStateType.SPRITE)
+		switch(_downStateType)
+		{
+		case DownStateType.SPRITE:
 			_renderer.sprite = _originalSprite;
-		else if(_downStateType == DownStateType.HIGHLIGHT || _downStateType == DownStateType.SCALE)
-		{
-			if(_downStateType == DownStateType.HIGHLIGHT)
-				enabled = false;
-
+			break;
+		case DownStateType.HIGHLIGHT:
+			enabled = false;
 			transform.SetScaleXY(_originalScale.x, _originalScale.y);
-		}
-		else if(_downStateType == DownStateType.ALPHA)
-		{
+			break;
+		case DownStateType.ALPHA:
 			transform.SetScaleXY(_originalScale.x, _originalScale.y);
 			if (_renderer != null)
 				_renderer.color = new Color(_renderer.color.r,_renderer.color.g,_renderer.color.b, _originalAlpha);
+			break;
+		case DownStateType.SCALE:
+			transform.SetScaleXY(_originalScale.x, _originalScale.y);
+			break;
+		case DownStateType.DOWN_SHIFT:
+			transform.AddYPosition(-_downShift);
+
+			if(_originalSprite)
+				_renderer.sprite = _originalSprite;
+			break;
 		}
+	}
+
+	void CalculateRect()
+	{
+		Vector2 pos = Camera.main.WorldToScreenPoint(transform.position);
+		Vector2 max = Camera.main.WorldToScreenPoint(renderer.bounds.max);
+		Vector2 min = Camera.main.WorldToScreenPoint(renderer.bounds.min);
+
+		_highlightRect = new Rect(min.x, Screen.height - pos.y - (max.y - min.y) / 2f, max.x - min.x, (max.y - min.y));
 	}
 	#endregion
 
@@ -152,14 +185,29 @@ public class AnimatedButton : ButtonComponent
 	protected override void ButtonDown()
 	{
 		SetToPressed();
+
+		if(_partnerButton)
+			_partnerButton.SetToPressed();
+
+		UINavigationController.PlayButtonDown();
 	}
 	protected override void MovedOffButton()
 	{
 		SetToNormal();
+
+		if(_partnerButton)
+			_partnerButton.SetToNormal();
+
+		UINavigationController.PlayButtonUp();
 	}
 	protected override void ButtonUp()
 	{
 		SetToNormal();
+
+		if(_partnerButton)
+			_partnerButton.SetToNormal();
+
+		UINavigationController.PlayButtonUp();
 	}
 	#endregion
 }
