@@ -1,6 +1,20 @@
 fileFormatVersion: 2
 guid: 7ceca75f8be84469dad0c6307cf64670
 TextureImporter:
+  fileIDToRecycleName:
+    21300000: IconJump_0
+    21300002: IconJump_1
+    21300004: IconJump_2
+    21300006: IconJump_3
+    21300008: IconJump_4
+    21300010: IconJump_5
+    21300012: IconJump_6
+    21300014: IconJump_7
+    21300016: IconJump_8
+    21300018: IconJump_9
+    21300020: IconJump_10
+    21300022: IconJump_11
+    21300024: IconJump_12
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -35,6 +49,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: .5, y: .5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spritePixelsToUnits: 128
   alphaIsTransparency: 1
   textureType: 8
@@ -54,6 +69,7 @@ TextureImporter:
         height: 97
       alignment: 0
       pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
     - name: IconJump_1
       rect:
         serializedVersion: 2
@@ -63,6 +79,7 @@ TextureImporter:
         height: 97
       alignment: 0
       pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
     - name: IconJump_2
       rect:
         serializedVersion: 2
@@ -72,6 +89,7 @@ TextureImporter:
         height: 97
       alignment: 0
       pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
     - name: IconJump_3
       rect:
         serializedVersion: 2
@@ -81,6 +99,7 @@ TextureImporter:
         height: 97
       alignment: 0
       pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
     - name: IconJump_4
       rect:
         serializedVersion: 2
@@ -90,6 +109,7 @@ TextureImporter:
         height: 97
       alignment: 0
       pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
     - name: IconJump_5
       rect:
         serializedVersion: 2
@@ -99,6 +119,7 @@ TextureImporter:
         height: 97
       alignment: 0
       pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
     - name: IconJump_6
       rect:
         serializedVersion: 2
@@ -108,6 +129,7 @@ TextureImporter:
         height: 97
       alignment: 0
       pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
     - name: IconJump_7
       rect:
         serializedVersion: 2
@@ -117,6 +139,7 @@ TextureImporter:
         height: 97
       alignment: 0
       pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
     - name: IconJump_8
       rect:
         serializedVersion: 2
@@ -126,6 +149,7 @@ TextureImporter:
         height: 97
       alignment: 0
       pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
     - name: IconJump_9
       rect:
         serializedVersion: 2
@@ -135,6 +159,7 @@ TextureImporter:
         height: 97
       alignment: 0
       pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
     - name: IconJump_10
       rect:
         serializedVersion: 2
@@ -144,6 +169,7 @@ TextureImporter:
         height: 97
       alignment: 0
       pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
     - name: IconJump_11
       rect:
         serializedVersion: 2
@@ -153,6 +179,7 @@ TextureImporter:
         height: 97
       alignment: 0
       pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
     - name: IconJump_12
       rect:
         serializedVersion: 2
@@ -162,5 +189,6 @@ TextureImporter:
         height: 97
       alignment: 0
       pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
   spritePackingTag: 
   userData: 

@@ -61,9 +61,9 @@ namespace gametheory.UI
     		if(temp)
     			temp.Activate();
     	}
-    	public static void PresentUIViewWithTransition(string view, Transition transition)
+    	public static void PresentGUIViewWithTransition(string view, Transition transition)
     	{
-    		UIView temp = instance.GetUIView(view);
+    		GUIView temp = instance.GetGUIView(view);
 
     		if(temp)
     			temp.Activate(transition);
@@ -81,12 +81,12 @@ namespace gametheory.UI
     		if(temp)
     			temp.Deactivate();
     	}
-    	public static void RemoveUIViewWithTransition(string view, Transition transition)
+    	public static void RemoveGUIViewWithTransition(string view, Transition transition)
     	{
-    		UIView temp = instance.GetUIView(view);
+            GUIView temp = instance.GetGUIView(view);
 
-    		if(temp)
-    			temp.FlagForExit(transition);
+            if (temp)
+                temp.FlagForExit(transition);
     	}
 
     	//Other methods
@@ -111,6 +111,17 @@ namespace gametheory.UI
 
     		return null;
     	}
+
+        public GUIView GetGUIView(string name)
+        {
+            for (int i = 0; i < _views.Count; i++)
+            {
+                if (_views[i] && _views[i].name == name && _views[i].GetType() == typeof(GUIView))
+                    return _views[i] as GUIView;
+            }
+
+            return null;
+        }
 
     	bool HasUIView(string name)
     	{
