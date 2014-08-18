@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace gametheory.UI
 {
-    public class GUIDropDown : UIBase 
+    public class GUIDropDown : GUIBase 
     {
     	#region Public Vars
     	public int _maxItems = 4;

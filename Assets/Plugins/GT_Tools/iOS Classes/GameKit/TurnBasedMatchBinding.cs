@@ -1,12 +1,13 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace gametheory.iOSTools.GameCenter
+namespace gametheory.iOS.GameKit
 {
     /// <summary>
-    /// Collection of external methods used to access iOS' Turnbased Match methods.
+    /// Provides access to iOS' Turnbased Match functionality.
     /// </summary>
     public class TurnBasedMatchBinding
     {
+        #region Methods
     	[DllImport ("__Internal")]
     	static extern void GKDeclineInvite();
 
@@ -140,5 +141,6 @@ namespace gametheory.iOSTools.GameCenter
     		GKLoadMatchData();
     		#endif
     	}
+        #endregion
     }
 }

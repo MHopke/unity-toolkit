@@ -1,7 +1,10 @@
-using gametheory.iOSTools.GameCenter;
+using gametheory.iOS.GameKit;
 
 namespace gametheory
 {
+    /// <summary>
+    /// Representation of an achievement.
+    /// </summary>
     public class Achievement 
     {
     	#region Constants
@@ -10,15 +13,22 @@ namespace gametheory
     	#endregion
 
     	#region Public Variables
-    	public string _name;
-    	public string _description;
+    	public string Name;
+    	public string Description;
 
-    	public bool _hidden;
-    	public bool _unlocked;
+    	public bool Hidden;
+    	public bool Unlocked;
 
-    	public float _progress;
+        /// <summary>
+        /// The current progress on the achievement. 100f indicates completion.
+        /// </summary>
+    	public float Progress;
 
-    	public string _platformIdentifier;
+        /// <summary>
+        /// Platform specific identifier. This is how the achievement shows up in GameCenter,
+        /// Google Play, Steam, etc.
+        /// </summary>
+    	public string PlatformIdentifier;
     	#endregion
 
     	#region Constructors
@@ -26,9 +36,9 @@ namespace gametheory
 
     	public Achievement(string name, string description, string platformId)
     	{
-    		_name = name;
-    		_description = description;
-    		_platformIdentifier = platformId;
+    		Name = name;
+    		Description = description;
+    		PlatformIdentifier = platformId;
     	}
     	#endregion
 
@@ -40,20 +50,20 @@ namespace gametheory
     	/// <param name="progress">Progress.</param>
     	public bool ReportProgress(float progress)
     	{
-    		if(_unlocked)
+    		if(Unlocked)
     			return false;
     		else
     		{
-    			_progress = progress;
+    			Progress = progress;
 
     			if(progress >= 100.0f)
     			{
-    				_unlocked = true;
-    				_progress = 100.0f;
+    				Unlocked = true;
+    				Progress = 100.0f;
     			}
 
     			#if UNITY_IPHONE
-    			GameKitBinding.ReportAchievement(_name, _progress);
+    			GameKitBinding.ReportAchievement(Name, Progress);
     			#elif UNITY_ANDROID
     			#endif
 
@@ -69,19 +79,19 @@ namespace gametheory
 
     		if(splitStr.Length > 1)
     		{
-    			if(!bool.TryParse(splitStr[0], out _unlocked))
-    				_unlocked = false;
+    			if(!bool.TryParse(splitStr[0], out Unlocked))
+    				Unlocked = false;
 
     			if(splitStr.Length > 2)
     			{
-    				if(float.TryParse(splitStr[1], out _progress))
-    					_progress = 0.0f;
+    				if(float.TryParse(splitStr[1], out Progress))
+    					Progress = 0.0f;
     			}
     		}
     	}
     	public override string ToString()
     	{
-    		return _unlocked.ToString() + "," + _progress.ToString();
+    		return Unlocked.ToString() + "," + Progress.ToString();
     	}
     	#endregion
     }

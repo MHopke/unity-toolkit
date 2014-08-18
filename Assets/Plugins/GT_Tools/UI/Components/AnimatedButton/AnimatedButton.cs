@@ -4,48 +4,38 @@ namespace gametheory.UI
 {
     public class AnimatedButton : ButtonComponent 
     {
-    	#region Enumerations
-    	public enum DownStateType {NONE = 0, SPRITE, HIGHLIGHT, ALPHA, SCALE, DOWN_SHIFT };
-    	#endregion
-
     	#region Public Variables
     	public bool _switchOnExit;
-    	public bool _recalculateHighlight;
+    	/*public bool _recalculateHighlight;
     	public bool _deactivatedState;
 
-    	public float _downScale;
     	public float _alpha;
-    	public float _downShift;
+    	public float _downShift;*/
 
-    	public DownStateType _downStateType;
+        public AnimatedButtonAnimation _animation;
 
-    	public Sprite _pressedSprite;
     	public Animator _animator;
 
     	public AnimatedButton _partnerButton;
     	#endregion
 
     	#region Private Variables
-    	float _originalAlpha;
-
-    	Vector3 _originalScale;
+    	/*float _originalAlpha;
 
     	Rect _highlightRect;
 
     	static Color _deactivated;
 
-    	Texture2D _highlight;
-
-    	Sprite _originalSprite;
-    	SpriteRenderer _renderer;
+    	Texture2D _highlight;*/
     	#endregion
 
     	#region Unity Methods
     	void Start()
     	{
-    		_originalScale = transform.localScale;
+            if (_animation)
+                _animation.Initialize();
 
-    		if(_downStateType != DownStateType.NONE)
+    		/*if(_downStateType != DownStateType.NONE)
     		{
     			_renderer = renderer as SpriteRenderer;
 
@@ -56,14 +46,14 @@ namespace gametheory.UI
     			}
     		}
 
-    		_deactivated = new Color(1f, 1f, 1f,0.3f);
+    		_deactivated = new Color(1f, 1f, 1f,0.3f);*/
 
     		enabled = false;
     	}
 
     	void OnGUI()
     	{
-    		GUI.DrawTexture(_highlightRect, _highlight);
+    		//GUI.DrawTexture(_highlightRect, _highlight);
     	}
     	#endregion
 
@@ -72,16 +62,16 @@ namespace gametheory.UI
     	{
     		base.OnActivate();
 
-    		if(_deactivatedState)
-    			_renderer.color = Color.white;
+    		/*if(_deactivatedState)
+    			_renderer.color = Color.white;*/
     	}
 
     	protected override void OnDeactivate()
     	{
     		base.OnDeactivate();
 
-    		if(_deactivatedState)
-    			_renderer.color = _deactivated;
+    		/*if(_deactivatedState)
+    			_renderer.color = _deactivated;*/
 
     		if(enabled)
     			enabled = false;
@@ -108,11 +98,11 @@ namespace gametheory.UI
     	#region Animation Methods
     	public void SetToPressed()
     	{
-    		switch(_downStateType)
+            if (_animation)
+                _animation.Animate();
+
+    		/*switch(_downStateType)
     		{
-    		case DownStateType.SPRITE:
-    			_renderer.sprite = _pressedSprite;
-    			break;
     		case DownStateType.HIGHLIGHT:
     			transform.SetXYScale(_originalScale.x * _downScale, _originalScale.y * _downScale);
 
@@ -134,24 +124,21 @@ namespace gametheory.UI
     			if(_renderer != null)
     				_renderer.color = new Color(_renderer.color.r, _renderer.color.g, _renderer.color.b, _originalAlpha * _alpha);
     			break;
-    		case DownStateType.SCALE:
-    			transform.SetXYScale(_originalScale.x * _downScale, _originalScale.y * _downScale);
-    			break;
     		case DownStateType.DOWN_SHIFT:
     			transform.AddYPosition(_downShift);
 
     			if(_pressedSprite)
     				_renderer.sprite = _pressedSprite;
     			break;
-    		}
+    		}*/
     	}
     	public void SetToNormal()
     	{
-    		switch(_downStateType)
+            if (_animation)
+                _animation.Restore();
+
+    		/*switch(_downStateType)
     		{
-    		case DownStateType.SPRITE:
-    			_renderer.sprite = _originalSprite;
-    			break;
     		case DownStateType.HIGHLIGHT:
     			enabled = false;
     			transform.SetXYScale(_originalScale.x, _originalScale.y);
@@ -161,37 +148,32 @@ namespace gametheory.UI
     			if (_renderer != null)
     				_renderer.color = new Color(_renderer.color.r,_renderer.color.g,_renderer.color.b, _originalAlpha);
     			break;
-    		case DownStateType.SCALE:
-    			transform.SetXYScale(_originalScale.x, _originalScale.y);
-    			break;
     		case DownStateType.DOWN_SHIFT:
     			transform.AddYPosition(-_downShift);
 
     			if(_originalSprite)
     				_renderer.sprite = _originalSprite;
     			break;
-    		}
+    		}*/
     	}
 
     	void CalculateRect()
     	{
-            Vector2 pos = UIScreen.UICamera.WorldToScreenPoint(transform.position);
+            /*Vector2 pos = UIScreen.UICamera.WorldToScreenPoint(transform.position);
             Vector2 max = UIScreen.UICamera.WorldToScreenPoint(renderer.bounds.max);
             Vector2 min = UIScreen.UICamera.WorldToScreenPoint(renderer.bounds.min);
 
-    		_highlightRect = new Rect(min.x, Screen.height - pos.y - (max.y - min.y) / 2f, max.x - min.x, (max.y - min.y));
+    		_highlightRect = new Rect(min.x, Screen.height - pos.y - (max.y - min.y) / 2f, max.x - min.x, (max.y - min.y));*/
     	}
     	#endregion
 
     	#region Input Methods
     	protected override void ButtonDown()
     	{
-    		SetToPressed();
+            SetToPressed();
 
     		if(_partnerButton)
     			_partnerButton.SetToPressed();
-
-    		UINavigationController.PlayButtonDown();
     	}
     	protected override void MovedOffButton()
     	{
@@ -199,8 +181,6 @@ namespace gametheory.UI
 
     		if(_partnerButton)
     			_partnerButton.SetToNormal();
-
-    		UINavigationController.PlayButtonUp();
     	}
     	protected override void ButtonUp()
     	{
@@ -208,15 +188,13 @@ namespace gametheory.UI
 
     		if(_partnerButton)
     			_partnerButton.SetToNormal();
-
-    		UINavigationController.PlayButtonUp();
     	}
     	#endregion
 
     	#region Other Methods
     	public void SetOriginalScale()
     	{
-    		_originalScale = transform.localScale;
+    		//_originalScale = transform.localScale;
     	}
     	#endregion
     }

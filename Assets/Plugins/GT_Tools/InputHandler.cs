@@ -4,11 +4,14 @@ using System;
 namespace gametheory
 {
     /// <summary>
-    /// Watches for base input and translate to useable events
+    /// Watches for base input and translates it into custom events.
     /// </summary>
     public class InputHandler : MonoBehaviour
     {
     	#region Events
+        /// <summary>
+        /// Delegate for sending touch events. NOTE: touchPosition is in pixels.
+        /// </summary>
     	public delegate void TouchInfo(Vector2 touchPosition, int touchID);
 
     	static event TouchInfo touchEndEvent;
@@ -18,21 +21,32 @@ namespace gametheory
     	public delegate void TouchMoving(Vector2 touch, Vector2 deltaPos,int touchID);
     	static event TouchMoving touchMovingEvent;
 
-    	//Fired when a swipe is detected
+        /// <summary>
+        /// Fires when a swipe is detected.
+        /// </summary>
     	public static event Action<bool> swipeEvent;
 
-    	//Fired when a shake is detected
+    	/// <summary>
+        /// Fired when a shake is detected.
+        /// </summary>
     	public static event Action shakeEvent;
 
-    	//Fired when a pinch is detected. False indicates a pull
+    	/// <summary>
+        /// Fires when a pinch/pull is detected. True indicates a pinch and false indicates a pull.
+        /// </summary>
     	public static event Action<bool> pinchEvent;
 
-    	//Fired when there has been no input for _inActiveTime
+    	/// <summary>
+        /// Fires when there has been no input for _inActiveTime
+        /// </summary>
     	public static event Action userInActive;
     	#endregion
 
     	#region Constants
     	public const int INVALID_FINGER = -1;
+        /// <summary>
+        /// The minimum difference (in pixels) that will trigger a swipe event.
+        /// </summary>
     	public const float SWIPE_THRESHOLD = 20.0f;
     	public const float MOVE_THRESHOLD = 0.0001f;
     	#endregion
@@ -41,24 +55,31 @@ namespace gametheory
     	bool _shaken;
     	bool _checkShake;
     	bool _checkPinch;
-    	bool _moditorActivity;
+        /// <summary>
+        /// Determines if the class should register inactivity.
+        /// </summary>
+        bool _monitorActivity;
 
-    	//Used to determine if the monobehaviour can be disabled
-    	//when input checks such as shake, or pinch are disabled;
+    	/// <summary>
+        /// Used to determine if the Monobehaviour can be disabled when input checks such as shake, or pinch are disabled.
+        /// </summary>
     	int _checkState = 0;
     	int _maxTouches = 1;
 
     	float _shakeResetTime;
-    	float _oldDistance;
+        float _previousFingersDifference;
     	float _shakeTimer;
     	float _inActiveTime;
     	float _inputTimer;
 
-    	Vector3 _oldAcceleration;
+        Vector3 _previousAcceleration;
+        /// <summary>
+        /// The minimum acceleration difference required to trigger a shake event.
+        /// </summary>
     	Vector3 _shakeThreshold;
     	#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBPLAYER
     	bool _mouseDown;
-    	Vector3 _oldMousePosition;
+        Vector3 _previousMousePosition;
     	#endif
 
     	static InputHandler _instance = null;
@@ -82,7 +103,7 @@ namespace gametheory
         // Update is called once per frame
     	void Update()
         {
-    		if(_moditorActivity)
+    		if(_monitorActivity)
     			_inputTimer += Time.deltaTime;
 
     		#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBPLAYER
@@ -90,7 +111,7 @@ namespace gametheory
     		{
     			_mouseDown = true;
 
-    			_oldMousePosition = Input.mousePosition;
+    			_previousMousePosition = Input.mousePosition;
 
     			if(touchStartEvent != null)
     				touchStartEvent(Input.mousePosition,0);
@@ -107,18 +128,18 @@ namespace gametheory
     		}
     		else if(_mouseDown)
     		{
-    			if(_oldMousePosition != Input.mousePosition)
+    			if(_previousMousePosition != Input.mousePosition)
     			{
     				if(touchMovingEvent != null)
-    					touchMovingEvent(Input.mousePosition,Input.mousePosition - _oldMousePosition,0);
+    					touchMovingEvent(Input.mousePosition,Input.mousePosition - _previousMousePosition,0);
     			}
-    			else if(_oldMousePosition == Input.mousePosition)
+    			else if(_previousMousePosition == Input.mousePosition)
     			{
     				if(touchStationaryEvent != null)
     					touchStationaryEvent(Input.mousePosition,0);
     			}
 
-    			_oldMousePosition = Input.mousePosition;
+    			_previousMousePosition = Input.mousePosition;
 
     			MarkInput();
     		}
@@ -132,9 +153,9 @@ namespace gametheory
 
     			if(!_shaken)
     			{
-    				float xDif = Mathf.Abs(_oldAcceleration.x - acc.x);
-    				float yDif = Mathf.Abs(_oldAcceleration.y - acc.y);
-    				float zDif = Mathf.Abs(_oldAcceleration.z - acc.z);
+                    float xDif = Mathf.Abs(_previousAcceleration.x - acc.x);
+                    float yDif = Mathf.Abs(_previousAcceleration.y - acc.y);
+                    float zDif = Mathf.Abs(_previousAcceleration.z - acc.z);
     				
     				if(shakeEvent != null && ((_shakeThreshold.x != 0.0f && xDif > _shakeThreshold.x) || 
     				                     (_shakeThreshold.y != 0.0f && yDif > _shakeThreshold.y) 
@@ -157,7 +178,7 @@ namespace gametheory
     				}
     			}
     					
-    			_oldAcceleration = acc;
+                _previousAcceleration = acc;
     		}
 
     		_maxTouches = Mathf.Min(1,Input.touchCount);
@@ -206,18 +227,18 @@ namespace gametheory
     		{
     			float distance = (Input.GetTouch(0).position - Input.GetTouch(1).position).magnitude;
 
-    			if(_oldDistance < distance)
+                if(_previousFingersDifference < distance)
     				pinchEvent(false);
-    			else if(_oldDistance > distance)
+                else if(_previousFingersDifference > distance)
     				pinchEvent(true);
 
-    			_oldDistance = distance;
+                _previousFingersDifference = distance;
 
     			MarkInput();
     		}
     		#endif
 
-    		if(_moditorActivity && _inputTimer >= _inActiveTime && userInActive != null)
+    		if(_monitorActivity && _inputTimer >= _inActiveTime && userInActive != null)
     		{
     			_inputTimer = 0f;
 
@@ -236,7 +257,7 @@ namespace gametheory
     		_instance._checkShake = true;
     		_instance._shakeThreshold = threshold;
     		_instance._shakeResetTime = resetTime;
-    		_instance._oldAcceleration = Input.acceleration;
+    		_instance._previousAcceleration = Input.acceleration;
 
     		shakeEvent = shakeMethod;
 
@@ -264,7 +285,7 @@ namespace gametheory
     		_instance._checkPinch = true;
 
     		if(Input.touchCount == 2)
-    			_instance._oldDistance = (Input.GetTouch(0).position - Input.GetTouch(1).position).magnitude;
+    			_instance._previousFingersDifference = (Input.GetTouch(0).position - Input.GetTouch(1).position).magnitude;
 
     		pinchEvent = pinchMethod;
 
@@ -358,8 +379,8 @@ namespace gametheory
     	#region Methods
     	public static bool MonitorActivity
     	{
-    		get { return _instance._moditorActivity; }
-    		set { _instance._moditorActivity = value; }
+    		get { return _instance._monitorActivity; }
+    		set { _instance._monitorActivity = value; }
     	}
     	#endregion
     }

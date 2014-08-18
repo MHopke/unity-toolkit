@@ -24,8 +24,13 @@ namespace gametheory.UI
 
     	#region Public Variables
     	public bool _useHierarchy;
-
+        public bool _animates;
     	public bool _skipActivation;
+
+        public string _animationInKey;
+        public string _animationOutKey;
+
+        public Animator _animator;
 
     	public ScreenSetting _screenSetting;
 
@@ -88,7 +93,10 @@ namespace gametheory.UI
 
     		enabled = true;
 
-            ActivateEvent();
+            if (_animates)
+                _animator.SetTrigger(_animationInKey);
+            else
+                ActivateEvent();
 
     		#if LOG
     		Debug.Log(name + " activated.");
@@ -102,11 +110,15 @@ namespace gametheory.UI
 
     		//Debug.Log(name + " deactivate");
 
-    		Deactivation();
-
     		enabled = false;
 
-            DeactivateEvent();
+            if (_animates)
+                _animator.SetTrigger(_animationOutKey);
+            else
+            {
+                Deactivation();
+                DeactivateEvent();
+            }
     		//Resources.UnloadUnusedAssets();
     	}
 
@@ -221,6 +233,18 @@ namespace gametheory.UI
     		return true;
     	}
     	#endregion
+
+        #region Animation Methods
+        void AnimationInDone()
+        {
+            ActivateEvent();
+        }
+        void AnimationOutDone()
+        {
+            Deactivation();
+            DeactivateEvent();
+        }
+        #endregion
 
         #region Event Call Methods
         protected void ActivateEvent()

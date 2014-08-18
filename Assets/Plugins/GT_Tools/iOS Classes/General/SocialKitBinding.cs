@@ -3,8 +3,11 @@ using UnityEngine;
 #endif
 using System.Runtime.InteropServices;
 
-namespace gametheory.iOSTools.Social
+namespace gametheory.iOS.Social
 {
+    /// <summary>
+    /// Provides access to iOS' social functionality.
+    /// </summary>
     public static class SocialKitBinding 
     {
     	[DllImport ("__Internal")]

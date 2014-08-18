@@ -2,7 +2,7 @@
 
 namespace gametheory.UI
 {
-    public class GUIInputField : UIBase 
+    public class GUIInputField : GUIBase 
     {
     	#if UNITY_IOS
     	#region Events 

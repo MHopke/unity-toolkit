@@ -1,16 +1,47 @@
 ﻿using MiniJSON;
 using System.Collections.Generic;
 
-namespace gametheory.iOSTools.GameCenter
+namespace gametheory.iOS.GameKit
 {
     /// <summary>
-    /// GK friends list. Holds a list of GKFriend representing the user's GameCenter Friends.
+    /// Wrapper class that holds a user's GameCenter display name and player id.
+    /// </summary>
+    public class GKUser
+    {
+        #region Public Vars
+        public string DisplayName;
+        public string PlayerID;
+        #endregion
+
+        #region Constructors
+        public GKUser()
+        {
+            DisplayName = "Default";
+            PlayerID = "-1";
+        }
+
+        public GKUser(string id, string name)
+        {
+            DisplayName = name;
+            PlayerID = id;
+        }
+        #endregion
+    }
+
+    /// <summary>
+    /// Wrapper class containing GKUser list representing the local player's GameCenter friends.
     /// </summary>
     public class GKFriendsList
     {
+        #region Private Vars
     	static List<GKUser> friends;
-    	public GKFriendsList(){ friends = new List<GKUser>(); }
+        #endregion
 
+        #region Contructors
+    	public GKFriendsList(){ friends = new List<GKUser>(); }
+        #endregion
+
+        #region Methods
     	/// <summary>
     	/// Sets the friends list. Rewrites the list each time this is called.
     	/// </summary>
@@ -29,15 +60,22 @@ namespace gametheory.iOSTools.GameCenter
     		}
     	}
 
+        /// <summary>
+        /// Checks if the list has a GKUser with with specified id.
+        /// </summary>
+        /// <returns><c>true</c>, if the user exists, <c>false</c> otherwise.</returns>
+        /// <param name="id">Identifier.</param>
     	bool ListContains(string id)
     	{
     		for(int i =0; i < friends.Count; i++)
-    			if(friends[i].playerID == id)
+    			if(friends[i].PlayerID == id)
     				return true;
 
     		return false;
     	}
+        #endregion
 
+        #region Accessors
     	public GKUser this[int index]
     	{
     		get { return friends [index]; }
@@ -46,26 +84,6 @@ namespace gametheory.iOSTools.GameCenter
     	{
     		get { return friends.Count; }
     	}
-    }
-
-    /// <summary>
-    /// GK friend. Holds the user's GameCenter display name and player id.
-    /// </summary>
-    public class GKUser
-    {
-    	public string displayName;
-    	public string playerID;
-
-    	public GKUser()
-    	{
-    		displayName = "Default";
-    		playerID = "-1";
-    	}
-
-    	public GKUser(string id, string name)
-    	{
-    		displayName = name;
-    		playerID = id;
-    	}
+        #endregion
     }
 }

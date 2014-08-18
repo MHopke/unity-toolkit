@@ -3,12 +3,12 @@
 namespace gametheory
 {
     /// <summary>
-    /// BWG plugins manager. All BWG Plugins should be components of this GameObject.
-    /// ONLY ONE OF THIS SHOULD EXIST AT A TIME.
+    /// This acts as the base GameObject that gametheory plugin's should be attached to. The native
+    /// side 
     /// </summary>
-    public class BWGPluginsManager : MonoBehaviour 
+    public class PluginsManager : MonoBehaviour 
     {
-    	BWGPluginsManager singleton = null;
+        PluginsManager singleton = null;
 
     	void Awake()
     	{

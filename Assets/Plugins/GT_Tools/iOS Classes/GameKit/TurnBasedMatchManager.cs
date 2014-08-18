@@ -1,8 +1,11 @@
 ﻿using UnityEngine;
 using System;
 
-namespace gametheory.iOSTools.GameCenter
+namespace gametheory.iOS.GameKit
 {
+    /// <summary>
+    /// Handles callbacks from the native code accessed by TurnBasedMatchBinding.
+    /// </summary>
     public class TurnBasedMatchManager : MonoBehaviour 
     {
     	#region Events

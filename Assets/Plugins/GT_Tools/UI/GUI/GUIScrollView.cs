@@ -141,7 +141,7 @@ namespace gametheory.UI
     		for(int i = 0; i < _elements.Count; i++)
     		{
     			if(_elements[i] != null)
-    				_elements[i].SetToPosition();
+                    (_elements[i] as GUIBase).SetToPosition();
     		}
 
     		base.InPlace();

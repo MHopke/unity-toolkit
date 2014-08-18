@@ -3,10 +3,10 @@ using UnityEngine;
 #endif
 using System.Runtime.InteropServices;
 
-namespace gametheory.iOSTools
+namespace gametheory.iOS
 {
     /// <summary>
-    /// Bridge for generic iOS calls, such as view alerts.
+    /// Provides access to general iOS functionality such as view alerts.
     /// </summary>
     public static class iOSBinding
     {

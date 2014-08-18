@@ -24,7 +24,7 @@ namespace gametheory.UI
     		for(int i = 0; i < _views.Count; i++)
     		{
     			if(_views[i] && !_views[i]._skipActivation)
-    				_views[i].Activate();
+                    _views[i].Activate();
     		}
 
     		instance = this;
@@ -39,7 +39,7 @@ namespace gametheory.UI
     		for(int i = 0; i < _views.Count; i++)
     		{
     			if(_views[i])
-    				_views[i].FlagForExit();
+                    _views[i].Deactivate();
     		}
 
     		#if LOG
@@ -52,14 +52,14 @@ namespace gametheory.UI
     	//Present view methods
     	public static void PresentUIView(UIView view)
     	{
-    		view.Activate();
+            view.Activate();
     	}
     	public static void PresentUIView(string view)
     	{
     		UIView temp = instance.GetUIView(view);
 
     		if(temp)
-    			temp.Activate();
+                temp.Activate();
     	}
     	public static void PresentGUIViewWithTransition(string view, Transition transition)
     	{
@@ -72,14 +72,14 @@ namespace gametheory.UI
     	//Remove view methods
     	public static void RemoveUIView(UIView view)
     	{
-    		view.Deactivate();
+            view.Deactivate();
     	}
     	public static void RemoveUIView(string view)
     	{
     		UIView temp = instance.GetUIView(view);
 
     		if(temp)
-    			temp.Deactivate();
+                temp.Deactivate();
     	}
     	public static void RemoveGUIViewWithTransition(string view, Transition transition)
     	{

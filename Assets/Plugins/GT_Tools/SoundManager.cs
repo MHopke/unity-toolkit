@@ -4,17 +4,18 @@ using System.Collections.Generic;
 namespace gametheory
 {
     /// <summary>
-    /// This class contains all functionality for all audio particular to the Physical
-    /// Apps menu system. The SoundManager queues Sounds in a list and will play each one after
-    /// another, allowing for easy sequential audio playback. Additionally, this class controls 
-    /// the opening audio sequence.
+    /// Queues Sounds in a list and will play each one after
+    /// another, allowing for easy sequential audio playback. Additionally, this is
+    /// setup to enable an opening audio sequence.
     /// </summary>
     [RequireComponent(typeof(AudioSource))]
     public class SoundManager : MonoBehaviour
     {
     	#region Events
+        /// <summary>
+        /// Fires when the opening audio sequence is complete
+        /// </summary>
     	static public event System.Action openingDoneEvent;
-    	static public event System.Action audioDidFinish;
     	#endregion
     	
     	#region Enumerations
@@ -22,8 +23,8 @@ namespace gametheory
     	#endregion
     	
     	#region Public variables
-    	public AudioClip AppTitle;  // audio clips for all particular events
-    	public AudioClip PAChime;
+    	public AudioClip AppTitle;
+    	public AudioClip OpeningChime;
     	public AudioClip MenuInactivity;
     	public AudioClip Rare;
     	public AudioClip Instructions;
@@ -31,73 +32,78 @@ namespace gametheory
     	#endregion
 
     	#region Private variables
-    	List<Sound> clips;  // list of sound clips - used like a queue
-    	bool audioDelayed;
-    	bool _restoreAudio;  // used for pausing and unpausing audio
+        /// <summary>
+        /// The list of clips that are queued to play. Does not use a queue because it needs to be
+        /// looped through to unload assets when clearing the list.
+        /// </summary>
+        List<Sound> _clips;
+        /// <summary>
+        /// Checked against to see if the game should continuing playing audio after it has been paused.
+        /// </summary>
+    	bool _restoreAudio;
 
-    	Sound currentSound;
-    	SoundState soundState;
+        Sound _currentSound;
+
+        SoundState _soundState;
+
     	static SoundManager instance = null;  // used to ensure a single instance of this object
     	#endregion
 
     	#region Unity Methods
     	void Awake()
     	{
-    		if(instance == null)
-    			instance = this;
+            if (instance == null)
+            {
+                instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
     		else
     			Destroy(gameObject);
     	}
-
-    	// method invoked when object is instantiated
+            
         void Start () 
         {
-    		clips = new List<Sound>();  // initialize sound list
+    		_clips = new List<Sound>();  // initialize sound list
     		PlayChime();
         }
-
-    	// update is called once per frame
+            
         void Update ()
     	{
-    		if (soundState == SoundState.PAUSED)
+    		if (_soundState == SoundState.PAUSED)
     			return;
 
     		// check if there is no audio playing
     		if (!audio.isPlaying) 
     		{
     			// if there are clips to play
-    			if (clips.Count > 0) 
+    			if (_clips.Count > 0) 
     			{
     				// if current sound still playing, handle it
-    				if(currentSound != null)
+    				if(_currentSound != null)
     				{
-    					if(currentSound.delayTime > 0.0f)
+    					if(_currentSound.DelayTime > 0.0f)
     					{
-    						currentSound.delayTime -= Time.deltaTime;
+    						_currentSound.DelayTime -= Time.deltaTime;
     						return;
     					}
 
-    					if(currentSound.runTimeLoaded)
-    						Resources.UnloadAsset(currentSound.clip);
-
-    					if(currentSound.flaggedForEvent && audioDidFinish != null)
-    						audioDidFinish();
+                        _currentSound.Finish();
     				}
 
     				// play next sound clip
-    				currentSound = clips[0];
-    				audio.clip = clips[0].clip;
+    				_currentSound = _clips[0];
+    				audio.clip = _clips[0].Clip;
     				audio.Play();
-    				clips.RemoveAt(0);
+    				_clips.RemoveAt(0);
     			}
     			else 
     			{
     				// otherwise handle sound states
-    				if(soundState == SoundState.CHIME)
-    					PlayOpeningName();
-    				else if(soundState == SoundState.TITLE)
+    				if(_soundState == SoundState.CHIME)
+    					PlayTitle();
+    				else if(_soundState == SoundState.TITLE)
     				{
-    					soundState = SoundState.NONE;
+    					_soundState = SoundState.NONE;
 
     					if(openingDoneEvent != null)
     						openingDoneEvent();
@@ -105,21 +111,17 @@ namespace gametheory
     				else
     				{
     					// no states and no sounds - set all audio off
-    					if(currentSound != null)
+    					if(_currentSound != null)
     					{
-    						if(currentSound.delayTime > 0.0f)
+                            if(_currentSound.DelayTime > 0.0f)
     						{
-    							currentSound.delayTime -= Time.deltaTime;
+                                _currentSound.DelayTime -= Time.deltaTime;
     							return;
     						}
 
-    						if(currentSound.runTimeLoaded)
-    							Resources.UnloadAsset(currentSound.clip);
+                            _currentSound.Finish();
 
-    						if(currentSound.flaggedForEvent && audioDidFinish != null)
-    							audioDidFinish();
-
-    						currentSound = null;
+    						_currentSound = null;
     					}
     				}
     			}
@@ -128,40 +130,50 @@ namespace gametheory
     	#endregion
 
     	#region Audio Control Methods
-    	// method to add passed Sound to Sound list
+    	/// <summary>
+        /// Adds a Sound to the list of sounds.
+        /// </summary>
+        /// <param name="sound">Sound.</param>
     	public static void AddClip(Sound sound)
     	{
-    		instance.clips.Add(sound);
+    		instance._clips.Add(sound);
     	}
-    	// method to add passed AudioClip to Sound list
+    	/// <summary>
+        /// Adds a Sound to the list of sounds.
+        /// </summary>
+        /// <param name="clip">Clip.</param>
     	public static void AddClip(AudioClip clip)
     	{
-    		instance.clips.Add(new Sound(clip));
+    		instance._clips.Add(new Sound(clip));
     	}
 
-    	// method to clear all audio from Sound list and stop all audio from playing
-    	public static void ClearOldAudio()
+    	/// <summary>
+        /// Clears the Sounds in _clips and stops any currently playing audio.
+        /// </summary>
+    	public static void ClearSounds()
     	{
     		Stop();
 
-    		instance.audioDelayed = false;
-
     		// unload any assets before clearing the list
-    		for(int i = 0; i < instance.clips.Count; i++)
-    			if(instance.clips[i].runTimeLoaded)
-    				Resources.UnloadAsset(instance.clips[i].clip);
+            for (int i = 0; i < instance._clips.Count; i++)
+                instance._clips[i].Clear();
 
-    		instance.clips.Clear();
-    		instance.currentSound = null;
+    		instance._clips.Clear();
+    		instance._currentSound = null;
     	}
 
-    	// method to stop audio
+    	/// <summary>
+        /// Stop the current playing Sound.
+        /// </summary>
     	public static void Stop()
     	{
     		instance.audio.Stop();
     	}
 
-    	// method to pause audio
+    	/// <summary>
+        /// Pause the current playing Sound.
+        /// </summary>
+        /// <param name="pause">If set to <c>true</c> pause the Sound.</param>
     	public static void Pause(bool pause)
     	{
     		// pause
@@ -186,23 +198,31 @@ namespace gametheory
     		}
     	}
 
-    	// method to play sound immediately - for special cases where audio is time specific (Sound type)
+    	/// <summary>
+        /// Causes the new Sound to be "immediately" played by clearing the Sound list.
+        /// </summary>
+        /// <param name="sound">Sound.</param>
     	public static void PlayClipImmediately(Sound sound)
     	{
-    		ClearOldAudio ();
+    		ClearSounds ();
 
     		AddClip (sound);
     	}
 
-    	// method to play sound immediately - for special cases where audio is time specific (AudioClip type)
+    	/// <summary>
+        /// Causes the new Sound to be "immediately" played by clearing the Sound list.
+        /// </summary>
+        /// <param name="clip">Clip.</param>
     	public static void PlayClipImmediately(AudioClip clip)
     	{
-    		ClearOldAudio();
+    		ClearSounds();
 
     		AddClip(clip);
     	}
 
-    	// method to play the inactive clip
+    	/// <summary>
+        /// Play a random Sound generated from the list of the inactive AudioClips.
+        /// </summary>
     	public void PlayInactiveSound()
     	{
     		if(GameInactivity.Count > 0)
@@ -214,34 +234,29 @@ namespace gametheory
     	#endregion
 
     	#region Opening Audio Methods
+        /// <summary>
+        /// Plays the opening chime.
+        /// </summary>
     	public void PlayChime()
     	{
-    		PlayClipImmediately(new Sound(PAChime));
-    		soundState = SoundState.CHIME;
+    		PlayClipImmediately(new Sound(OpeningChime));
+    		_soundState = SoundState.CHIME;
     	}
-
-    	public void PlayOpeningName()
+        /// <summary>
+        /// Plays the title clip.
+        /// </summary>
+    	public void PlayTitle()
     	{
     		PlayClipImmediately(new Sound(AppTitle));
-    		soundState = SoundState.TITLE;
+    		_soundState = SoundState.TITLE;
     	}
-
+        /// <summary>
+        /// Skips the opening audio sequence.
+        /// </summary>
     	public static void SkipOpening()
     	{
-    		ClearOldAudio();
-    		instance.soundState = SoundState.NONE;
-    	}
-    	#endregion
-
-    	#region Accessors
-    	public static bool AudioIsPlaying
-    	{
-    		get { return instance.audio.isPlaying; }
-    	}
-
-    	public static SoundManager Instance
-    	{
-    		get { return instance; }
+    		ClearSounds();
+    		instance._soundState = SoundState.NONE;
     	}
     	#endregion
     }

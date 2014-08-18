@@ -2,7 +2,7 @@
 
 namespace gametheory.UI
 {
-    public class GUIButton : UIBase 
+    public class GUIButton : GUIBase 
     {
     	#region Events
     	public event System.Action clickEvent;

@@ -37,9 +37,10 @@ namespace gametheory.UI
     	#endregion
 
     	#region Unity Methods
+
+        #if UNITY_IOS
     	void Update()
     	{
-    		#if UNITY_IOS
     		if (_keyBoard != null) 
     		{
     			if(_keyBoard.active)
@@ -72,8 +73,8 @@ namespace gametheory.UI
     				//Debug.Log("filtered");
     			}
     		}
-    #endif
     	}
+        #endif
     	#endregion
 
     	#region Overriden Methods
@@ -94,7 +95,7 @@ namespace gametheory.UI
 
     		_rect.x = Screen.width / 2f - _rect.width / 2f;
 
-    		_primaryStyle.SetDefaultStyle("textfield");
+            _guiStyle.SetDefaultStyle("textfield");
     		#endif
     	}
 
@@ -184,15 +185,18 @@ namespace gametheory.UI
     	#if !UNITY_IOS || UNITY_EDITOR
     	string _text="";
 
-    	public Rect _rect;
-    	public override void Draw()
+        public Rect _rect;
+
+        public CustomStyle _guiStyle;
+
+    	void OnGUI()
     	{
     		GUI.SetNextControlName(GetHashCode().ToString());
     		
-    		if(_primaryStyle.custom)
-    			_effect.Text = GUI.TextField(_rect, _effect.Text, _primaryStyle.style);
+            if(_guiStyle.custom)
+                _effect.Text = GUI.TextField(_rect, _effect.Text, _guiStyle.style);
     		else
-    			_effect.Text = GUI.TextField(_rect, _effect.Text, _primaryStyle.styleName);
+                _effect.Text = GUI.TextField(_rect, _effect.Text, _guiStyle.styleName);
     		
     		if(GUI.GetNameOfFocusedControl() != name && _text == "")
     			_text = _defaultText;

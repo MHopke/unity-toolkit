@@ -6,7 +6,8 @@ namespace gametheory.UI
     /// This class acts as an additional abstraction of Unity's Screen class.
     /// It is designed to be utilized by any UI/auto sizing objects. 
     /// </summary>
-    public class UIScreen : MonoBehaviour {
+    public class UIScreen : MonoBehaviour 
+    {
 
     	#region Public Variables
         public Vector2 DesignedResolution;
@@ -96,6 +97,10 @@ namespace gametheory.UI
     	#endregion
     }
 
+    /// <summary>
+    /// Used to determine how a UI element should be adjusted when appearing on
+    /// different resolutions.
+    /// </summary>
     [System.Serializable]
     public class ScreenSetting
     {

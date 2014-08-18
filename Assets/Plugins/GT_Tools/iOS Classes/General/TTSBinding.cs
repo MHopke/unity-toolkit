@@ -3,8 +3,11 @@ using UnityEngine;
 #endif
 using System.Runtime.InteropServices;
 
-namespace gametheory.iOSTools
+namespace gametheory.iOS
 {
+    /// <summary>
+    /// Provides access to iOS 7's text-to-speech functionality.
+    /// </summary>
     public static class TTSBinding 
     {
     	[DllImport ("__Internal")]

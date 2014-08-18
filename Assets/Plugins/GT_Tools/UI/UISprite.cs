@@ -1,4 +1,3 @@
-//#define DRAW
 using UnityEngine;
 
 namespace gametheory.UI
@@ -52,14 +51,6 @@ namespace gametheory.UI
     	}
     	#endregion
 
-    	#if DRAW
-    	public override void Draw()
-    	{
-    		GUI.Box(_drawRect, "");
-    		//base.Draw();
-    	}
-    	#endif
-
     	#region Color Methods
     	protected Color GetColor()
     	{
@@ -107,22 +98,6 @@ namespace gametheory.UI
     	{
     		get { return _spriteAnimator; }
     		set { _spriteAnimator = value; }
-    	}
-
-    	/// <summary>
-    	/// Gets the bounding area of the element (in pixels). Assumes the Sprite's
-    	/// pivot point is Left.
-    	/// </summary>
-    	/// <returns>The bounds.</returns>
-    	public override Rect GetBounds()
-    	{
-    		Vector2 max = Camera.main.WorldToScreenPoint(_spriteRenderer.sprite.bounds.max);
-    		Vector2 min = Camera.main.WorldToScreenPoint(_spriteRenderer.sprite.bounds.min);
-
-    		float width = max.x - min.x;
-    		float height = max.y - min.y;
-
-    		return new Rect(_currentPosition.x - width / 2f, _currentPosition.y - height / 2f, max.x - min.x, (max.y - min.y));
     	}
     	#endregion
     }

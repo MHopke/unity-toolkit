@@ -2,30 +2,7 @@
 
 namespace gametheory.UI
 {
-    /// <summary>
-    /// This class creates objects that will be scaled according the the designedSize.
-    /// Using these enables the use of constants instead of percentages of Screen height / width.
-    /// </summary>
-    public static class AutoSized
-    {
-    	public static Vector2 designedSize = new Vector2(1024,768);
-
-    	public static Rect CreateRect(float x, float y, float width, float height)
-    	{
-    		return new Rect(Screen.width * (x / designedSize.x), Screen.height * (y / designedSize.y),
-    			Screen.width * (width / designedSize.x), Screen.height * (height / designedSize.y));
-    	}
-    	public static Rect CreateRect(Rect rect)
-    	{
-    		return CreateRect(rect.x, rect.y, rect.width, rect.height);
-    	}
-    	public static Vector2 CreateVector2(float x, float y)
-    	{
-    		return new Vector2(Screen.width * (x / designedSize.x), Screen.height * (y / designedSize.y));
-    	}
-    }
-
-    #region Custom UI Classes
+    #region Custom GUI Classes
     /// <summary>
     /// A wrapper class for a Unity's GUI.Toggle. Enables independent control 
     /// of the toggle and the label.

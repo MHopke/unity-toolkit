@@ -2,6 +2,9 @@
 
 namespace gametheory.UI
 {
+    /// <summary>
+    /// Used to make any Sprite act as toggle.
+    /// </summary>
     public class ToggleComponent : ButtonComponent
     {
         #region Events

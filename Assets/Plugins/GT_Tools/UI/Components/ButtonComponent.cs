@@ -3,18 +3,25 @@
 namespace gametheory.UI
 {
     /// <summary>
-    /// Button component. Put this on any gameobject to make it a button which
-    /// responds to the InputHandler.
+    /// Add to any GameObject with a collider2D to make it act as a button.
     /// </summary>
     public class ButtonComponent : MonoBehaviour 
     {
     	#region Events
+        /// <summary>
+        /// Fires when the user releases the button, and they are within its bounds.
+        /// </summary>
     	public event System.Action clickEvent;
+        /// <summary>
+        /// Fires when the user releases the button, they are within its bounds, and the
+        /// button is indexed.
+        /// </summary>
     	public event System.Action<int> indexedClickEvent;
     	#endregion
 
     	#region Public Vars
     	public bool _indexedButton;
+
     	public int _index;
     	#endregion
 

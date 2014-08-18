@@ -106,7 +106,7 @@ namespace gametheory.UI
             {
                 if (_elements[i] && _elements[i].Active)
                 {
-                    _elements[i].Draw();
+                    (_elements[i] as GUIBase).Draw();
                 }
             }
         }
@@ -182,7 +182,7 @@ namespace gametheory.UI
                 for (int i = 0; i < _elements.Count; i++)
                 {
                     if (_elements[i])
-                        _elements[i].Reposition(scale);
+                        (_elements[i] as GUIBase).Reposition(scale);
                 }
             }
         }
@@ -220,13 +220,6 @@ namespace gametheory.UI
         #endregion
 
         #region Exit Methods
-        public void FlagForExit()
-        {
-            
-
-            Exit();
-        }
-
         public override void Exit()
         {
             _currentTransition = new Transition(_currentPosition, 1f);

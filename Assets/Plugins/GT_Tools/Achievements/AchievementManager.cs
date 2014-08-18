@@ -7,6 +7,9 @@ using System.Collections.Generic;
 
 namespace gametheory
 {
+    /// <summary>
+    /// Manages progress, saving, and loading of achievements.
+    /// </summary>
     public class AchievementManager 
     {
     	#region Private Variables
@@ -31,19 +34,19 @@ namespace gametheory
     					Achievement achievement = new Achievement();
 
     					reader.MoveToAttribute("name");
-    					achievement._name = reader.Value;
+    					achievement.Name = reader.Value;
 
     					reader.MoveToAttribute("description");
-    					achievement._description = reader.Value;
+    					achievement.Description = reader.Value;
 
     					#if UNITY_IOS
     					reader.MoveToAttribute("gameCenter");
     					#elif UNITY_ANDROID
     					reader.MoveToAttribute("googePlay");
     					#endif
-    					achievement._platformIdentifier = reader.Value;
+    					achievement.PlatformIdentifier = reader.Value;
 
-    					_achievements.Add(achievement._name, achievement);
+    					_achievements.Add(achievement.Name, achievement);
     				}
     			}
     		} else
@@ -53,6 +56,10 @@ namespace gametheory
     		UnlockAchievements(json);
     	}
 
+        /// <summary>
+        /// Used to unlock any previously earned achievements.
+        /// </summary>
+        /// <param name="json">Json.</param>
     	static void UnlockAchievements(string json)
     	{
     		if(json != "")
@@ -74,6 +81,11 @@ namespace gametheory
     		return Json.Serialize(_achievements);
     	}
 
+        /// <summary>
+        /// Updates the progress on an achievement.
+        /// </summary>
+        /// <param name="achievementId">Achievement identifier.</param>
+        /// <param name="progress">Progress.</param>
     	public static void UpdateAchievement(string achievementId, float progress)
     	{
     		if(_achievements.ContainsKey(achievementId))

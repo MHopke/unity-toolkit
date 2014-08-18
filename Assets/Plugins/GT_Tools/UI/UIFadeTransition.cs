@@ -37,7 +37,7 @@ namespace gametheory.UI
     		_texture.SetPixel(0, 0, _originalColor);
     		_texture.Apply();
 
-    		_rect = AutoSized.CreateRect(0, 0, 640, 960);
+    		//_rect = AutoSized.CreateRect(0, 0, 640, 960);
 
     		_fadeState = FadeState.NONE;
 

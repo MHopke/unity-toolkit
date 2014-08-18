@@ -5,7 +5,7 @@ namespace gametheory.UI
     /// <summary>
     /// Representation of a graphical UI element. Uses Unity 4.3 Sprite System.
     /// </summary>
-    public class GUITexture : UIBase
+    public class GUITexture : GUIBase
     {
     	#region Public Variables
     	public Texture2D _texture;

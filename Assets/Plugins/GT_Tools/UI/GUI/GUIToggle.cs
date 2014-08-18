@@ -2,7 +2,7 @@
 
 namespace gametheory.UI
 {
-    public class GUIToggle : UIBase 
+    public class GUIToggle : GUIBase 
     {
     	#region Events
     	public event System.Action<bool> toggledEvent;

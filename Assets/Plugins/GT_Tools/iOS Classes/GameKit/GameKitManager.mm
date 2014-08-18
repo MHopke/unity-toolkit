@@ -95,12 +95,12 @@ const NSString* STATUSES = @"status";
     [status appendString:@","];
     [status appendString:[GKLocalPlayer localPlayer].alias];
     
-    UnitySendMessage("BWGPluginsManager", "Authenticated", [status cStringUsingEncoding:NSASCIIStringEncoding]);
+    UnitySendMessage("GameKitManager", "Authenticated", [status cStringUsingEncoding:NSASCIIStringEncoding]);
 }
 
 - (void) disableGameCenter
 {
-    UnitySendMessage("BWGPluginsManager", "Authenticated", "false");
+    UnitySendMessage("GameKitManager", "Authenticated", "false");
 }
 
 - (void) loadLeaderboardInfo
@@ -134,7 +134,7 @@ const NSString* STATUSES = @"status";
                 NSData* jsonData = [NSJSONSerialization dataWithJSONObject:friends
                                                                    options:NSJSONWritingPrettyPrinted error:&jsonError];
                 
-                UnitySendMessage("BWGPluginsManager", "RetrievedFriends", [[[[NSString alloc] initWithData:jsonData encoding:NSASCIIStringEncoding] autorelease] cStringUsingEncoding:NSASCIIStringEncoding]);
+                UnitySendMessage("GameKitManager", "RetrievedFriends", [[[[NSString alloc] initWithData:jsonData encoding:NSASCIIStringEncoding] autorelease] cStringUsingEncoding:NSASCIIStringEncoding]);
             }
         }
     }];
@@ -182,7 +182,7 @@ const NSString* STATUSES = @"status";
                  NSData* jsonData = [NSJSONSerialization dataWithJSONObject:_achievementsDictionary
                                                                     options:NSJSONWritingPrettyPrinted error:&jsonError];
                  
-                 UnitySendMessage("BWGPluginsManager", "AchievementsLoaded", [[[[NSString alloc] initWithData:jsonData encoding:NSASCIIStringEncoding] autorelease] cStringUsingEncoding:NSASCIIStringEncoding]);
+                 UnitySendMessage("GameKitManager", "AchievementsLoaded", [[[[NSString alloc] initWithData:jsonData encoding:NSASCIIStringEncoding] autorelease] cStringUsingEncoding:NSASCIIStringEncoding]);
                  //UnitySendMessage("BWGPluginManager", "AchievementsLoaded", (char*)[jsonData bytes]);
              }
          }
@@ -304,7 +304,7 @@ extern "C"
         {
             _activeMatch = match;
             
-            UnitySendMessage("BWGPluginsManager", "MatchSuccessfullyCreated", [match.matchID cStringUsingEncoding:NSASCIIStringEncoding]);
+            UnitySendMessage("GameKitManager", "MatchSuccessfullyCreated", [match.matchID cStringUsingEncoding:NSASCIIStringEncoding]);
         }
     }];
 }
@@ -312,7 +312,7 @@ extern "C"
 - (void)player:(GKPlayer *)player matchEnded:(GKTurnBasedMatch *)match
 {
     NSLog(@"Game has ended");
-    UnitySendMessage("BWGPluginsManager", "MatchEnded", [match.matchID cStringUsingEncoding:NSASCIIStringEncoding]);
+    UnitySendMessage("GameKitManager", "MatchEnded", [match.matchID cStringUsingEncoding:NSASCIIStringEncoding]);
 }
 
 - (void)player:(GKPlayer *)player receivedExchangeCancellation:(GKTurnBasedExchange *)exchange forMatch:(GKTurnBasedMatch *)match
@@ -346,10 +346,10 @@ extern "C"
          {
              _activeMatch = match;
              
-             UnitySendMessage("BWGPluginsManager", "MatchCreationSuccess", [match.matchID cStringUsingEncoding:NSASCIIStringEncoding]);
+             UnitySendMessage("GameKitManager", "MatchCreationSuccess", [match.matchID cStringUsingEncoding:NSASCIIStringEncoding]);
          }
          else
-             UnitySendMessage("BWGPluginsManager", "MatchCreationFailure", "");
+             UnitySendMessage("GameKitManager", "MatchCreationFailure", "");
      }];
     
     /*GKTurnBasedMatchmakerViewController *mmvc = [[GKTurnBasedMatchmakerViewController alloc] initWithMatchRequest:request];
@@ -469,7 +469,7 @@ extern "C"
                   NSData* jsonData = [NSJSONSerialization dataWithJSONObject:info
                                                                      options:NSJSONWritingPrettyPrinted error:&jsonError];
                   
-                  UnitySendMessage("BWGPluginsManager", "MatchesLoaded", [[[[NSString alloc] initWithData:jsonData encoding:NSASCIIStringEncoding] autorelease] cStringUsingEncoding:NSASCIIStringEncoding]);
+                  UnitySendMessage("GameKitManager", "MatchesLoaded", [[[[NSString alloc] initWithData:jsonData encoding:NSASCIIStringEncoding] autorelease] cStringUsingEncoding:NSASCIIStringEncoding]);
               }];
          }
      }];
@@ -483,7 +483,7 @@ extern "C"
     if([_activeMatch.matchID isEqualToString:matchID])
     {
         //[self loadMatchData];
-        UnitySendMessage("BWGPluginsManager","MatchLoaded","");
+        UnitySendMessage("GameKitManager","MatchLoaded","");
         return;
     }
     else
@@ -505,7 +505,7 @@ extern "C"
                  
                  [matchIDs appendString:@"|"];
                  
-                 UnitySendMessage("BWGPluginsManager","MatchLoaded",[matchIDs cStringUsingEncoding:NSASCIIStringEncoding]);
+                 UnitySendMessage("GameKitManager","MatchLoaded",[matchIDs cStringUsingEncoding:NSASCIIStringEncoding]);
                  //[self loadMatchData];
              }
          }];
@@ -523,7 +523,7 @@ extern "C"
     [_activeMatch saveCurrentTurnWithMatchData:_gameData completionHandler:^(NSError *error)
      {
          if(error == nil)
-             UnitySendMessage("BWGPluginsManager", "MatchDataSaved", "");
+             UnitySendMessage("GameKitManager", "MatchDataSaved", "");
      }];
 }
 
@@ -562,13 +562,13 @@ extern "C"
          if(error)
          {
              //NSLog(error.debugDescription);//error
-             UnitySendMessage("BWGPluginsManager", "TurnAdvancedError", "");
+             UnitySendMessage("GameKitManager", "TurnAdvancedError", "");
              _gameData = nil;
              [_gameData release];
          }
          else
          {
-             UnitySendMessage("BWGPluginsManager", "TurnAdvancedSucess", "");
+             UnitySendMessage("GameKitManager", "TurnAdvancedSucess", "");
              _gameData = nil;
              [_gameData release];
          }
@@ -585,13 +585,13 @@ extern "C"
      {
          if(error == nil)
          {
-             UnitySendMessage("BWGPluginsManager", "MatchEnded", ""/*[identifier cStringUsingEncoding:NSASCIIStringEncoding]*/);
+             UnitySendMessage("GameKitManager", "MatchEnded", ""/*[identifier cStringUsingEncoding:NSASCIIStringEncoding]*/);
              
              _gameData = nil;
              [_gameData release];
          }
          else
-             UnitySendMessage("BWGPluginsManager", "MatchEndedError", ""/*[identifier cStringUsingEncoding:NSASCIIStringEncoding]*/);
+             UnitySendMessage("GameKitManager", "MatchEndedError", ""/*[identifier cStringUsingEncoding:NSASCIIStringEncoding]*/);
          
      }];
 }
@@ -606,7 +606,7 @@ extern "C"
         [_activeMatch removeWithCompletionHandler:^(NSError *error) {
             //some code
             if(error== nil)
-                UnitySendMessage("BWGPluginsManager", "MatchRemoved", [_activeMatch.matchID cStringUsingEncoding:NSASCIIStringEncoding]);
+                UnitySendMessage("GameKitManager", "MatchRemoved", [_activeMatch.matchID cStringUsingEncoding:NSASCIIStringEncoding]);
         }];
     }
     else
@@ -619,7 +619,7 @@ extern "C"
                      //some code
                      //NSLog(@"removed");
                      if(error == nil)
-                         UnitySendMessage("BWGPluginsManager", "MatchRemoved", [_activeMatch.matchID cStringUsingEncoding:NSASCIIStringEncoding]);
+                         UnitySendMessage("GameKitManager", "MatchRemoved", [_activeMatch.matchID cStringUsingEncoding:NSASCIIStringEncoding]);
                  }];
                  
                  _activeMatch = nil;
@@ -635,7 +635,7 @@ extern "C"
 
 - (void)sendQuitGame
 {
-    UnitySendMessage("BWGPluginsManager", "MatchQuit", [_activeMatch.matchID cStringUsingEncoding:NSASCIIStringEncoding]);
+    UnitySendMessage("GameKitManager", "MatchQuit", [_activeMatch.matchID cStringUsingEncoding:NSASCIIStringEncoding]);
 }
 
 - (void) quit
@@ -698,7 +698,7 @@ extern "C"
     //Triggered this here because Unity sets an incorrect category somewhere during its background initialization
     //[[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:NULL];
     
-    UnitySendMessage("GameManager", "GameCenterAuthenicationDone", "");
+    UnitySendMessage("GameKitManager", "GameCenterAuthenicationDone", "");
 }
 
 - (void)loadMatchData
@@ -711,7 +711,7 @@ extern "C"
              string cData = (string)[matchData bytes];
              if(cData[strlen(cData) - 1] == '}')
              {
-                 UnitySendMessage("BWGPluginsManager", "MatchDataLoaded", cData);
+                 UnitySendMessage("GameKitManager", "MatchDataLoaded", cData);
              }
          }
      }];

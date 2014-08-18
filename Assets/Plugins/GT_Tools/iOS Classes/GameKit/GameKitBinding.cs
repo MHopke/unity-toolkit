@@ -1,9 +1,9 @@
 using System.Runtime.InteropServices;
 
-namespace gametheory.iOSTools.GameCenter
+namespace gametheory.iOS.GameKit
 {
     /// <summary>
-    /// Collection of external methods accessing iOS' Gamekit.
+    /// Provides access to iOS' GameKit functionality.
     /// </summary>
     public class GameKitBinding
     {

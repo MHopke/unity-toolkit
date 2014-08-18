@@ -1,23 +1,46 @@
 ﻿using UnityEngine;
 using System;
 
-namespace gametheory.iOSTools.GameCenter
+namespace gametheory.iOS.GameKit
 {
     /// <summary>
-    /// Game kit manager. Place this on the single BWGPluginsManager GameObject.
+    /// Handles callbacks from native code accessed by GameKitBinding.
     /// </summary>
-    public class GameKitManager : MonoBehaviour {
-
+    public class GameKitManager : MonoBehaviour 
+    {
     	#region Events
-    	//Fired when Game Center has been authenticated (or disabled)
+    	/// <summary>
+        /// Fires when Game Center has been authenticated (or disabled)
+        /// </summary>
     	public static event Action<bool> authenticationEvent;
 
-    	//Fired when the local player's friend list has been retrieved
+    	/// <summary>
+        /// Fires when the local player's friend list has been retrieved.
+        /// </summary>
     	public static event Action<string> retrievedFriendsEvent;
 
-    	//Fired when the local player's achievments have been loaded
+    	/// <summary>
+        /// Fires when the local player's achievments have been loaded.
+        /// </summary>
     	public static event Action<string> achievementsLoaded;
     	#endregion
+
+        #region Private Vars
+        static GameKitManager instance =null;
+        #endregion
+
+        #region Unity Methods
+        void Awake()
+        {
+            if (instance == null)
+            {
+                DontDestroyOnLoad(gameObject);
+                instance = this;
+            }
+            else
+                Destroy(gameObject);
+        }
+        #endregion
 
     	#region Callbacks
     	void Authenticated(string status)

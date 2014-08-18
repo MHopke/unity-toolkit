@@ -3,8 +3,7 @@
 namespace gametheory.UI
 {
     /// <summary>
-    /// This class controls the flow from one UIViewController to another. Only 1 UIViewController
-    /// should be active at a time.
+    /// Controls the navigation between one UIViewController and another.
     /// </summary>
     public class UINavigationController : MonoBehaviour 
     {
@@ -18,11 +17,10 @@ namespace gametheory.UI
     	#endregion
 
     	#region Public Variables
-    	//The Custom GUISkin used by the game's UI.
+    	/// <summary>
+        /// The Custom GUISkin used by this scene.
+        /// </summary>
     	public GUISkin _skin;
-
-    	public AudioClip _buttonDown;
-    	public AudioClip _buttonUp;
 
     	public UIFadeTransition _fadeTransition;
 
@@ -84,6 +82,10 @@ namespace gametheory.UI
     	#endregion
 
     	#region Methods
+        /// <summary>
+        /// Removes the old UIViewController and presents the new one.
+        /// </summary>
+        /// <param name="controllerId">Controller identifier.</param>
     	public static void NavigateToController(string controllerId)
     	{
     		//Debug.Log("id: " + controllerId);
@@ -99,6 +101,10 @@ namespace gametheory.UI
     				instance.SwitchControllers();
     		}
     	}
+        /// <summary>
+        /// Removes the old UIViewController and presents the new one.
+        /// </summary>
+        /// <param name="controller">Controller.</param>
     	public static void NavigateToController(UIViewController controller)
     	{
     		//Debug.Log("id: " + controllerId);
@@ -114,7 +120,11 @@ namespace gametheory.UI
     				instance.SwitchControllers();
     		}
     	}
-
+        /// <summary>
+        /// Retrieves the UIViewController with the given id.
+        /// </summary>
+        /// <returns>The view controller. If no view controller is found it will return null.</returns>
+        /// <param name="id">Identifier.</param>
     	public static UIViewController GetViewController(string id)
     	{
     		for(int i = 0; i < instance._controllers.Length; i++)
@@ -127,6 +137,9 @@ namespace gametheory.UI
     		return null;
     	}
 
+        /// <summary>
+        /// Removes the old view controller and attempts to present a new one.
+        /// </summary>
     	void SwitchControllers()
     	{
     		currentController.Deactivate();
@@ -134,6 +147,10 @@ namespace gametheory.UI
     		ActivateControllerWithId(_targetControllerId);
     	}
 
+        /// <summary>
+        /// Searches the list of view controllers and if it finds one with same Id it presents it.
+        /// </summary>
+        /// <param name="Id">Identifier.</param>
     	void ActivateControllerWithId(string Id)
     	{
     		for(int i = 0; i < _controllers.Length; i++)
@@ -167,26 +184,6 @@ namespace gametheory.UI
 
     		if(transitionDidFinishEvent != null)
     			transitionDidFinishEvent(_targetControllerId);
-    	}
-    	#endregion
-
-    	#region Audio Methods
-    	public static void PlayButtonDown()
-    	{
-    		//if(/*DataManager.AudioOn &&*/ instance.audio && !instance.audio.isPlaying)
-    		//instance.audio.PlayOneShot(instance._buttonDown);
-    	}
-
-    	public static void PlayButtonUp()
-    	{
-    		//if(/*DataManager.AudioOn &&*/ instance.audio && !instance.audio.isPlaying)
-    		//instance.audio.PlayOneShot(instance._buttonUp);
-    	}
-
-    	public static void PlayGenericClick()
-    	{
-    		//if(DataManager.AudioOn && instance.audio && !instance.audio.isPlaying)
-    		//instance.audio.Play();
     	}
     	#endregion
 

@@ -5,7 +5,7 @@ namespace gametheory.UI
     /// <summary>
     /// The UI representation of a label. Uses OnGUI to render the text.
     /// </summary>
-    public class GUILabel : UIBase 
+    public class GUILabel : GUIBase 
     {
     	#region Public Variables
     	public string text;
