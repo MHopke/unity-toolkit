@@ -3,13 +3,16 @@
 namespace gametheory.UI
 {
     /// <summary>
-    /// This class acts as an additional abstraction of Unity's Screen class.
-    /// It is designed to be utilized by any UI/auto sizing objects. 
+    /// Handles the scaling of the UI Camera and UI elements so that they appear
+    /// correctly on different resolutions and aspect ratios.
     /// </summary>
     public class UIScreen : MonoBehaviour 
     {
 
     	#region Public Variables
+        /// <summary>
+        /// The base resolution the game is being designed to be played in.
+        /// </summary>
         public Vector2 DesignedResolution;
 
         public Camera _uiCamera;

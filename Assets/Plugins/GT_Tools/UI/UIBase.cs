@@ -40,12 +40,6 @@ namespace gametheory.UI
     	#endregion
 
     	#region Init, Activation, Deactivation Methods
-        /// <summary>
-    	/// Initialize the element with the specified speed and offset.
-    	/// Moves the element to its starting position and links any components.
-    	/// </summary>
-    	/// <param name="offset">Offset.</param>
-    	/// <param name="speedParam">Speed parameter.</param>
     	public void Init()
     	{
     		if(!_initialized)
