@@ -32,8 +32,6 @@ namespace gametheory.UI
 
         public Animator _animator;
 
-    	public ScreenSetting _screenSetting;
-
     	public List<UIBase> _elements;
     	#endregion
 
@@ -62,8 +60,14 @@ namespace gametheory.UI
     		{
     			for(int i = 0; i < _elements.Count; i++)
     			{
-    				if(_elements[i])
-    					_elements[i].Init();
+                    if (_elements[i])
+                    {
+                        _elements[i].Init();
+
+                        //Disables all renders, etc so that you don't have to manually do it
+                        if (_skipActivation)
+                            _elements[i].PresentVisuals(false);
+                    }
     			}
     		}
     	}
@@ -210,27 +214,6 @@ namespace gametheory.UI
     		}
 
             TransitionOutEvent();
-    	}
-
-    	bool HasUIExited()
-    	{
-    		if(_elements != null)
-    		{
-    			for(int i = 0; i < _elements.Count; i++)
-    			{
-    				if(_elements[i] && !_elements[i].HasExited)
-    					#if LOG
-    					{
-    						Debug.Log(_elements[i].name);
-    						return false;
-    					}
-    					#else
-    					return false;
-    					#endif
-    			}
-    		}
-
-    		return true;
     	}
     	#endregion
 

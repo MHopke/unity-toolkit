@@ -3,10 +3,11 @@ using UnityEngine.UI;
 
 namespace gametheory.UI
 {
-    public class UIInputField : UIBase
+    public class UIButton : UIBase
     {
         #region Public Vars
-        public InputField _inputField;
+        public Button _button;
+        public Text _text;
         #endregion
 
         #region Overriden Methods
@@ -14,32 +15,36 @@ namespace gametheory.UI
         {
             base.OnInit();
 
-            if (!_inputField)
-                _inputField = GetComponent<InputField>();
+            if (!_button)
+                _button = GetComponent<Button>();
+
+            if (!_text)
+                _text = GetComponentInChildren<Text>();
         }
         protected override void Disabled()
         {
             base.Disabled();
 
-            if (_inputField)
-                _inputField.interactable = false;
+            if (_button)
+                _button.interactable = false;
         }
+
         protected override void Enabled()
         {
             base.Enabled();
 
-            if (_inputField)
-                _inputField.interactable = true;
+            if (_button)
+                _button.interactable = true;
         }
         public override void PresentVisuals(bool display)
         {
             base.PresentVisuals(display);
 
-            if (_inputField)
-            {
-                _inputField.image.enabled = display;
-                _inputField.text.enabled = display;
-            }
+            if (_button)
+                _button.image.enabled = display;
+
+            if (_text)
+                _text.enabled = display;
         }
         #endregion
     }

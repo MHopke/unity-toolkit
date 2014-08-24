@@ -18,15 +18,11 @@ namespace gametheory.UI
     		if(!_effect)
     			_effect = GetComponent<EffectManager>();
     	}
-    	protected override void OnActivate(MovementState moveState)
+    	protected override void OnActivate()
     	{
-    		base.OnActivate(moveState);
+    		base.OnActivate();
 
     		_effect.SetText(_effect.Text, true);
-    	}
-    	protected override void OnDeactivate()
-    	{
-    		base.OnDeactivate();
     	}
     	#endregion
 
