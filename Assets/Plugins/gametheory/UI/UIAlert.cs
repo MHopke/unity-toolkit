@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections.Generic;
 
 namespace gametheory.UI
@@ -82,7 +82,7 @@ namespace gametheory.UI
         {
             for(int i = 0; i < _elements.Count; i++)
             {
-                _elements[i].Deactivate();
+                _elements[i].Remove();
             }
         }
         public void UnHide()
@@ -106,7 +106,7 @@ namespace gametheory.UI
         {
             for(int i = 0; i < _elements.Count; i++)
             {
-                _elements[i].Deactivate();
+                _elements[i].Remove();
             }
             LoseFocus();
             UIAlertController.Instance.RemoveAlert();

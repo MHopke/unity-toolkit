@@ -73,7 +73,7 @@ namespace gametheory
     			return;
 
     		// check if there is no audio playing
-    		if (!audio.isPlaying) 
+    		if (!GetComponent<AudioSource>().isPlaying) 
     		{
     			// if there are clips to play
     			if (_clips.Count > 0) 
@@ -92,8 +92,8 @@ namespace gametheory
 
     				// play next sound clip
     				_currentSound = _clips[0];
-    				audio.clip = _clips[0].Clip;
-    				audio.Play();
+    				GetComponent<AudioSource>().clip = _clips[0].Clip;
+    				GetComponent<AudioSource>().Play();
     				_clips.RemoveAt(0);
     			}
     			else 
@@ -167,7 +167,7 @@ namespace gametheory
         /// </summary>
     	public static void Stop()
     	{
-    		instance.audio.Stop();
+    		instance.GetComponent<AudioSource>().Stop();
     	}
 
     	/// <summary>
@@ -179,10 +179,10 @@ namespace gametheory
     		// pause
     		if(pause)
     		{
-    			if(instance.audio.isPlaying)
+    			if(instance.GetComponent<AudioSource>().isPlaying)
     				instance._restoreAudio = true;
 
-    			instance.audio.Pause();
+    			instance.GetComponent<AudioSource>().Pause();
     			instance.enabled = false;
     		}
     		// unpause
@@ -190,7 +190,7 @@ namespace gametheory
     		{
     			if(instance._restoreAudio)
     			{
-    				instance.audio.Play();
+    				instance.GetComponent<AudioSource>().Play();
     				instance._restoreAudio = false;
     			}
 

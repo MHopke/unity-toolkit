@@ -9,6 +9,10 @@ public class UIScrollbar : UIBase
     public Image _backgroundImage;
     #endregion
 
+    #region Private Vars
+    bool _hide;
+    #endregion
+
     #region Overriden Methods
     protected override void OnInit()
     {
@@ -46,6 +50,36 @@ public class UIScrollbar : UIBase
             if (_slider.targetGraphic)
                 _slider.targetGraphic.enabled = display;
         }
+    }
+    #endregion
+
+    #region Methods
+    public void Hide()
+    {
+        if (_hide)
+            return;
+
+        _hide = true;
+        
+        PresentVisuals(false);
+        _slider.interactable = false;
+    }
+    public void Show()
+    {
+        if (!_hide)
+            return;
+        
+        _hide = false;
+
+        PresentVisuals(true);
+        _slider.interactable = true;
+    }
+    #endregion
+
+    #region Accessors
+    public float Size
+    {
+        get { return _slider.size; }
     }
     #endregion
 }

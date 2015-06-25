@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 using gametheory.UI;
 using System;
@@ -65,7 +65,7 @@ public class DefaultAlert : UIAlert
             if (showClose)
                 instance._closeButton.Activate();
             else
-                instance._closeButton.Deactivate();
+                instance._closeButton.Remove();
         
             instance._titleText.text = title;
             instance._messageText.text = message;
@@ -89,7 +89,7 @@ public class DefaultAlert : UIAlert
         if(content.ShowClose)
             _closeButton.Activate();
         else
-            _closeButton.Deactivate();
+            _closeButton.Remove();
         
         _titleText.text = content.Title;
         _messageText.text = content.Message;

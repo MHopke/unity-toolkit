@@ -10,6 +10,7 @@ public class LoadAlert : UIAlert
     #endregion
 
     #region Public Vars
+    public string ExtraneousInfo;
     public Text _loadingText;
     public Loader _loader;
     public static LoadAlert Instance = null;
@@ -33,7 +34,7 @@ public class LoadAlert : UIAlert
     #endregion
 
     #region Methods
-    public void StartLoad(string text, System.Action timeOutCallback=null, float fillTime=1.0f, float timeOut=10.0f, float pauseTime=0.15f)
+    public void StartLoad(string text, System.Action timeOutCallback=null, float timeOut=10.0f, float fillTime=1.0f, float pauseTime=0.15f)
     {
         _loadingText.text = text;
         
@@ -44,6 +45,7 @@ public class LoadAlert : UIAlert
         _loader._fillPause = pauseTime;
 
         _loader.Start(TimedOut);
+        _loader.extraneousTime += ExtranesouTime;
 
         base.Open();
     }
@@ -52,9 +54,12 @@ public class LoadAlert : UIAlert
         if (!_loader.enabled)
             return;
 
+        ExtraneousInfo ="";
         _loader.Done();
 
         timedOut = null;
+
+        _loader.extraneousTime -= ExtranesouTime;
 
 		Close();
     }
@@ -65,6 +70,10 @@ public class LoadAlert : UIAlert
             timedOut();
 
         Close();
+    }
+    void ExtranesouTime()
+    {
+        _loadingText.text = ExtraneousInfo;
     }
     #endregion
 }

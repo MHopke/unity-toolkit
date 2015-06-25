@@ -44,7 +44,7 @@ namespace gametheory.UI
 
             if (_button)
             {
-                //_button.interactable = false;
+                _button.interactable = false;
 
                 if (_buttonIconImage)
                     _buttonIconImage.color = _button.colors.disabledColor;
@@ -62,7 +62,7 @@ namespace gametheory.UI
 
             if (_button)
             {
-                //_button.interactable = true;
+                _button.interactable = true;
 
                 if (_buttonIconImage)
                     _buttonIconImage.color = _button.colors.normalColor;

@@ -57,6 +57,39 @@ namespace gametheory.UI
                     _fillImage.enabled = display;
             }
         }
+        public override void LostFocus()
+        {
+            base.LostFocus();
+            _previousEnabledState = _slider.interactable;
+
+            Disabled();
+        }
+        public override void GainedFocus()
+        {
+            base.GainedFocus();
+
+            if (_previousEnabledState)
+                Enabled();
+        }
+        protected override void Disabled()
+        {
+            base.Disabled();
+
+            if (_slider)
+            {
+                _slider.interactable = false;
+            }
+        }
+        protected override void Enabled()
+        {
+            base.Enabled();
+
+            if (_slider)
+            {
+                _slider.interactable = true;
+            }
+                
+        }
         #endregion
 
         #region Accessors
@@ -64,6 +97,16 @@ namespace gametheory.UI
         {
             get { return (_slider) ? _slider.value : 0f; }
             set { if (_slider) _slider.value = value; }
+        }
+        public float Max
+        {
+            get { return (_slider) ? _slider.maxValue : 0f; }
+            set { if (_slider) _slider.maxValue = value; }
+        }
+        public float Min
+        {
+            get { return (_slider) ? _slider.minValue : 0f; }
+            set { if (_slider) _slider.minValue = value; }
         }
         #endregion
     }

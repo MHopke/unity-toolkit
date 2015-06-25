@@ -10,6 +10,7 @@ public class Loader : MonoBehaviour
 {
     #region Events
     static event System.Action timedOut;
+    public event System.Action extraneousTime;
     #endregion
 
     #region Constants
@@ -20,12 +21,16 @@ public class Loader : MonoBehaviour
     public float _fillTime = 0.25f;
     public float _waitTime = 5.0f;
     public float _fillPause = 0.25f;
+    public float _extraneousTime = 60f;
 
     public Image _emptyCircle;
     public Image _fullCircle;
     #endregion
 
     #region Private Vars
+    bool _noTimeout;
+    bool _extraneousTimeUp;
+
     float _fillDelta;
     float _timer;
     float _pauseTimer;
@@ -57,12 +62,26 @@ public class Loader : MonoBehaviour
 
         _timer += Time.deltaTime;
 
-        if(_timer >= _waitTime)
+        if(_noTimeout)
         {
-            Done();
+            if(!_extraneousTimeUp && _timer >= _extraneousTime)
+            {
+                if(extraneousTime != null)
+                    extraneousTime();
 
-            if(timedOut != null)
-                timedOut();
+                _extraneousTimeUp = true;
+            }
+
+        }
+        else
+        {
+            if (_timer >= _waitTime)
+            {
+                Done();
+
+                if (timedOut != null)
+                    timedOut();
+            }
         }
     }
     #endregion
@@ -74,7 +93,14 @@ public class Loader : MonoBehaviour
         _emptyCircle.enabled = true;
         _fullCircle.enabled = true;
 
+        _extraneousTimeUp = false;
+
         _fullCircle.fillAmount = 0f;
+
+        if (_waitTime <= 0.0f)
+            _noTimeout = true;
+        else
+            _noTimeout = false;
 
         enabled = true;
 

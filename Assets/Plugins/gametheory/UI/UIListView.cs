@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 
@@ -8,10 +8,16 @@ namespace gametheory.UI
     {
         #region Public Vars
         public bool _startsWithItems;
+        public bool ZeroScrollBar;
+        public bool HideScrollBar;
+
         public RectTransform _listTransform;
 
         public UIBase _emptyListItem;
         public Text _defaultListItemText;
+
+        public ScrollRect Scroll;
+        public UIScrollbar ScrollBar;
 
         public List<UIBase> _listItems;
         #endregion
@@ -41,6 +47,8 @@ namespace gametheory.UI
                 if(!_listItems[i]._skipUIViewActivation)
                     _listItems[i].Activate();
             }
+
+            CheckToHideScrollbar();
         }
         protected override void Deactivation()
         {
@@ -48,8 +56,11 @@ namespace gametheory.UI
 
             for(int i = 0; i < _listItems.Count; i++)
             {
-                _listItems[i].Deactivate();
+                _listItems[i].Remove();
             }
+
+            if(ZeroScrollBar)
+                Scroll.normalizedPosition = Vector2.zero;
         }
         public override void Exit()
         {
@@ -93,7 +104,7 @@ namespace gametheory.UI
             if(_emptyListItem && _emptyListItem.gameObject.activeSelf)
             {
                 _emptyListItem.gameObject.SetActive(false);
-                _emptyListItem.Deactivate();
+                _emptyListItem.Remove();
             }
         }
 
@@ -104,6 +115,8 @@ namespace gametheory.UI
             (element.transform as RectTransform).SetParent(_listTransform,false);
             _listItems.Add(element);
             element.Activate();
+
+            CheckToShowScrollBar();
         }
         public void AddListElements(List<UIBase> elements)
         {
@@ -115,6 +128,8 @@ namespace gametheory.UI
                 _listItems.Add(elements[i]);
                 elements[i].Activate();
             }
+
+            CheckToShowScrollBar();
         }
         public void RemoveListElements(int count)
         {
@@ -130,6 +145,8 @@ namespace gametheory.UI
                 
                 _listItems.RemoveAt(lastItem);
             }
+
+            CheckToHideScrollbar();
         }
         public void RemoveListElement(UIBase element)
         {
@@ -142,11 +159,14 @@ namespace gametheory.UI
                     return;
                 }
             }
+            CheckToHideScrollbar();
         }
         public void RemoveListElement(int index)
         {
             Destroy(_listItems[index].gameObject);
             _listItems.RemoveAt(index);
+
+            CheckToHideScrollbar();
         }
         public void ClearElements()
         {
@@ -156,6 +176,8 @@ namespace gametheory.UI
                 
                 _listItems.RemoveAt(0);
             }
+
+            CheckToHideScrollbar();
         }
 
         public void SetListItemStates(bool canInteract)
@@ -167,6 +189,28 @@ namespace gametheory.UI
                 else
                     _listItems[i].Disable();
             }
+        }
+
+        public void RegisterListChange()
+        {
+            if (HideScrollBar)
+            {
+                if (ScrollBar.Size >= 1f)
+                    ScrollBar.Hide();
+                else
+                    ScrollBar.Show();
+            }
+        }
+
+        void CheckToHideScrollbar()
+        {
+            if (HideScrollBar && ScrollBar.Size >= 1f)
+                ScrollBar.Hide();
+        }
+        void CheckToShowScrollBar()
+        {
+            if (HideScrollBar && ScrollBar.Size > 1f)
+                ScrollBar.Show();
         }
         #endregion
     }

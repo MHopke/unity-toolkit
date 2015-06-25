@@ -1,4 +1,4 @@
-﻿//#define LOG
+//#define LOG
 using UnityEngine;
 
 namespace gametheory.UI
@@ -81,7 +81,7 @@ namespace gametheory.UI
             PresentVisuals(true);
         }
 
-    	public void Deactivate()
+    	public void Remove()
     	{
     		if(!_active)
     			return;
@@ -139,7 +139,7 @@ namespace gametheory.UI
     		if(!_active)
     			return;
 
-    		Deactivate();
+    		Remove();
     	}
     	#endregion
 

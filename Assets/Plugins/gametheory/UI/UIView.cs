@@ -1,4 +1,4 @@
-﻿//#define LOG
+//#define LOG
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
@@ -121,7 +121,7 @@ namespace gametheory.UI
             ActivateEvent();
         }
 
-        public void Activate(bool backButton=false)
+        public void Activate(string animation="")
     	{
             if(_active) return;
 
@@ -135,10 +135,18 @@ namespace gametheory.UI
 
             if (_animates)
             {
-                if (backButton)
+                if (!_animator.enabled)
+                    _animator.enabled = true;
+
+                if (animation == "")
+                    _animator.SetTrigger(_animationInKey);
+                else
+                    _animator.SetTrigger(animation);
+
+                /*if (backButton)
                     _animator.SetTrigger(_animationBackKey);
                 else
-                    _animator.SetTrigger(_animationInKey);
+                    _animator.SetTrigger(_animationInKey);*/
             }
 
             Activation();
@@ -165,7 +173,7 @@ namespace gametheory.UI
     		#endif
     	}
 
-        public void Deactivate(bool backButton=false) 
+        public void Deactivate(string animation="") 
     	{
             if(!_active)
     			return;
@@ -182,10 +190,13 @@ namespace gametheory.UI
 
             if (_animates)
             {
-                if (backButton)
-                    _animator.SetTrigger(_animationCurrentBackKey);
-                else
+                if (_animator)
+                    _animator.enabled = true;
+
+                if (animation == "")
                     _animator.SetTrigger(_animationOutKey);
+                else
+                    _animator.SetTrigger(animation);
             }
             else
                 Deactivation();
@@ -204,7 +215,7 @@ namespace gametheory.UI
     			for(int i = 0; i < _elements.Count; i++)
     			{
     				if(_elements[i])
-    					_elements[i].Deactivate();
+    					_elements[i].Remove();
     			}
     		}
 
@@ -307,6 +318,8 @@ namespace gametheory.UI
         #region Animation Methods
         void AnimationInDone()
         {
+            if (_animator)
+                _animator.enabled = false;
             TransitionInEvent();
             OnAnimateIn();
         }
@@ -314,6 +327,9 @@ namespace gametheory.UI
 
         void AnimationOutDone()
         {
+            if (_animator)
+                _animator.enabled = false;
+
             Deactivation();
             TransitionOutEvent();
             OnAnimateOut();

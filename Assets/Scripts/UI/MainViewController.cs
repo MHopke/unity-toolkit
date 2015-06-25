@@ -249,7 +249,7 @@ public class MainViewController : UIViewController
             return;
         }
 
-        _viewStack.Peek().Deactivate(true);
+        _viewStack.Peek().Deactivate();
 
         if (back != null)
             back(_viewStack.Peek().name);
@@ -258,13 +258,13 @@ public class MainViewController : UIViewController
 
         //Debug.Log(_viewStack.Count);
 
-        _viewStack.Peek().Activate(true);
+        _viewStack.Peek().Activate();
         _currentView = _viewStack.Peek();
 
         CheckNavigationState();
 
         if (_viewStack.Count == 1)
-            _backButton.Deactivate();
+            _backButton.Remove();
         /*else if(_viewStack.Count == 2)
             _backButton._button.image.sprite = _homeSprite;*/
     }

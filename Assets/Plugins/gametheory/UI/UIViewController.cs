@@ -13,6 +13,8 @@ namespace gametheory.UI
     {
     	#region Public Variables
         public List<UIView> _views;
+        public List<ViewTransition> Transitions;
+
         public static UIViewController Instance = null;
     	#endregion
 
@@ -73,9 +75,9 @@ namespace gametheory.UI
 
     	#region Methods
     	//Present view methods
-    	public static void PresentUIView(UIView view)
+        public static void PresentUIView(UIView view,string animation="")
     	{
-            view.Activate();
+            view.Activate(animation);
 
             Instance.OnPresent(view);
 
@@ -91,9 +93,9 @@ namespace gametheory.UI
         protected virtual void OnPresent(UIView view){}
 
     	//Remove view methods
-    	public static void RemoveUIView(UIView view)
+        public static void RemoveUIView(UIView view,string animation="")
     	{
-            view.Deactivate();
+            view.Deactivate(animation);
 
             Instance.OnRemove(view);
     	}
