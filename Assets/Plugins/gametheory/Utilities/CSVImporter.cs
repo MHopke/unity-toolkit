@@ -21,8 +21,12 @@ namespace gametheory.Utilities
 
                 for (int sub = 0; sub < map.Headers.Length; sub++)
                 {
-                    info = type.GetProperty(map.Headers[sub]);
-                    info.SetValue(obj,Convert.ChangeType(map.Contents[index][sub],info.PropertyType) ,null);
+					if(!string.IsNullOrEmpty(map.Headers[sub]))
+					{
+	                    info = type.GetProperty(map.Headers[sub]);
+						if(info != null)
+	                    	info.SetValue(obj,Convert.ChangeType(map.Contents[index][sub],info.PropertyType) ,null);
+					}
                 }
 
                 list.Add(obj);
