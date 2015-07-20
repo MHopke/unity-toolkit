@@ -6,7 +6,7 @@
 //
 //
 
-#import "BWG_Definitions.h"
+#import "gametheory.h"
 #import <Social/Social.h>
 #import "UnityAppController.h"
 
