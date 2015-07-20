@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using gametheory.UI;
 using gametheory.Localization;
 using System.Collections;
@@ -7,7 +7,7 @@ using System.Collections;
 /// A premade component that can be used as a toggle for
 /// selecting a language. Utilizes gametheory's UI system.
 /// </summary>
-public class LanguageToggle : UIToggle 
+public class LanguageToggle : ExtendedToggle 
 {
     #region Events
     public static event System.Action<Language> changeLanguage;

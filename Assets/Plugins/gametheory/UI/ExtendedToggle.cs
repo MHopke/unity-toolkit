@@ -1,13 +1,13 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace gametheory.UI
 {
-    public class UIToggle : UIBase
+    public class ExtendedToggle : VisualElement
     {
         #region Public Vars
-        public Toggle _toggle;
-        public Text _text;
+        public Toggle Toggle;
+        public Text Text;
         #endregion
 
         #region Overriden Methods
@@ -15,46 +15,46 @@ namespace gametheory.UI
         {
             base.OnInit();
 
-            if (!_toggle)
-                _toggle = GetComponent<Toggle>();
+            if (!Toggle)
+                Toggle = GetComponent<Toggle>();
 
-            if (!_text)
-                _text = GetComponentInChildren<Text>();
+            if (!Text)
+                Text = GetComponentInChildren<Text>();
         }
         protected override void Disabled()
         {
             base.Disabled();
 
-            if (_toggle)
-                _toggle.interactable = false;
+            if (Toggle)
+                Toggle.interactable = false;
         }
         protected override void Enabled()
         {
             base.Enabled();
 
-            if (_toggle)
-                _toggle.interactable = true;
+            if (Toggle)
+                Toggle.interactable = true;
         }
         public override void PresentVisuals(bool display)
         {
             base.PresentVisuals(display);
 
-            if (_toggle)
+            if (Toggle)
             {
-                if(_toggle.targetGraphic)
-                    _toggle.targetGraphic.enabled = display;
+                if(Toggle.targetGraphic)
+                    Toggle.targetGraphic.enabled = display;
 
-                if (_toggle.graphic)
+                if (Toggle.graphic)
                 {
                     //Debug.Log(display + " " + _toggle.isOn);
 
-                    if(_toggle.isOn)
-                        _toggle.graphic.enabled = display;
+                    if(Toggle.isOn)
+                        Toggle.graphic.enabled = display;
                 }
             }
 
-            if (_text)
-                _text.enabled = display;
+            if (Text)
+                Text.enabled = display;
         }
         #endregion
 
@@ -63,23 +63,23 @@ namespace gametheory.UI
         {
             if (_active)
             {
-                if (_toggle.graphic && !_toggle.graphic.enabled)
-                    _toggle.graphic.enabled = true;
+                if (Toggle.graphic && !Toggle.graphic.enabled)
+                    Toggle.graphic.enabled = true;
             }
             else
-                _toggle.graphic.enabled = false;
+                Toggle.graphic.enabled = false;
         }
         #endregion
 
         #region Accessors
         public bool IsOn
         {
-            get { return _toggle.isOn; }
+            get { return Toggle.isOn; }
             set
             {
-                if (_toggle)
+                if (Toggle)
                 {
-                    _toggle.isOn = value;
+                    Toggle.isOn = value;
 
                     HandleVisuals();
                 }

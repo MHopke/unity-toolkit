@@ -8,14 +8,14 @@ using gametheory.UI;
 public class TransformAdjuster : MonoBehaviour 
 {
     #region Public Vars
-    public ScreenSetting _screenSetting;
+    public ScaleSettings ScaleSetting;
     #endregion
 
     #region Unity Methods
 	// Use this for initialization
 	void Start () 
 	{
-        UIScreen.AdjustTransform(transform, _screenSetting);
+        UIScreen.Instance.AdjustTransform(transform, ScaleSetting);
 	}
     #endregion
 }

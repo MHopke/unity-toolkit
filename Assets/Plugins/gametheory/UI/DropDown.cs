@@ -1,9 +1,9 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections.Generic;
 
 namespace gametheory.UI
 {
-    public class UIDropDown : UIButton 
+    public class DropDown : ExtendedButton 
     {
         #region Public Vars
         public Transform ListParent;
@@ -12,7 +12,7 @@ namespace gametheory.UI
         #region Protected Vars
         protected bool _dropDown;
 
-        protected List<UIBase> _listItems;
+        protected List<VisualElement> _listItems;
         #endregion
         
         #region UI Methods
@@ -20,8 +20,8 @@ namespace gametheory.UI
         {
             _dropDown = ! _dropDown;
 
-            if(_buttonIconImage)
-                _buttonIconImage.transform.ScaleY(-1f);
+            if(ButtonIconImage)
+                ButtonIconImage.transform.ScaleY(-1f);
 
             OnSelect();
         }
@@ -35,9 +35,9 @@ namespace gametheory.UI
         #endregion
 
         #region Virtual Methods
-        public virtual void InstatiateChild(UIBase prefab)
+        public virtual void InstatiateChild(VisualElement prefab)
         {
-            UIBase element = (UIBase)GameObject.Instantiate(prefab, Vector3.zero, Quaternion.identity);
+            VisualElement element = (VisualElement)GameObject.Instantiate(prefab, Vector3.zero, Quaternion.identity);
 
             OnInstatiate(element);
             
@@ -45,7 +45,7 @@ namespace gametheory.UI
             
             (element.transform as RectTransform).SetParent(ListParent, false);
         }
-        protected virtual void OnInstatiate(UIBase element){}
+        protected virtual void OnInstatiate(VisualElement element){}
         protected virtual void OnSelect(){}
         #endregion
     }

@@ -1,9 +1,9 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 namespace gametheory.UI
 {
-    public class IntroTab : UIImage
+    public class IntroTab : ExtendedImage
     {
         #region Methods
         public void SwitchStatus(bool status)

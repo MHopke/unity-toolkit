@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using gametheory.UI;
 using gametheory.Localization;
 using System;
@@ -24,7 +24,7 @@ public class VariableInfo
 /// A premade component that will generate the Key/Value pairs that will
 /// be written into the xml file.
 /// </summary>
-public class GenerateKeys : UIListView 
+public class GenerateKeys : UIList 
 {
 	#region Public Variables
     [Tooltip("Folder where localized scripts are located")]
@@ -32,7 +32,7 @@ public class GenerateKeys : UIListView
 
     public KeyValueUI KeyValuePrefab;
 
-    public UIText ClassLabelPrefab;
+    public ExtendedText ClassLabelPrefab;
 
     [Tooltip("Folders that should be ignored in the scripts directory")]
 	public List<string> IgnoreDirectories;
@@ -60,7 +60,7 @@ public class GenerateKeys : UIListView
 
 		foreach(var kvp in _info.VariableMaps)
 		{
-			var label = (UIText)Instantiate(ClassLabelPrefab, Vector3.zero, Quaternion.identity);
+			var label = (ExtendedText)Instantiate(ClassLabelPrefab, Vector3.zero, Quaternion.identity);
 			label.Text = kvp.Key;
 			AddListElement(label);
 
@@ -138,11 +138,11 @@ public class GenerateKeys : UIListView
 	{		
 		//set up list
 		_currentTotalCount += data.Count;
-		var startIndex = _listItems.Count;
+		var startIndex = ListItems.Count;
 
-		if(_listItems.Count != _currentTotalCount)
+		if(ListItems.Count != _currentTotalCount)
 		{
-			if(_listItems.Count < _currentTotalCount)
+			if(ListItems.Count < _currentTotalCount)
 			{
 				for(int i = startIndex; i < _currentTotalCount; i++)
 				{
@@ -152,25 +152,25 @@ public class GenerateKeys : UIListView
 			}
 			else
 			{
-				RemoveListElements(_listItems.Count - _currentTotalCount);
+				RemoveListElements(ListItems.Count - _currentTotalCount);
 			}
 		}
 		
-		if(_listItems.Count == 0)
+		if(ListItems.Count == 0)
 		{
-			if(_emptyListItem)
-				_emptyListItem.Activate();
+			if(EmptyListItem)
+				EmptyListItem.Present();
 		}
 		else
 		{
 			string key = "";
 			var keys = data.Keys.ToList();
 
-			for(int i = startIndex; i < _listItems.Count; i++)
+			for(int i = startIndex; i < ListItems.Count; i++)
 			{
 				key = keys[i - startIndex];
                 if (data[key] != null)
-                    (_listItems[i] as KeyValueUI).Initialize(classKey, key, data[key], OnSubmit);
+					(ListItems[i] as KeyValueUI).Initialize(classKey, key, data[key], OnSubmit);
                 else
                     Debug.Log(classKey + " " + key);
 			}

@@ -8,7 +8,7 @@ using gametheory.UI;
 /// This class is provided as a starting point for any "native app" styled
 /// project that we build.
 /// </summary>
-public class MainViewController : UIViewController 
+public class AppNavigationController : UIViewController 
 {
     #region Events
     /// <summary>
@@ -32,7 +32,7 @@ public class MainViewController : UIViewController
     #endregion
 
     #region Public Vars
-    public UIButton _backButton;
+    public ExtendedButton _backButton;
 
     public UIView _currentView;
     public UIView _navView;
@@ -85,7 +85,7 @@ public class MainViewController : UIViewController
         {
             if(_viewStack.Count == 1)
             {
-                _backButton.Activate();
+                _backButton.Present();
             }
         }
 
@@ -119,7 +119,7 @@ public class MainViewController : UIViewController
     }
     public static void ViewChangeRequiresConfirm(string title, string message, System.Action callback)
     {
-        MainViewController controller = Instance as MainViewController;
+        AppNavigationController controller = Instance as AppNavigationController;
 
         controller._viewChangeRequiresConfirm = true;
         controller._backConfirmTitle = title;
@@ -129,7 +129,7 @@ public class MainViewController : UIViewController
     }
     public static void ClearViewConfirm()
     {
-        MainViewController controller = Instance as MainViewController;
+        AppNavigationController controller = Instance as AppNavigationController;
         
         controller._viewChangeRequiresConfirm = false;
         controller._viewForConfirm = null;
@@ -138,7 +138,7 @@ public class MainViewController : UIViewController
     }
     public static void BackRequiresConfirm(string title, string message, System.Action callback,bool includeNavBar=true)
     {
-        MainViewController controller = Instance as MainViewController;
+        AppNavigationController controller = Instance as AppNavigationController;
 
         controller._backRequiresConfirm = true;
         controller._backConfirmTitle = title;
@@ -149,7 +149,7 @@ public class MainViewController : UIViewController
     }
     public static void ClearBackConfirm()
     {
-        MainViewController controller = Instance as MainViewController;
+        AppNavigationController controller = Instance as AppNavigationController;
 
         controller._backRequiresConfirm = false;
         controller._viewForConfirm = null;
@@ -158,7 +158,7 @@ public class MainViewController : UIViewController
     }
     public static void GoBack()
     {
-        MainViewController controller = Instance as MainViewController;
+        AppNavigationController controller = Instance as AppNavigationController;
         controller.Back();
     }
 

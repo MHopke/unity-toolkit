@@ -7,15 +7,15 @@ namespace gametheory.UI
     /// The base class for UI elements. You should never use this class, instead use an existing sub-class or 
     /// create your own.
     /// </summary>
-    public class UIBase : MonoBehaviour 
+    public class VisualElement : MonoBehaviour 
     {
     	#region Public Variables
     	//Allows the UI element to skip activation from a UIView.
     	//Used in situations when an element should be hidden by default
-        public bool _skipUIViewActivation;
-        public bool _startsDisabled;
+        public bool SkipUIViewActivation;
+        public bool StartsDisabled;
 
-        public Animator _animator;
+        public Animator Animator;
     	#endregion
 
     	#region Protected Variables
@@ -38,7 +38,7 @@ namespace gametheory.UI
     			//_primaryStyle.style.fontSize = UIScreen.AspectRatio.x
     			_initialized = true;
 
-                if (_skipUIViewActivation)
+                if (SkipUIViewActivation)
                 {
                     PresentVisuals(false);
                 }
@@ -47,8 +47,8 @@ namespace gametheory.UI
 
     	protected virtual void OnInit()
         {
-            if (!_animator)
-                _animator = GetComponent<Animator>();
+            if (!Animator)
+                Animator = GetComponent<Animator>();
         }
         public void CleanUp()
         {
@@ -59,7 +59,7 @@ namespace gametheory.UI
         /// <summary>
         /// Activates the UI element.
         /// </summary>
-    	public void Activate()
+    	public void Present()
     	{
     		if(_active)
     			return;
@@ -68,7 +68,7 @@ namespace gametheory.UI
 
     		OnActivate();
 
-            if(_startsDisabled)
+            if(StartsDisabled)
                 Disable();
 
     		#if LOG
@@ -146,18 +146,18 @@ namespace gametheory.UI
         #region Animation Methods
         public void SetTrigger(string triggerName)
         {
-            if (_animator && _animator.runtimeAnimatorController)
+            if (Animator && Animator.runtimeAnimatorController)
             {
                 //Debug.Log(triggerName);
-                _animator.SetTrigger(triggerName);
+                Animator.SetTrigger(triggerName);
                 //enabled = true;
             }
         }
         public void SetBool(string name, bool value)
         {
-            if (_animator && _animator.runtimeAnimatorController)
+            if (Animator && Animator.runtimeAnimatorController)
             {
-                _animator.SetBool(name, value);
+                Animator.SetBool(name, value);
                 //enabled = true;
             }
         }

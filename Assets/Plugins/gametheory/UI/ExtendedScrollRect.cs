@@ -1,12 +1,12 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 using gametheory.UI;
 
-public class UIScrollRect : UIBase 
+public class ExtendedScrollRect : VisualElement 
 {
     #region Public Vars
-    public ScrollRect _scrollRect;
-    public Image _maskImage;
+    public ScrollRect ScrollRect;
+    public Image MaskImage;
     #endregion
 
     #region Overriden Methods
@@ -14,11 +14,11 @@ public class UIScrollRect : UIBase
     {
         base.OnInit();
 
-        if (!_scrollRect)
-            _scrollRect = GetComponent<ScrollRect>();
+        if (!ScrollRect)
+            ScrollRect = GetComponent<ScrollRect>();
 
-        if (!_maskImage)
-            _maskImage = GetComponent<Image>();
+        if (!MaskImage)
+            MaskImage = GetComponent<Image>();
     }
     /*protected override void Enabled()
     {
@@ -54,19 +54,19 @@ public class UIScrollRect : UIBase
     {
         base.PresentVisuals(display);
 
-        if (_scrollRect)
+        if (ScrollRect)
         {
-            _scrollRect.enabled = display;
+            ScrollRect.enabled = display;
 
-            if (_scrollRect.horizontalScrollbar)
-                _scrollRect.horizontalScrollbar.interactable = display;
+            if (ScrollRect.horizontalScrollbar)
+                ScrollRect.horizontalScrollbar.interactable = display;
 
-            if (_scrollRect.verticalScrollbar)
-                _scrollRect.verticalScrollbar.interactable = display;
+            if (ScrollRect.verticalScrollbar)
+                ScrollRect.verticalScrollbar.interactable = display;
         }
 
-        if (_maskImage)
-            _maskImage.enabled = display;
+        if (MaskImage)
+            MaskImage.enabled = display;
     }
     #endregion
 }

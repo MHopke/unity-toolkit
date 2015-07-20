@@ -1,9 +1,9 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 namespace gametheory.UI
 {
-    public class IntroPage : UIImage
+    public class IntroPage : ExtendedImage
     {
         #region Public Vars
         public string Path;
@@ -16,11 +16,11 @@ namespace gametheory.UI
         }
         public void SetImage(Sprite sprite)
         {
-            _image.sprite = sprite;
+            Image.sprite = sprite;
         }
         public void UnloadImage()
         {
-            Resources.UnloadAsset(_image.sprite);
+            Resources.UnloadAsset(Image.sprite);
         }
         #endregion
     }

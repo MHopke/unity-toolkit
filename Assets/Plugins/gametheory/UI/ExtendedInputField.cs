@@ -1,9 +1,9 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace gametheory.UI
 {
-    public class UIInputField : UIBase
+    public class ExtendedInputField : VisualElement
     {
         #region Events
         public event System.Action<string> OnSubmit;
@@ -11,8 +11,8 @@ namespace gametheory.UI
 
         #region Public Vars
         //public InputField.ContentType _validation;
-        public Text _label;
-        public InputField _inputField;
+        public Text Label;
+        public InputField InputField;
         #endregion
 
 		#region Virtual Methods
@@ -24,8 +24,8 @@ namespace gametheory.UI
         {
             base.OnInit();
 
-            if (!_inputField)
-                _inputField = GetComponent<InputField>();
+            if (!InputField)
+                InputField = GetComponent<InputField>();
 
             //_inputField.contentType = _validation;
         }
@@ -33,15 +33,15 @@ namespace gametheory.UI
         {
             base.OnActivate();
 
-            if (_inputField)
-                _inputField.onEndEdit.AddListener(SubmittedData);
+            if (InputField)
+                InputField.onEndEdit.AddListener(SubmittedData);
         }
         protected override void OnDeactivate()
         {
             base.OnDeactivate();
 
-            if (_inputField)
-                _inputField.onEndEdit.RemoveListener(SubmittedData);
+            if (InputField)
+                InputField.onEndEdit.RemoveListener(SubmittedData);
         }
         /*protected override void Disabled()
         {
@@ -67,31 +67,31 @@ namespace gametheory.UI
         {
             base.PresentVisuals(display);
 
-            if(_label)
-                _label.enabled = display;
+            if(Label)
+                Label.enabled = display;
 
-            if (_inputField)
+            if (InputField)
             {
-                _inputField.enabled = display;
+                InputField.enabled = display;
 
-                if(_inputField.image)
-                    _inputField.image.enabled = display;
+                if(InputField.image)
+                    InputField.image.enabled = display;
 
-                if(_inputField.placeholder)
+                if(InputField.placeholder)
                 {
                     //Debug.Log(display + " " + _inputField.text);
                     if (display)
                     {
-                        if (_inputField.text == "")
-                            _inputField.placeholder.enabled = display;
+                        if (InputField.text == "")
+                            InputField.placeholder.enabled = display;
                     }
                     else
-                        _inputField.placeholder.enabled = display;
+                        InputField.placeholder.enabled = display;
                 }
 
-                _inputField.textComponent.enabled = display;
+                InputField.textComponent.enabled = display;
 
-                _inputField.interactable = display;
+                InputField.interactable = display;
             }
         }
         #endregion
@@ -109,20 +109,20 @@ namespace gametheory.UI
         #region Accessors
         public string Text
         {
-            get { return ((_inputField) ? _inputField.text : ""); }
+            get { return ((InputField) ? InputField.text : ""); }
             set 
             {
-                if (_inputField)
+                if (InputField)
                 {
-                    if (_inputField.text != value)
+                    if (InputField.text != value)
                     {
                         //_inputField.text.text = value;
-                        _inputField.text = value;
+                        InputField.text = value;
 
-                        if(!_active && _inputField.text == "")
+                        if(!_active && InputField.text == "")
                         {
-                            if(_inputField.placeholder)
-                                _inputField.placeholder.enabled = false;
+                            if(InputField.placeholder)
+                                InputField.placeholder.enabled = false;
                         }
                     }
                 }
@@ -132,11 +132,11 @@ namespace gametheory.UI
         {
             set 
             {
-                if (_inputField)
+                if (InputField)
                 {
-                    if (_inputField.placeholder)
+                    if (InputField.placeholder)
                     {
-                        (_inputField.placeholder as Text).text = value;
+                        (InputField.placeholder as Text).text = value;
                     }
                 }
             }

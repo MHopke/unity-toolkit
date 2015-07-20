@@ -24,20 +24,20 @@ namespace gametheory.UI
     	#endregion
 
     	#region Public Variables
-    	public bool _useHierarchy;
-        public bool _animates;
-    	public bool _skipActivation;
+    	public bool UseHierarchy;
+        public bool Animates;
+    	public bool SkipActivation;
 
-        public string _animationInKey;
-        public string _animationOutKey;
-        public string _animationBackKey;
-        public string _animationCurrentBackKey;
+        public string AnimationInKey;
+        public string AnimationOutKey;
+        public string AnimationBackKey;
+        public string AnimationCurrentBackKey;
 
-        public Animator _animator;
+        public Animator Animator;
 
-        public CanvasGroup _canvasGroup;
+        public CanvasGroup CanvasGroup;
 
-    	public List<UIBase> _elements;
+    	public List<VisualElement> Elements;
     	#endregion
 
         #region Protected Vars
@@ -54,47 +54,47 @@ namespace gametheory.UI
 
     	#region Activation, Deactivation Methods
         // Use this for initialization
-        public void Initialize(bool inCurrentViewController)
+        public void Initialize()
         {
             if (_init)
                 return;
 
-            if (_useHierarchy)
+            if (UseHierarchy)
             {
-                UIBase[] ui = GetComponentsInChildren<UIBase>();
+                VisualElement[] ui = GetComponentsInChildren<VisualElement>();
 
                 for (int i = 0; i < ui.Length; i++)
-                    _elements.Add(ui[i]);
+                    Elements.Add(ui[i]);
             }
 
-            OnInit(inCurrentViewController);
+            OnInit();
 
             _active = false;
             _init = true;
         }
 
-        protected virtual void OnInit(bool inCurrentViewController)
+        protected virtual void OnInit()
     	{
-    		if(_elements != null)
+    		if(Elements != null)
     		{
-                if (_skipActivation || !inCurrentViewController)
+                if (SkipActivation)
                 {
-                    if (_canvasGroup)
-                        _canvasGroup.blocksRaycasts = false;
+                    if (CanvasGroup)
+                        CanvasGroup.blocksRaycasts = false;
                 }
 
-    			for(int i = 0; i < _elements.Count; i++)
+    			for(int i = 0; i < Elements.Count; i++)
     			{
-                    if (_elements[i])
+                    if (Elements[i])
                     {
                         //Debug.Log(_elements[i].name);
 
-                        _elements[i].Init();
+                        Elements[i].Init();
 
                         //Disables all renders, etc so that you don't have to manually do it
-                        if (_skipActivation || !inCurrentViewController)
+                        if (SkipActivation)
                         {
-                            _elements[i].PresentVisuals(false);
+                            Elements[i].PresentVisuals(false);
                         }
                     }
     			}
@@ -111,8 +111,8 @@ namespace gametheory.UI
 
             _active = true;
 
-            if(_canvasGroup)
-                _canvasGroup.blocksRaycasts = true;
+            if(CanvasGroup)
+                CanvasGroup.blocksRaycasts = true;
 
             Activation();
 
@@ -127,21 +127,21 @@ namespace gametheory.UI
 
             _active = true;
 
-            if (_canvasGroup)
+            if (CanvasGroup)
             {
-                _canvasGroup.interactable = true;
-                _canvasGroup.blocksRaycasts = true;
+                CanvasGroup.interactable = true;
+                CanvasGroup.blocksRaycasts = true;
             }
 
-            if (_animates)
+            if (Animates)
             {
-                if (!_animator.enabled)
-                    _animator.enabled = true;
+                if (!Animator.enabled)
+                    Animator.enabled = true;
 
                 if (animation == "")
-                    _animator.SetTrigger(_animationInKey);
+                    Animator.SetTrigger(AnimationInKey);
                 else
-                    _animator.SetTrigger(animation);
+                    Animator.SetTrigger(animation);
 
                 /*if (backButton)
                     _animator.SetTrigger(_animationBackKey);
@@ -159,12 +159,12 @@ namespace gametheory.UI
     	/// </summary>
     	protected virtual void Activation()
     	{
-    		if(_elements != null)
+    		if(Elements != null)
     		{
-    			for(int i = 0; i < _elements.Count; i++)
+    			for(int i = 0; i < Elements.Count; i++)
     			{
-    				if(_elements[i] && !_elements[i]._skipUIViewActivation)
-    					_elements[i].Activate();
+    				if(Elements[i] && !Elements[i].SkipUIViewActivation)
+    					Elements[i].Present();
     			}
     		}
 
@@ -182,21 +182,21 @@ namespace gametheory.UI
 
             _active = false;
 
-            if (_canvasGroup)
+            if (CanvasGroup)
             {
-                _canvasGroup.interactable = false;
-                _canvasGroup.blocksRaycasts = false;
+                CanvasGroup.interactable = false;
+                CanvasGroup.blocksRaycasts = false;
             }
 
-            if (_animates)
+            if (Animates)
             {
-                if (_animator)
-                    _animator.enabled = true;
+                if (Animator)
+                    Animator.enabled = true;
 
                 if (animation == "")
-                    _animator.SetTrigger(_animationOutKey);
+                    Animator.SetTrigger(AnimationOutKey);
                 else
-                    _animator.SetTrigger(animation);
+                    Animator.SetTrigger(animation);
             }
             else
                 Deactivation();
@@ -210,12 +210,12 @@ namespace gametheory.UI
     	/// </summary>
     	protected virtual void Deactivation()
     	{
-    		if(_elements != null)
+    		if(Elements != null)
     		{
-    			for(int i = 0; i < _elements.Count; i++)
+    			for(int i = 0; i < Elements.Count; i++)
     			{
-    				if(_elements[i])
-    					_elements[i].Remove();
+    				if(Elements[i])
+    					Elements[i].Remove();
     			}
     		}
 
@@ -225,12 +225,12 @@ namespace gametheory.UI
     	}
         protected virtual void CleanUp()
         {
-            if(_elements != null)
+            if(Elements != null)
             {
-                for(int i = 0; i < _elements.Count; i++)
+                for(int i = 0; i < Elements.Count; i++)
                 {
-                    if(_elements[i])
-                        _elements[i].CleanUp();
+                    if(Elements[i])
+                        Elements[i].CleanUp();
                 }
             }
         }
@@ -243,14 +243,14 @@ namespace gametheory.UI
     		Debug.Log(name + " lost focus");
     		#endif
 
-            if (_canvasGroup)
-                _canvasGroup.interactable = false;
+            if (CanvasGroup)
+                CanvasGroup.interactable = false;
 
-    		for(int i = 0; i < _elements.Count; i++)
+    		for(int i = 0; i < Elements.Count; i++)
     		{
-                if (_elements[i])
+                if (Elements[i])
                 {
-                    _elements[i].LostFocus();
+                    Elements[i].LostFocus();
                 }
     		}
     	}
@@ -261,22 +261,22 @@ namespace gametheory.UI
     		Debug.Log(name + " gained focus");
     		#endif
 
-            if (_canvasGroup)
-                _canvasGroup.interactable = true;
+            if (CanvasGroup)
+                CanvasGroup.interactable = true;
 
-    		for(int i = 0; i < _elements.Count; i++)
+    		for(int i = 0; i < Elements.Count; i++)
     		{
-    			if(_elements[i])
-                    _elements[i].GainedFocus();
+    			if(Elements[i])
+                    Elements[i].GainedFocus();
     		}
     	}
 
-    	public UIBase RetrieveUIElement(string name)
+    	public VisualElement RetrieveUIElement(string name)
     	{
-    		for(int i = 0; i < _elements.Count; i++)
+    		for(int i = 0; i < Elements.Count; i++)
     		{
-    			if(name == _elements[i].name)
-    				return _elements[i];
+    			if(name == Elements[i].name)
+    				return Elements[i];
     		}
 
     		return null;
@@ -284,9 +284,9 @@ namespace gametheory.UI
 
     	public bool HasUIElement(string element)
     	{
-    		for(int i = 0; i < _elements.Count; i++)
+    		for(int i = 0; i < Elements.Count; i++)
     		{
-    			if(element == _elements[i].name)
+    			if(element == Elements[i].name)
     				return true;
     		}
 
@@ -302,12 +302,12 @@ namespace gametheory.UI
 
     	public virtual void Exit()
     	{
-    		if(_elements != null)
+    		if(Elements != null)
     		{
-    			for(int i = 0; i < _elements.Count; i++)
+    			for(int i = 0; i < Elements.Count; i++)
     			{
-    				if(_elements[i])
-    					_elements[i].Exit();
+    				if(Elements[i])
+    					Elements[i].Exit();
     			}
     		}
 
@@ -318,8 +318,8 @@ namespace gametheory.UI
         #region Animation Methods
         void AnimationInDone()
         {
-            if (_animator)
-                _animator.enabled = false;
+            if (Animator)
+                Animator.enabled = false;
             TransitionInEvent();
             OnAnimateIn();
         }
@@ -327,8 +327,8 @@ namespace gametheory.UI
 
         void AnimationOutDone()
         {
-            if (_animator)
-                _animator.enabled = false;
+            if (Animator)
+                Animator.enabled = false;
 
             Deactivation();
             TransitionOutEvent();
@@ -363,20 +363,20 @@ namespace gametheory.UI
         #endregion
 
         #region Other Methods
-        public void AddUIElement(UIBase element, bool activate)
+        public void AddUIElement(VisualElement element, bool activate)
         {
-            _elements.Add(element);
+            Elements.Add(element);
             element.Init();
 
             if (activate)
-                element.Activate();
+                element.Present();
         }
-        public void RemoveUIElement(UIBase element)
+        public void RemoveUIElement(VisualElement element)
         {
-            if(!_elements.Contains(element))
+            if(!Elements.Contains(element))
                 return;
 
-            _elements.Remove(element);
+            Elements.Remove(element);
         }
         #endregion
 

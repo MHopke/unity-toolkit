@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 using gametheory.UI;
 using System.Collections;
@@ -8,7 +8,7 @@ using System.Collections;
 /// that will be stored in the localization xml. Utilizes gametheory's UI
 /// system. 
 /// </summary>
-public class KeyValueUI : UIInputField
+public class KeyValueUI : ExtendedInputField
 {
 	#region Private Variables
 	private event System.Action<string, string, string> onSubmitData;
@@ -18,7 +18,7 @@ public class KeyValueUI : UIInputField
 	#region Methods
     public void Initialize(string className, string label,string text, System.Action<string, string, string> submitEvent)
 	{
-		_label.text = label;
+		Label.text = label;
         Text = text;
 		_className = className;
 		onSubmitData += submitEvent;
@@ -36,7 +36,7 @@ public class KeyValueUI : UIInputField
 	protected override void OnSubmitData(string value)
 	{
 		if(onSubmitData != null)
-			onSubmitData(_className, _label.text, value);
+			onSubmitData(_className, Label.text, value);
 	}
 	#endregion
 }

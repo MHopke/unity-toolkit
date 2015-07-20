@@ -1,10 +1,10 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 namespace gametheory.UI
 {
     [System.Serializable]
-    public class ViewTransition 
+    public class UIViewTransition 
     {
         #region Public Vars
         public UIView CurrentView;

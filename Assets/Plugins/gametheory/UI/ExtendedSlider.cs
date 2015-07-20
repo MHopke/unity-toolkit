@@ -1,16 +1,18 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 
 namespace gametheory.UI
 {
-    public class UISlider : UIBase
+    public class ExtendedSlider : VisualElement
     {
         #region Public Vars
-        public bool _canInteract;
-        public Slider _slider;
-        public Image _fillImage;
-        public Image _backgroundImage;
+        public bool CanInteract;
+
+        public Slider Slider;
+
+        public Image FillImage;
+        public Image BackgroundImage;
         #endregion
 
         #region Overriden Methods
@@ -18,11 +20,11 @@ namespace gametheory.UI
         {
             base.OnInit();
 
-            if (!_slider)
-                _slider = GetComponent<Slider>();
+            if (!Slider)
+                Slider = GetComponent<Slider>();
 
-            if (!_backgroundImage)
-                _backgroundImage = GetComponent<Image>();
+            if (!BackgroundImage)
+                BackgroundImage = GetComponent<Image>();
         }
         /*protected override void Disabled()
         {
@@ -42,25 +44,25 @@ namespace gametheory.UI
         {
             base.PresentVisuals(display);
 
-            if (_slider)
+            if (Slider)
             {
-                if(_slider.image)
-                    _slider.image.enabled = display;
+                if(Slider.image)
+                    Slider.image.enabled = display;
 
-                if (_backgroundImage)
-                    _backgroundImage.enabled = display;
+                if (BackgroundImage)
+                    BackgroundImage.enabled = display;
 
-                if (_slider.targetGraphic)
-                    _slider.targetGraphic.enabled = display;
+                if (Slider.targetGraphic)
+                    Slider.targetGraphic.enabled = display;
 
-                if (_fillImage)
-                    _fillImage.enabled = display;
+                if (FillImage)
+                    FillImage.enabled = display;
             }
         }
         public override void LostFocus()
         {
             base.LostFocus();
-            _previousEnabledState = _slider.interactable;
+            _previousEnabledState = Slider.interactable;
 
             Disabled();
         }
@@ -75,18 +77,18 @@ namespace gametheory.UI
         {
             base.Disabled();
 
-            if (_slider)
+            if (Slider)
             {
-                _slider.interactable = false;
+                Slider.interactable = false;
             }
         }
         protected override void Enabled()
         {
             base.Enabled();
 
-            if (_slider)
+            if (Slider)
             {
-                _slider.interactable = true;
+                Slider.interactable = true;
             }
                 
         }
@@ -95,18 +97,18 @@ namespace gametheory.UI
         #region Accessors
         public float Value
         {
-            get { return (_slider) ? _slider.value : 0f; }
-            set { if (_slider) _slider.value = value; }
+            get { return (Slider) ? Slider.value : 0f; }
+            set { if (Slider) Slider.value = value; }
         }
         public float Max
         {
-            get { return (_slider) ? _slider.maxValue : 0f; }
-            set { if (_slider) _slider.maxValue = value; }
+            get { return (Slider) ? Slider.maxValue : 0f; }
+            set { if (Slider) Slider.maxValue = value; }
         }
         public float Min
         {
-            get { return (_slider) ? _slider.minValue : 0f; }
-            set { if (_slider) _slider.minValue = value; }
+            get { return (Slider) ? Slider.minValue : 0f; }
+            set { if (Slider) Slider.minValue = value; }
         }
         #endregion
     }

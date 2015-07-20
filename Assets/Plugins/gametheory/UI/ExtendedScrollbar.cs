@@ -1,12 +1,12 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 using gametheory.UI;
 
-public class UIScrollbar : UIBase
+public class ExtendedScrollbar : VisualElement
 {
     #region Public Vars
-    public Scrollbar _slider;
-    public Image _backgroundImage;
+    public Scrollbar Slider;
+    public Image BackgroundImage;
     #endregion
 
     #region Private Vars
@@ -18,11 +18,11 @@ public class UIScrollbar : UIBase
     {
         base.OnInit();
 
-        if (!_slider)
-            _slider = GetComponent<Scrollbar>();
+        if (!Slider)
+            Slider = GetComponent<Scrollbar>();
 
-        if (!_backgroundImage)
-            _backgroundImage = GetComponent<Image>();
+        if (!BackgroundImage)
+            BackgroundImage = GetComponent<Image>();
     }
     /*protected override void Disabled()
     {
@@ -42,13 +42,13 @@ public class UIScrollbar : UIBase
     {
         base.PresentVisuals(display);
 
-        if (_slider)
+        if (Slider)
         {
-            if (_backgroundImage)
-                _backgroundImage.enabled = display;
+            if (BackgroundImage)
+                BackgroundImage.enabled = display;
 
-            if (_slider.targetGraphic)
-                _slider.targetGraphic.enabled = display;
+            if (Slider.targetGraphic)
+                Slider.targetGraphic.enabled = display;
         }
     }
     #endregion
@@ -62,7 +62,7 @@ public class UIScrollbar : UIBase
         _hide = true;
         
         PresentVisuals(false);
-        _slider.interactable = false;
+        Slider.interactable = false;
     }
     public void Show()
     {
@@ -72,14 +72,14 @@ public class UIScrollbar : UIBase
         _hide = false;
 
         PresentVisuals(true);
-        _slider.interactable = true;
+        Slider.interactable = true;
     }
     #endregion
 
     #region Accessors
     public float Size
     {
-        get { return _slider.size; }
+        get { return Slider.size; }
     }
     #endregion
 }

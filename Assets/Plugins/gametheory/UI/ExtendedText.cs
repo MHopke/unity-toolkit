@@ -1,12 +1,12 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace gametheory.UI
 {
-    public class UIText : UIBase
+    public class ExtendedText : VisualElement
     {
         #region Public Vars
-        public Text _text;
+        public Text Label;
         #endregion
 
         #region Overriden Methods
@@ -14,23 +14,23 @@ namespace gametheory.UI
         {
             base.OnInit();
 
-            if (!_text)
-                _text = GetComponent<Text>();
+            if (!Label)
+                Label = GetComponent<Text>();
         }
         public override void PresentVisuals(bool display)
         {
             base.PresentVisuals(display);
 
-            if (_text)
-                _text.enabled = display;
+            if (Label)
+                Label.enabled = display;
         }
         #endregion
 
         #region Accessors
         public string Text
         {
-            get { return ((_text) ? _text.text : ""); }
-            set { if (_text) _text.text = value; }
+            get { return ((Label) ? Label.text : ""); }
+            set { if (Label) Label.text = value; }
         }
         #endregion
     }

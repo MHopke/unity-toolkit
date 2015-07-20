@@ -6,10 +6,10 @@ namespace gametheory.UI
     public class UIAlert : MonoBehaviour 
     {
         #region Public Vars
-        public bool _findElements;
-        public bool _skipStack;
-        public CanvasGroup _canvasGroup;
-        public List<UIBase> _elements;
+        public bool FindElements;
+        public bool SkipStack;
+        public CanvasGroup CanvasGroup;
+        public List<VisualElement> Elements;
         #endregion
 
         #region Private Vars
@@ -35,22 +35,22 @@ namespace gametheory.UI
             if(_init)
                 return;
 
-            if(_findElements)
+            if(FindElements)
             {
-                UIBase[] elements = GetComponentsInChildren<UIBase>();
+                VisualElement[] elements = GetComponentsInChildren<VisualElement>();
 
-                _elements = new List<UIBase>();
+                Elements = new List<VisualElement>();
 
                 for(int i = 0; i < elements.Length; i++)
                 {
-                    _elements.Add(elements[i]);
+                    Elements.Add(elements[i]);
                 }
             }
 
-            for(int i = 0; i < _elements.Count; i++)
+            for(int i = 0; i < Elements.Count; i++)
             {
-                _elements[i].Init();
-                _elements[i].PresentVisuals(false);
+                Elements[i].Init();
+                Elements[i].PresentVisuals(false);
             }
             LoseFocus();
 
@@ -69,10 +69,10 @@ namespace gametheory.UI
         }
         protected virtual void OnOpen()
         {
-            for(int i = 0; i < _elements.Count; i++)
+            for(int i = 0; i < Elements.Count; i++)
             {
-                if(!_elements[i]._skipUIViewActivation)
-                    _elements[i].Activate();
+                if(!Elements[i].SkipUIViewActivation)
+                    Elements[i].Present();
             }
             GainFocus();
             UIAlertController.Instance.PresentAlert(this);
@@ -80,16 +80,16 @@ namespace gametheory.UI
 
         public void Hide()
         {
-            for(int i = 0; i < _elements.Count; i++)
+            for(int i = 0; i < Elements.Count; i++)
             {
-                _elements[i].Remove();
+                Elements[i].Remove();
             }
         }
         public void UnHide()
         {
-            for(int i = 0; i < _elements.Count; i++)
+            for(int i = 0; i < Elements.Count; i++)
             {
-                _elements[i].Activate();
+                Elements[i].Present();
             }
         }
 
@@ -104,9 +104,9 @@ namespace gametheory.UI
         }
         protected virtual void OnClose()
         {
-            for(int i = 0; i < _elements.Count; i++)
+            for(int i = 0; i < Elements.Count; i++)
             {
-                _elements[i].Remove();
+                Elements[i].Remove();
             }
             LoseFocus();
             UIAlertController.Instance.RemoveAlert();
@@ -114,10 +114,10 @@ namespace gametheory.UI
 
         public virtual void GainFocus()
         {
-            if(_canvasGroup)
+            if(CanvasGroup)
             {
-                _canvasGroup.blocksRaycasts = true;
-                _canvasGroup.interactable = true;
+                CanvasGroup.blocksRaycasts = true;
+                CanvasGroup.interactable = true;
             }
             /*for(int i = 0; i < _elements.Length; i++)
             {
@@ -126,23 +126,23 @@ namespace gametheory.UI
         }
         public virtual void LoseFocus()
         {
-            if(_canvasGroup)
+            if(CanvasGroup)
             {
-                _canvasGroup.blocksRaycasts = false;
-                _canvasGroup.interactable = false;
+                CanvasGroup.blocksRaycasts = false;
+                CanvasGroup.interactable = false;
             }
             /*for(int i = 0; i < _elements.Length; i++)
             {
                 _elements[i].Disable();
             }*/
         }
-        public void AddElement(UIBase element)
+        public void AddElement(VisualElement element)
         {
-            _elements.Add(element);
+            Elements.Add(element);
         }
-        public void RemoveElement(UIBase element)
+        public void RemoveElement(VisualElement element)
         {
-            _elements.Remove(element);
+            Elements.Remove(element);
         }
         #endregion
     }

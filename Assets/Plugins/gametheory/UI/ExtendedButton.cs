@@ -1,18 +1,18 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace gametheory.UI
 {
-    public class UIButton : UIBase
+    public class ExtendedButton : VisualElement
     {
         #region Public Vars
-        public Button _button;
+        public Button Button;
 
-        public Text _text;
+        public Text Label;
 
-        public Image _buttonIconImage;
+        public Image ButtonIconImage;
 
-        public TextColorBlock _textColorBlock;
+        public TextColorBlock TextColorBlock;
         #endregion
 
         #region Private Vars
@@ -24,16 +24,16 @@ namespace gametheory.UI
         {
             base.OnInit();
 
-            if (!_button)
-                _button = GetComponent<Button>();
+            if (!Button)
+                Button = GetComponent<Button>();
 
             /*if (_button)
                 _button.interactable = false;*/
 
             //Debug.Log(name + " : " + _button.interactable);
 
-            if (!_text)
-                _text = GetComponentInChildren<Text>();
+            if (!Label)
+                Label = GetComponentInChildren<Text>();
 
         }
         protected override void Disabled()
@@ -42,16 +42,16 @@ namespace gametheory.UI
 
             //Debug.Log(name + " : " + _button.interactable);
 
-            if (_button)
+            if (Button)
             {
-                _button.interactable = false;
+                Button.interactable = false;
 
-                if (_buttonIconImage)
-                    _buttonIconImage.color = _button.colors.disabledColor;
+                if (ButtonIconImage)
+                    ButtonIconImage.color = Button.colors.disabledColor;
             }
 
-            if(_text && _textColorBlock)
-                _text.color = _textColorBlock._colorBlock.disabledColor;
+            if(Label && TextColorBlock)
+                Label.color = TextColorBlock.ColorBlock.disabledColor;
         }
 
         protected override void Enabled()
@@ -60,24 +60,24 @@ namespace gametheory.UI
 
             //Debug.Log(name + " : " + _button.interactable);
 
-            if (_button)
+            if (Button)
             {
-                _button.interactable = true;
+                Button.interactable = true;
 
-                if (_buttonIconImage)
-                    _buttonIconImage.color = _button.colors.normalColor;
+                if (ButtonIconImage)
+                    ButtonIconImage.color = Button.colors.normalColor;
             }
 
-            if(_text && _textColorBlock)
-                _text.color = _textColorBlock._colorBlock.normalColor;
+            if(Label && TextColorBlock)
+                Label.color = TextColorBlock.ColorBlock.normalColor;
         }
 
         public override void LostFocus()
         {
             base.LostFocus();
 
-            if(_button)
-                _previousEnabledState = _button.interactable;
+            if(Button)
+                _previousEnabledState = Button.interactable;
 
             //Debug.Log(name + " : " + _previousEnabledState);
 
@@ -97,29 +97,29 @@ namespace gametheory.UI
         {
             base.PresentVisuals(display);
 
-            if (_button)
+            if (Button)
             {
-                if(_button.image)
-                    _button.image.enabled = display;
+                if(Button.image)
+                    Button.image.enabled = display;
             }
 
-            if (_text)
-                _text.enabled = display;
+            if (Label)
+                Label.enabled = display;
         }
         #endregion
 
         #region Accessors
         public bool Interactable
         {
-            get { return (_button) ? _button.interactable : false; }
+            get { return (Button) ? Button.interactable : false; }
         }
 
         public string Text
         {
-            get { return (_text) ? _text.text : ""; }
+            get { return (Label) ? Label.text : ""; }
             set {
-                if (_text)
-                    _text.text = value;
+                if (Label)
+                    Label.text = value;
             }
         }
         #endregion

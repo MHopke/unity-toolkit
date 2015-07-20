@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 
@@ -42,7 +42,7 @@ namespace gametheory.UI
             else
                 _alertStack.Peek().Hide();
 
-            if(!alert._skipStack)
+            if(!alert.SkipStack)
                 _alertStack.Push(alert);
         }
         public void RemoveAlert()

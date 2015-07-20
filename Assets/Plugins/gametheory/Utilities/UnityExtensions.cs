@@ -114,8 +114,8 @@ public static class UnityExtensions
     /// <param name="renderer">Renderer.</param>
 	public static Rect GetScreenRect(this Renderer renderer)
 	{
-		Vector2 max = UIScreen.UICamera.WorldToScreenPoint(renderer.bounds.max);
-        Vector2 min = UIScreen.UICamera.WorldToScreenPoint(renderer.bounds.min);
+		Vector2 max = UIScreen.Instance.UICamera.WorldToScreenPoint(renderer.bounds.max);
+        Vector2 min = UIScreen.Instance.UICamera.WorldToScreenPoint(renderer.bounds.min);
 
 		return new Rect(min.x, Screen.height - min.y - (max.y - min.y), max.x - min.x, (max.y - min.y));
 	}

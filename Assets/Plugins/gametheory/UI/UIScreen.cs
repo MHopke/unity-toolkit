@@ -8,48 +8,47 @@ namespace gametheory.UI
     /// </summary>
     public class UIScreen : MonoBehaviour 
     {
-
     	#region Public Variables
         /// <summary>
         /// The base resolution the game is being designed to be played in.
         /// </summary>
         public Vector2 DesignedResolution;
 
-        public Camera _uiCamera;
+        public Camera UICamera;
 
     	[HideInInspector]
-        public Vector2 _aspectRatio;
+        public Vector2 AspectRatio;
+
+		public static UIScreen Instance = null;
     	#endregion
 
     	#region Private Variables
     	float _cameraRatio;
-
-    	static UIScreen instance = null;
     	#endregion
 
     	#region Unity Methods
     	// Use this for initialization
     	void Awake () 
         {
-    		if(instance == null)
+    		if(Instance == null)
     		{
-    			_aspectRatio = new Vector2((float)Screen.width / DesignedResolution.x,
+    			AspectRatio = new Vector2((float)Screen.width / DesignedResolution.x,
     				(float)Screen.height / DesignedResolution.y);
 
-                float orthographicSize = _uiCamera.orthographicSize;
+                float orthographicSize = UICamera.orthographicSize;
 
-                _uiCamera.orthographicSize = (Screen.height / 2.0f) / 100f;
+                UICamera.orthographicSize = (Screen.height / 2.0f) / 100f;
 
-                _cameraRatio = _uiCamera.orthographicSize / orthographicSize;
+                _cameraRatio = UICamera.orthographicSize / orthographicSize;
 
-    			instance = this;
+    			Instance = this;
     		} else
     			Destroy(gameObject);
     	}
     	#endregion
 
     	#region Methods
-    	public static void AdjustRect(ref Rect rect, ScreenSetting setting)
+    	public void AdjustRect(ref Rect rect, ScaleSettings setting)
     	{
     		rect.x *= AspectRatio.x;
     		rect.y *= AspectRatio.y;
@@ -64,7 +63,7 @@ namespace gametheory.UI
     		else
     			rect.height *= CameraRatio;
     	}
-    	public static void AdjustTransform(Transform transform, ScreenSetting setting)
+    	public void AdjustTransform(Transform transform, ScaleSettings setting)
     	{
     		if(setting.UseParent)
     			return;
@@ -88,18 +87,10 @@ namespace gametheory.UI
     	#endregion
 
     	#region Accessors
-    	public static Vector2 AspectRatio
-    	{
-    		get { return instance._aspectRatio; }
-    	}
     	public static float CameraRatio
     	{
-    		get { return instance._cameraRatio; }
+    		get { return Instance._cameraRatio; }
     	}
-        public static Camera UICamera
-        {
-            get { return instance._uiCamera; }
-        }
     	#endregion
     }
 
@@ -108,7 +99,7 @@ namespace gametheory.UI
     /// different resolutions.
     /// </summary>
     [System.Serializable]
-    public class ScreenSetting
+    public class ScaleSettings
     {
     	public bool UseParent;
         public bool SkipPosition;

@@ -13,11 +13,11 @@ public class DefaultAlert : UIAlert
     #endregion
 
     #region Public Vars
-    public Text _titleText;
-    public Text _messageText;
-    public Text _confirmText;
+    public Text TitleText;
+    public Text MessageText;
+    public Text ConfirmText;
 
-    public UIButton _closeButton;
+    public ExtendedButton CloseButton;
 
 	public static bool IsOpen;
     #endregion
@@ -63,13 +63,13 @@ public class DefaultAlert : UIAlert
             cancel = cancelCallback;
         
             if (showClose)
-                instance._closeButton.Activate();
+                instance.CloseButton.Present();
             else
-                instance._closeButton.Remove();
+                instance.CloseButton.Remove();
         
-            instance._titleText.text = title;
-            instance._messageText.text = message;
-            instance._confirmText.text = confirmText;
+            instance.TitleText.text = title;
+            instance.MessageText.text = message;
+            instance.ConfirmText.text = confirmText;
 
             instance.Open();
 
@@ -87,13 +87,13 @@ public class DefaultAlert : UIAlert
         cancel = content.Cancel;
         
         if(content.ShowClose)
-            _closeButton.Activate();
+            CloseButton.Present();
         else
-            _closeButton.Remove();
+            CloseButton.Remove();
         
-        _titleText.text = content.Title;
-        _messageText.text = content.Message;
-        _confirmText.text = content.ConfirmText;
+        TitleText.text = content.Title;
+        MessageText.text = content.Message;
+        ConfirmText.text = content.ConfirmText;
 
         Open();
     }
@@ -129,7 +129,7 @@ public class DefaultAlert : UIAlert
     #region LocalizationComponent Event Listeners
     void LanguageChanged()
     {
-        _confirmText.text = CONFIRM_TEXT;
+        ConfirmText.text = CONFIRM_TEXT;
     }
     #endregion
 }

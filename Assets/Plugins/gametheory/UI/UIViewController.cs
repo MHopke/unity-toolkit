@@ -1,4 +1,4 @@
-﻿//#define LOG
+//#define LOG
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
@@ -12,17 +12,25 @@ namespace gametheory.UI
     public class UIViewController : MonoBehaviour 
     {
     	#region Public Variables
-        public List<UIView> _views;
-        public List<ViewTransition> Transitions;
+        public List<UIView> Views;
+        public List<UIViewTransition> Transitions;
 
         public static UIViewController Instance = null;
     	#endregion
 
+		#region Unity Methods
+		void Awake()
+		{
+			Initialize();
+			Activate();
+		}
+		#endregion
+
     	#region Activate, Deactivate Methods
-        public void Initialize(bool currentViewController)
+        public void Initialize()
         {
-            for (int i = 0; i < _views.Count; i++)
-                _views[i].Initialize(currentViewController);
+            for (int i = 0; i < Views.Count; i++)
+                Views[i].Initialize();
 
             OnInit();
         }
@@ -41,19 +49,19 @@ namespace gametheory.UI
 
         protected virtual void OnActivate()
         {
-            for (int i = 0; i < _views.Count; i++)
+            for (int i = 0; i < Views.Count; i++)
             {
-                if (!_views[i]._skipActivation)
-                    _views[i].Activate();
+                if (!Views[i].SkipActivation)
+                    Views[i].Activate();
             }
         }
 
     	public void Deactivate()
     	{
-    		for(int i = 0; i < _views.Count; i++)
+    		for(int i = 0; i < Views.Count; i++)
     		{
-    			if(_views[i])
-                    _views[i].Deactivate();
+    			if(Views[i])
+                    Views[i].Deactivate();
     		}
 
             OnDeactivate();
@@ -109,12 +117,12 @@ namespace gametheory.UI
         protected virtual void OnRemove(UIView view){}
 
     	//Other methods
-    	public static UIBase GetElementFromView(string element, string view)
+    	public static VisualElement GetElementFromView(string element, string view)
     	{
-    		for(int i = 0; i < Instance._views.Count; i++)
+    		for(int i = 0; i < Instance.Views.Count; i++)
     		{
-    			if(Instance._views[i] && view == Instance._views[i].name)
-    				return Instance._views[i].RetrieveUIElement(element);
+    			if(Instance.Views[i] && view == Instance.Views[i].name)
+    				return Instance.Views[i].RetrieveUIElement(element);
     		}
 
     		return null;
@@ -122,10 +130,10 @@ namespace gametheory.UI
 
     	public UIView GetUIView(string name)
     	{
-    		for (int i = 0; i < _views.Count; i++)
+    		for (int i = 0; i < Views.Count; i++)
     		{
-    			if (_views[i] && _views[i].name == name)
-    				return _views[i];
+    			if (Views[i] && Views[i].name == name)
+    				return Views[i];
     		}
 
     		return null;
@@ -133,8 +141,8 @@ namespace gametheory.UI
 
     	bool HasUIView(string name)
     	{
-    		for (int i = 0; i < _views.Count; i++)
-    			if (_views[i] && _views[i].name == name)
+    		for (int i = 0; i < Views.Count; i++)
+    			if (Views[i] && Views[i].name == name)
     				return true;
 
     		return false;
@@ -146,10 +154,10 @@ namespace gametheory.UI
     	/// </summary>
     	public static  void GainFocus()
     	{
-    		for(int i = 0; i < Instance._views.Count; i++)
+    		for(int i = 0; i < Instance.Views.Count; i++)
     		{
-                if(Instance._views[i] && Instance._views[i].Active)
-    				Instance._views[i].GainedFocus();
+                if(Instance.Views[i] && Instance.Views[i].Active)
+    				Instance.Views[i].GainedFocus();
     		}
     	}
 
@@ -159,10 +167,10 @@ namespace gametheory.UI
     	/// </summary>
     	public static void LoseFocus()
     	{
-    		for(int i = 0; i < Instance._views.Count; i++)
+    		for(int i = 0; i < Instance.Views.Count; i++)
     		{
-                if(Instance._views[i] && Instance._views[i].Active)
-    				Instance._views[i].LostFocus();
+                if(Instance.Views[i] && Instance.Views[i].Active)
+    				Instance.Views[i].LostFocus();
     		}
     	}
     	#endregion

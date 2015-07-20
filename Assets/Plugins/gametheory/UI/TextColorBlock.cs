@@ -6,7 +6,7 @@ namespace gametheory.UI
     public class TextColorBlock : MonoBehaviour 
     {
         #region Public Vars
-        public ColorBlock _colorBlock;
+        public ColorBlock ColorBlock;
         #endregion
     }
 }

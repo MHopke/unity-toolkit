@@ -1,4 +1,4 @@
-﻿using UnityEngine.UI;
+using UnityEngine.UI;
 using gametheory.UI;
 using System.Collections;
 
@@ -10,10 +10,10 @@ public class SingleInputAlert : UIAlert
     #endregion
     
     #region Public Vars
-    public Text _titleText;
-    public Text _messageText;
-    public UIInputField _inputField;
-    public UIButton _closeButton;
+    public Text TitleText;
+    public Text MessageText;
+    public ExtendedInputField InputField;
+    public ExtendedButton CloseButton;
 
     public static SingleInputAlert Instance = null;
     #endregion
@@ -34,21 +34,21 @@ public class SingleInputAlert : UIAlert
         confirm = confirmCallback;
         cancel = cancelCallback;
 
-        _inputField.PlaceholderText = inputPlaceholder;
-        _inputField.Text = "";
+        InputField.PlaceholderText = inputPlaceholder;
+        InputField.Text = "";
 
         if(showClose)
-            _closeButton.Activate();
+            CloseButton.Present();
         
-        _titleText.text = title;
-        _messageText.text = message;
+        TitleText.text = title;
+        MessageText.text = message;
         
         Open();
     }
     
     public void Confirm()
     {
-        if (string.IsNullOrEmpty(_inputField.Text) || Helper.CheckIfSpaces(_inputField.Text))
+        if (string.IsNullOrEmpty(InputField.Text) || Helper.CheckIfSpaces(InputField.Text))
         {
             DefaultAlert.Present("Sorry!", "Please input some text.", null, null);
             return;
@@ -57,7 +57,7 @@ public class SingleInputAlert : UIAlert
         Close();
 
         if (confirm != null)
-            confirm(_inputField.Text);
+            confirm(InputField.Text);
         
         confirm = null;
         cancel = null;

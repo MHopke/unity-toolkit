@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using System.Collections;
 using gametheory.UI;
 
-public class IntroView : UIListView 
+public class IntroView : UIView 
 {
     #region Events
     public static event System.Action complete;
