@@ -40,8 +40,6 @@ namespace gametheory.UI
         {
             base.Disabled();
 
-            //Debug.Log(name + " : " + _button.interactable);
-
             if (Button)
             {
                 Button.interactable = false;
@@ -58,7 +56,7 @@ namespace gametheory.UI
         {
             base.Enabled();
 
-            //Debug.Log(name + " : " + _button.interactable);
+            //Debug.Log(name + " : " + Button.interactable);
 
             if (Button)
             {
@@ -72,9 +70,9 @@ namespace gametheory.UI
                 Label.color = TextColorBlock.ColorBlock.normalColor;
         }
 
-        public override void LostFocus()
+        public override void OnLostFocus()
         {
-            base.LostFocus();
+            base.OnLostFocus();
 
             if(Button)
                 _previousEnabledState = Button.interactable;
@@ -83,9 +81,9 @@ namespace gametheory.UI
 
             Disable();
         }
-        public override void GainedFocus()
+        public override void OnGainedFocus()
         {
-            base.GainedFocus();
+            base.OnGainedFocus();
 
             //Debug.Log(name + " : " + _previousEnabledState);
 
@@ -99,6 +97,8 @@ namespace gametheory.UI
 
             if (Button)
             {
+                Button.enabled = display;
+
                 if(Button.image)
                     Button.image.enabled = display;
             }

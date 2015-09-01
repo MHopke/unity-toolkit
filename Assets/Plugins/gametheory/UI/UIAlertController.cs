@@ -7,14 +7,11 @@ namespace gametheory.UI
     public class UIAlertController : MonoBehaviour 
     {
         #region Public Vars
-        //public Image _alpha;
-        //public CanvasGroup _alphaGroup;
-
         public static UIAlertController Instance = null;
         #endregion
 
         #region Private Vars
-        Stack<UIAlert> _alertStack;
+        Stack<UIView> _alertStack;
         #endregion
 
         #region Unity Methods
@@ -23,7 +20,7 @@ namespace gametheory.UI
             if(Instance == null)
             {
                 Instance = this;
-                _alertStack = new Stack<UIAlert>();
+                _alertStack = new Stack<UIView>();
             }
             else
                 Destroy(gameObject);
@@ -31,33 +28,51 @@ namespace gametheory.UI
         #endregion
 
         #region Methods
-        public void PresentAlert(UIAlert alert)
+        public void PresentAlert(UIView alert)
         {
             if(_alertStack.Count == 0)
             {
-                //_alpha.enabled = true;
-                //_alphaGroup.blocksRaycasts = true;
                 UIViewController.LoseFocus();
             }
             else
                 _alertStack.Peek().Hide();
+            
+            HookUpClose(alert);
 
-            if(!alert.SkipStack)
-                _alertStack.Push(alert);
+            _alertStack.Push(alert);
         }
         public void RemoveAlert()
         {
             if(_alertStack.Count > 0)
+            {
+                _alertStack.Peek().transitionOutEvent -= RemoveAlert;
                 _alertStack.Pop();
+            }
+
+            //Debug.Log("removed alert. Now count is: " + _alertStack.Count);
 
             if(_alertStack.Count == 0)
             {
-                //_alpha.enabled = false;
-                //_alphaGroup.blocksRaycasts = false;
                 UIViewController.GainFocus();
             }
             else
-                _alertStack.Peek().UnHide();
+                _alertStack.Peek().Show();
+        }
+        public void ClearStack()
+        {
+            while(_alertStack.Count > 0)
+            {
+                _alertStack.Peek().transitionOutEvent -= RemoveAlert;
+                _alertStack.Peek().Deactivate();
+                _alertStack.Pop();
+            }
+
+            UIViewController.GainFocus();
+        }
+        void HookUpClose(UIView alert)
+        {
+            alert.transitionOutEvent += RemoveAlert;
+            alert.Activate();
         }
         #endregion
     }

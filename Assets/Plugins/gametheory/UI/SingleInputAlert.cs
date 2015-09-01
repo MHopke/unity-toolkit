@@ -2,7 +2,7 @@ using UnityEngine.UI;
 using gametheory.UI;
 using System.Collections;
 
-public class SingleInputAlert : UIAlert
+public class SingleInputAlert : UIView
 {
     #region Events
     static event System.Action<string> confirm;
@@ -19,9 +19,9 @@ public class SingleInputAlert : UIAlert
     #endregion
 
     #region Overriden Methods
-    protected override void Init()
+    protected override void OnInit()
     {
-        base.Init();
+        base.OnInit();
         
         if(Instance == null)
             Instance = this;
@@ -43,7 +43,7 @@ public class SingleInputAlert : UIAlert
         TitleText.text = title;
         MessageText.text = message;
         
-        Open();
+        UIAlertController.Instance.PresentAlert(this);//Open();
     }
     
     public void Confirm()
@@ -54,7 +54,7 @@ public class SingleInputAlert : UIAlert
             return;
         }
 
-        Close();
+        Deactivate();//Close();
 
         if (confirm != null)
             confirm(InputField.Text);
@@ -64,7 +64,7 @@ public class SingleInputAlert : UIAlert
     }
     public void Cancel()
     {
-        Close();
+        Deactivate();//Close();
         
         if (cancel != null)
             cancel();

@@ -30,6 +30,7 @@ public class Loader : MonoBehaviour
     #region Private Vars
     bool _noTimeout;
     bool _extraneousTimeUp;
+    bool _init;
 
     float _fillDelta;
     float _timer;
@@ -37,12 +38,6 @@ public class Loader : MonoBehaviour
     #endregion
 
     #region Unity Methods
-    void Start()
-    {
-        enabled = false;
-        _fillDelta = MAX_FILL / _fillTime;
-    }
-
     void Update()
     {
         if(_fullCircle.fillAmount < MAX_FILL)
@@ -87,8 +82,14 @@ public class Loader : MonoBehaviour
     #endregion
 
     #region Methods
-    public void Start(System.Action timeOutCallback)
+    public void StartLoading(System.Action timeOutCallback)
 	{
+        if(!_init)
+        {
+            _fillDelta = MAX_FILL / _fillTime;
+            _init = true;
+        }
+
 		//_fillDelta = MAX_FILL / _fillTime;
         _emptyCircle.enabled = true;
         _fullCircle.enabled = true;

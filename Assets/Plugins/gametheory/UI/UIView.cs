@@ -13,6 +13,10 @@ namespace gametheory.UI
     public class UIView : MonoBehaviour 
     {
     	#region Events
+        //These four events will always fire, and come coupled (even if there are no animations).
+        //transitionEvent will always follow activatedEvent
+        //transitionOutEvent will always follow deactivatedEvent
+
     	//Fired when the screen is activated
     	public event System.Action activatedEvent;
     	//Fired when the screen has completed its transition in
@@ -26,7 +30,8 @@ namespace gametheory.UI
     	#region Public Variables
     	public bool UseHierarchy;
         public bool Animates;
-    	public bool SkipActivation;
+        public bool SkipActivation;
+        public bool DelayedDeactivation;
 
         public string AnimationInKey;
         public string AnimationOutKey;
@@ -46,6 +51,10 @@ namespace gametheory.UI
         #endregion
 
         #region Unity Methods
+        void Awake()
+        {
+            Initialize();
+        }
         void OnDestroy()
         {
             CleanUp();
@@ -71,50 +80,23 @@ namespace gametheory.UI
 
             _active = false;
             _init = true;
+
+            if(!DelayedDeactivation)
+                gameObject.SetActive(false);
         }
-
-        protected virtual void OnInit()
-    	{
-    		if(Elements != null)
-    		{
-                if (SkipActivation)
-                {
-                    if (CanvasGroup)
-                        CanvasGroup.blocksRaycasts = false;
-                }
-
-    			for(int i = 0; i < Elements.Count; i++)
-    			{
-                    if (Elements[i])
-                    {
-                        //Debug.Log(_elements[i].name);
-
-                        Elements[i].Init();
-
-                        //Disables all renders, etc so that you don't have to manually do it
-                        if (SkipActivation)
-                        {
-                            Elements[i].PresentVisuals(false);
-                        }
-                    }
-    			}
-    		}
-
-            #if LOG
-            Debug.Log(name + " : initialized");
-            #endif
-    	}
 
         public void ActivateWithoutAnimation()
         {
             if(_active) return;
+
+            gameObject.SetActive(true);
 
             _active = true;
 
             if(CanvasGroup)
                 CanvasGroup.blocksRaycasts = true;
 
-            Activation();
+            OnActivate();
 
             OnAnimateIn();
 
@@ -124,6 +106,8 @@ namespace gametheory.UI
         public void Activate(string animation="")
     	{
             if(_active) return;
+
+            gameObject.SetActive(true);
 
             _active = true;
 
@@ -149,28 +133,12 @@ namespace gametheory.UI
                     _animator.SetTrigger(_animationInKey);*/
             }
 
-            Activation();
+            OnActivate();
 
             ActivateEvent();
-    	}
 
-    	/// <summary>
-    	/// Overloadable method which handles the actual activation of UI elements
-    	/// </summary>
-    	protected virtual void Activation()
-    	{
-    		if(Elements != null)
-    		{
-    			for(int i = 0; i < Elements.Count; i++)
-    			{
-    				if(Elements[i] && !Elements[i].SkipUIViewActivation)
-    					Elements[i].Present();
-    			}
-    		}
-
-    		#if LOG
-    		Debug.Log(name + " activated.");
-    		#endif
+            if(!Animates)
+                TransitionInEvent();
     	}
 
         public void Deactivate(string animation="") 
@@ -199,77 +167,38 @@ namespace gametheory.UI
                     Animator.SetTrigger(animation);
             }
             else
-                Deactivation();
+                OnDeactivate();
 
             DeactivateEvent();
     		//Resources.UnloadUnusedAssets();
     	}
-
-    	/// <summary>
-    	/// Overloadable method which handles the actual deactivation of UI elements
-    	/// </summary>
-    	protected virtual void Deactivation()
-    	{
-    		if(Elements != null)
-    		{
-    			for(int i = 0; i < Elements.Count; i++)
-    			{
-    				if(Elements[i])
-    					Elements[i].Remove();
-    			}
-    		}
-
-    		#if LOG
-    		Debug.Log(name + " deactivated.");
-    		#endif
-    	}
-        protected virtual void CleanUp()
+    	
+        public void CleanUp()
         {
-            if(Elements != null)
-            {
-                for(int i = 0; i < Elements.Count; i++)
-                {
-                    if(Elements[i])
-                        Elements[i].CleanUp();
-                }
-            }
+            OnCleanUp();
+        }
+
+        public void Hide()
+        {
+            gameObject.SetActive(false);
+            OnHide();
+        }
+        public void Show()
+        {
+            gameObject.SetActive(true);
+            OnShow();
         }
     	#endregion
 
     	#region Interaction Methods
-    	public virtual void LostFocus()
-    	{
-    		#if LOG
-    		Debug.Log(name + " lost focus");
-    		#endif
-
-            if (CanvasGroup)
-                CanvasGroup.interactable = false;
-
-    		for(int i = 0; i < Elements.Count; i++)
-    		{
-                if (Elements[i])
-                {
-                    Elements[i].LostFocus();
-                }
-    		}
-    	}
-
-    	public virtual void GainedFocus()
-    	{
-    		#if LOG
-    		Debug.Log(name + " gained focus");
-    		#endif
-
-            if (CanvasGroup)
-                CanvasGroup.interactable = true;
-
-    		for(int i = 0; i < Elements.Count; i++)
-    		{
-    			if(Elements[i])
-                    Elements[i].GainedFocus();
-    		}
-    	}
+    	public void LostFocus()
+        {
+            OnLostFocus();
+        }
+        public void GainedFocus()
+        {
+            OnGainedFocus();
+        }
 
     	public VisualElement RetrieveUIElement(string name)
     	{
@@ -294,27 +223,6 @@ namespace gametheory.UI
     	}
     	#endregion
 
-    	#region Exit Methods
-    	public void FlagForExit()
-    	{
-    		Exit();
-    	}
-
-    	public virtual void Exit()
-    	{
-    		if(Elements != null)
-    		{
-    			for(int i = 0; i < Elements.Count; i++)
-    			{
-    				if(Elements[i])
-    					Elements[i].Exit();
-    			}
-    		}
-
-            TransitionOutEvent();
-    	}
-    	#endregion
-
         #region Animation Methods
         void AnimationInDone()
         {
@@ -330,8 +238,7 @@ namespace gametheory.UI
             if (Animator)
                 Animator.enabled = false;
 
-            Deactivation();
-            TransitionOutEvent();
+            OnDeactivate();
             OnAnimateOut();
         }
         protected virtual void OnAnimateOut(){}
@@ -380,11 +287,131 @@ namespace gametheory.UI
         }
         #endregion
 
-        #region Accessors
-        public bool Active
+        #region Virtual Methods
+        protected virtual void OnInit()
         {
-            get { return _active; }
+            if (SkipActivation && CanvasGroup)
+                CanvasGroup.blocksRaycasts = false;
+            
+            if(Elements != null)
+            {
+                for(int i = 0; i < Elements.Count; i++)
+                {
+                    if (Elements[i])
+                    {
+                        //Debug.Log(_elements[i].name);
+                        
+                        Elements[i].Init();
+                        
+                        //Disables all renders, etc so that you don't have to manually do it
+                        if (SkipActivation)
+                        {
+                            Elements[i].PresentVisuals(false);
+                        }
+                    }
+                }
+            }
+            
+            #if LOG
+            Debug.Log(name + " : initialized");
+            #endif
         }
+
+        /// <summary>
+        /// Overloadable method which handles the actual activation of UI elements
+        /// </summary>
+        protected virtual void OnActivate()
+        {
+            if(Elements != null)
+            {
+                for(int i = 0; i < Elements.Count; i++)
+                {
+                    if(Elements[i] && !Elements[i].SkipUIViewActivation)
+                        Elements[i].Present();
+                }
+            }
+            
+            #if LOG
+            Debug.Log(name + " activated.");
+            #endif
+        }
+
+        /// <summary>
+        /// Overloadable method which handles the actual deactivation of UI elements
+        /// </summary>
+        protected virtual void OnDeactivate()
+        {
+            if(Elements != null)
+            {
+                for(int i = 0; i < Elements.Count; i++)
+                {
+                    if(Elements[i])
+                        Elements[i].Remove();
+                }
+            }
+            
+            gameObject.SetActive(false);
+
+            TransitionOutEvent();
+
+            #if LOG
+            Debug.Log(name + " deactivated.");
+            #endif
+        }
+
+        protected virtual void OnCleanUp()
+        {
+            if(Elements != null)
+            {
+                for(int i = 0; i < Elements.Count; i++)
+                {
+                    if(Elements[i])
+                        Elements[i].CleanUp();
+                }
+            }
+        }
+        protected virtual void OnLostFocus()
+        {
+            if(!_active)
+                return;
+            
+            #if LOG
+            Debug.Log(name + " lost focus");
+            #endif
+            
+            if (CanvasGroup)
+                CanvasGroup.interactable = false;
+            
+            for(int i = 0; i < Elements.Count; i++)
+            {
+                if (Elements[i])
+                {
+                    Elements[i].LostFocus();
+                }
+            }
+        }
+        
+        protected virtual void OnGainedFocus()
+        {
+            if(!_active)
+                return;
+            
+            #if LOG
+            Debug.Log(name + " gained focus");
+            #endif
+            
+            if (CanvasGroup)
+                CanvasGroup.interactable = true;
+            
+            for(int i = 0; i < Elements.Count; i++)
+            {
+                if(Elements[i])
+                    Elements[i].GainedFocus();
+            }
+        }
+
+        protected virtual void OnHide(){}
+        protected virtual void OnShow(){}
         #endregion
     }
 }

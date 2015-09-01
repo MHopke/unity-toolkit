@@ -59,16 +59,16 @@ namespace gametheory.UI
                     FillImage.enabled = display;
             }
         }
-        public override void LostFocus()
+        public override void OnLostFocus()
         {
-            base.LostFocus();
+            base.OnLostFocus();
             _previousEnabledState = Slider.interactable;
 
             Disabled();
         }
-        public override void GainedFocus()
+        public override void OnGainedFocus()
         {
-            base.GainedFocus();
+            base.OnGainedFocus();
 
             if (_previousEnabledState)
                 Enabled();

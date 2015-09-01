@@ -29,16 +29,16 @@ namespace gametheory.UI
 
             //_inputField.contentType = _validation;
         }
-        protected override void OnActivate()
+        protected override void OnPresent()
         {
-            base.OnActivate();
+            base.OnPresent();
 
             if (InputField)
                 InputField.onEndEdit.AddListener(SubmittedData);
         }
-        protected override void OnDeactivate()
+        protected override void OnRemove()
         {
-            base.OnDeactivate();
+            base.OnRemove();
 
             if (InputField)
                 InputField.onEndEdit.RemoveListener(SubmittedData);

@@ -5,7 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-public class DefaultAlert : UIAlert 
+public class DefaultAlert : UIView 
 {
     #region Events
     static event System.Action confirm;
@@ -29,9 +29,9 @@ public class DefaultAlert : UIAlert
     #endregion
 
     #region Overriden Methods
-    protected override void Init()
+    protected override void OnInit()
     {
-        base.Init();
+        base.OnInit();
 
         if(instance == null)
             instance = this;
@@ -40,9 +40,9 @@ public class DefaultAlert : UIAlert
 
         _alertQueue = new Queue<AlertContent>();
     }
-    protected override void OnClose()
+    protected override void OnDeactivate()
     {
-        base.OnClose();
+        base.OnDeactivate();
 
         _alertQueue.Dequeue();
         
@@ -71,7 +71,7 @@ public class DefaultAlert : UIAlert
             instance.MessageText.text = message;
             instance.ConfirmText.text = confirmText;
 
-            instance.Open();
+            UIAlertController.Instance.PresentAlert(instance);//instance.Open();
 
             IsOpen = true;
         }
@@ -95,12 +95,12 @@ public class DefaultAlert : UIAlert
         MessageText.text = content.Message;
         ConfirmText.text = content.ConfirmText;
 
-        Open();
+        UIAlertController.Instance.PresentAlert(this);//Open();
     }
 
     public void Confirm()
     {
-        Close();
+        Deactivate();//Close();
 
         if (confirm != null)
         {
@@ -114,7 +114,7 @@ public class DefaultAlert : UIAlert
     }
     public void Cancel()
     {
-        Close();
+        Deactivate();//Close();
         
         if (cancel != null)
             cancel();

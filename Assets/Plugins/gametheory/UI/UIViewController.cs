@@ -19,69 +19,49 @@ namespace gametheory.UI
     	#endregion
 
 		#region Unity Methods
-		void Awake()
+		void Start()
 		{
-			Initialize();
+            enabled = false;
 			Activate();
 		}
+        void OnDestroy()
+        {
+            CleanUp();
+        }
 		#endregion
 
-    	#region Activate, Deactivate Methods
-        public void Initialize()
-        {
-            for (int i = 0; i < Views.Count; i++)
-                Views[i].Initialize();
-
-            OnInit();
-        }
-        protected virtual void OnInit(){}
-
+    	#region Methods
         public void Activate()
-    	{
-            Instance = this;
-
-            OnActivate();
-
-    		#if LOG
-    		Debug.Log(name + " activated.");
-    		#endif
-    	}
-
-        protected virtual void OnActivate()
         {
-            for (int i = 0; i < Views.Count; i++)
-            {
-                if (!Views[i].SkipActivation)
-                    Views[i].Activate();
-            }
+            Instance = this;
+            
+            OnActivate();
+            
+            #if LOG
+            Debug.Log(name + " activated.");
+            #endif
         }
-
-    	public void Deactivate()
-    	{
-    		for(int i = 0; i < Views.Count; i++)
-    		{
-    			if(Views[i])
+        
+        public void Deactivate()
+        {
+            for(int i = 0; i < Views.Count; i++)
+            {
+                if(Views[i])
                     Views[i].Deactivate();
-    		}
-
+            }
+            
             OnDeactivate();
-
-    		#if LOG
-    		Debug.Log(name + " deactivated.");
-    		#endif
-    	}
-
-        protected virtual void OnDeactivate(){}
-
+            
+            #if LOG
+            Debug.Log(name + " deactivated.");
+            #endif
+        }
+        
         public void CleanUp()
         {
             OnCleanUp();
         }
 
-        protected virtual void OnCleanUp(){}
-    	#endregion
-
-    	#region Methods
     	//Present view methods
         public static void PresentUIView(UIView view,string animation="")
     	{
@@ -98,7 +78,6 @@ namespace gametheory.UI
             if (temp)
                 PresentUIView(temp);
     	}
-        protected virtual void OnPresent(UIView view){}
 
     	//Remove view methods
         public static void RemoveUIView(UIView view,string animation="")
@@ -114,7 +93,6 @@ namespace gametheory.UI
             if (temp)
                 RemoveUIView(temp);
     	}
-        protected virtual void OnRemove(UIView view){}
 
     	//Other methods
     	public static VisualElement GetElementFromView(string element, string view)
@@ -156,7 +134,7 @@ namespace gametheory.UI
     	{
     		for(int i = 0; i < Instance.Views.Count; i++)
     		{
-                if(Instance.Views[i] && Instance.Views[i].Active)
+                if(Instance.Views[i])
     				Instance.Views[i].GainedFocus();
     		}
     	}
@@ -169,10 +147,27 @@ namespace gametheory.UI
     	{
     		for(int i = 0; i < Instance.Views.Count; i++)
     		{
-                if(Instance.Views[i] && Instance.Views[i].Active)
+                if(Instance.Views[i])
     				Instance.Views[i].LostFocus();
     		}
     	}
     	#endregion
+
+        #region Virtual Methods
+        protected virtual void OnActivate()
+        {
+            for (int i = 0; i < Views.Count; i++)
+            {
+                if (!Views[i].SkipActivation)
+                    Views[i].Activate();
+            }
+        }
+        protected virtual void OnDeactivate(){}
+        protected virtual void OnCleanUp(){}
+
+        
+        protected virtual void OnPresent(UIView view){}
+        protected virtual void OnRemove(UIView view){}
+        #endregion
     }
 }

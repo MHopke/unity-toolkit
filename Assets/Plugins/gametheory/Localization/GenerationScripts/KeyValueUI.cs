@@ -26,9 +26,9 @@ public class KeyValueUI : ExtendedInputField
 	#endregion
 
 	#region Overridden Methods
-	protected override void OnDeactivate()
+	protected override void OnRemove()
 	{
-		base.OnDeactivate();
+		base.OnRemove();
 
 		onSubmitData = null;
 	}

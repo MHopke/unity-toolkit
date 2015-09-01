@@ -145,7 +145,7 @@ namespace gametheory.Localization
 
             if (asset == null)
             {
-                LoadAlert.Instance.Close();
+                LoadAlert.Instance.Done();
                 LoadTimeout();
                 return false;
             }

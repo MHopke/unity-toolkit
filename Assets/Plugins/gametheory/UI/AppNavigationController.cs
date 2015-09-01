@@ -32,15 +32,13 @@ public class AppNavigationController : UIViewController
     #endregion
 
     #region Public Vars
-    public ExtendedButton _backButton;
+    public ExtendedButton BackButton;
 
-    public UIView _currentView;
-    public UIView _navView;
-    public UIView _topView;
+    public UIView CurrentView;
+    public UIView NavView;
+    public UIView TopView;
 
-    public UIView _mainView;
-    public UIView _loginView;
-    public UIView _usersView;
+    public static AppNavigationController Navigation = null;
     #endregion
 
     #region Private Vars
@@ -52,6 +50,7 @@ public class AppNavigationController : UIViewController
     string _backConfirmInfo;
 
     UIView _viewForConfirm;
+    UIView _homeView;
 
     //NavigationState _navState;
 
@@ -59,14 +58,19 @@ public class AppNavigationController : UIViewController
     #endregion
 
     #region Overriden Methods
-    protected override void OnInit()
+    protected override void OnActivate()
     {
-        base.OnInit();
+        base.OnActivate();
+
+        Navigation = this;
 
         /*if(_backButton)
             _defaultBack = _backButton._button.image.sprite;*/
 
         _viewStack = new Stack<UIView>();
+
+        _homeView = CurrentView;
+        _viewStack.Push(_homeView);
     }
     protected override void OnDeactivate()
     {
@@ -76,22 +80,22 @@ public class AppNavigationController : UIViewController
     }
     protected override void OnPresent(UIView view)
     {
-        if (_currentView.name == view.name)
+        if (CurrentView.name == view.name)
             return;
 
         base.OnPresent(view);
 
-        if ((_viewStack != null && _backButton != null))
+        if ((_viewStack != null && BackButton != null))
         {
             if(_viewStack.Count == 1)
             {
-                _backButton.Present();
+                BackButton.Present();
             }
         }
 
         _viewStack.Push(view);
 
-        _currentView = view;
+        CurrentView = view;
     }
     #endregion
 
@@ -106,10 +110,10 @@ public class AppNavigationController : UIViewController
             return;
         }
 
-        if (_currentView.name == view.name)
+        if (CurrentView.name == view.name)
             return;
 
-        RemoveUIView(_currentView);
+        RemoveUIView(CurrentView);
         PresentUIView(view);
 
         CheckNavigationState();
@@ -117,67 +121,75 @@ public class AppNavigationController : UIViewController
         if(clearStackHistory)
             RestoreStackToFlowStart();
     }
-    public static void ViewChangeRequiresConfirm(string title, string message, System.Action callback)
+    public void PushViewOnToStack(UIView view)
     {
-        AppNavigationController controller = Instance as AppNavigationController;
+        if (_viewChangeRequiresConfirm)
+        {
+            _viewForConfirm = view;
+            //_clearStackHistoryWithConfirm = clearStackHistory;
+            //AlertView.Present(_backConfirmTitle, _backConfirmInfo, Confirm, Cancel,true);
+            return;
+        }
+        
+        if (CurrentView.name == view.name)
+            return;
+        
+        RemoveUIView(CurrentView);
+        PresentUIView(view);
+    }
+    public void PopView()
+    {
+        Back();
+    }
+    public void PopStackToHome()
+    {
+        ClearStack();
 
-        controller._viewChangeRequiresConfirm = true;
-        controller._backConfirmTitle = title;
-        controller._backConfirmInfo = message;
+        RemoveUIView(CurrentView);
+        PresentUIView(_homeView);
+    }
+    public void ViewChangeRequiresConfirm(string title, string message, System.Action callback)
+    {
+        _viewChangeRequiresConfirm = true;
+        _backConfirmTitle = title;
+        _backConfirmInfo = message;
 
         confirmedBack = callback;
     }
-    public static void ClearViewConfirm()
+    public void ClearViewConfirm()
     {
-        AppNavigationController controller = Instance as AppNavigationController;
-        
-        controller._viewChangeRequiresConfirm = false;
-        controller._viewForConfirm = null;
+        _viewChangeRequiresConfirm = false;
+        _viewForConfirm = null;
         
         confirmedBack = null;
     }
-    public static void BackRequiresConfirm(string title, string message, System.Action callback,bool includeNavBar=true)
+    public void BackRequiresConfirm(string title, string message, System.Action callback,bool includeNavBar=true)
     {
-        AppNavigationController controller = Instance as AppNavigationController;
-
-        controller._backRequiresConfirm = true;
-        controller._backConfirmTitle = title;
-        controller._backConfirmInfo = message;
+        _backRequiresConfirm = true;
+        _backConfirmTitle = title;
+        _backConfirmInfo = message;
         //controller._includeNavBar = includeNavBar;
         
         confirmedBack = callback;
     }
-    public static void ClearBackConfirm()
+    public void ClearBackConfirm()
     {
-        AppNavigationController controller = Instance as AppNavigationController;
-
-        controller._backRequiresConfirm = false;
-        controller._viewForConfirm = null;
+        _backRequiresConfirm = false;
+        _viewForConfirm = null;
 
         confirmedBack = null;
-    }
-    public static void GoBack()
-    {
-        AppNavigationController controller = Instance as AppNavigationController;
-        controller.Back();
     }
 
     void RestoreStackToFlowStart()
     {
-        SetViewStackToStart();
-        _viewStack.Push(_currentView);
+        PopStackToHome();
+        _viewStack.Push(CurrentView);
         
         /*if(_backButton._button.image.sprite != _homeSprite)
             _backButton._button.image.sprite = _homeSprite;*/
         
         if (viewStackCleared != null)
             viewStackCleared();
-    }
-
-    void SetViewStackToStart()
-    {
-        ClearStack();
-        _viewStack.Push(_mainView);
     }
     
     void ClearStack()
@@ -186,56 +198,6 @@ public class AppNavigationController : UIViewController
     }
     void CheckNavigationState()
     {
-        /*switch (_navState)
-        {
-            case NavigationState.WORKOUT:
-                _workoutButton._text.color = _workoutButton._button.image.color = _workoutButton._button.colors.normalColor;
-                break;
-            case NavigationState.GAMES:
-                _gamesButton._text.color = _gamesButton._button.image.color = _gamesButton._button.colors.normalColor;
-                break;
-            case NavigationState.MENU:
-                _menuButton._text.color = _menuButton._button.image.color = _menuButton._button.colors.normalColor;
-                break;
-            case NavigationState.TEAM:
-                _teamButton._text.color = _teamButton._button.image.color = _teamButton._button.colors.normalColor;
-                break;
-        }
-
-        _navState = NavigationState.NONE;
-
-        if (_currentView == _programView)
-        {
-            _workoutButton._text.color = _workoutButton._button.colors.pressedColor;
-            _workoutButton._button.image.color = _workoutButton._button.colors.pressedColor;
-            _navState = NavigationState.WORKOUT;
-        }
-        else if (_currentView == _teamView)
-        {
-            _teamButton._text.color = _teamButton._button.colors.pressedColor;
-            _teamButton._button.image.color = _teamButton._button.colors.pressedColor;
-            _navState = NavigationState.TEAM;
-        }
-        else if (_currentView == _gamesListView)
-        {
-            _gamesButton._text.color = _gamesButton._button.colors.pressedColor;
-            _gamesButton._button.image.color = _gamesButton._button.colors.pressedColor;
-            _navState = NavigationState.GAMES;
-        }
-        else if (_currentView == _menuView)
-        {
-            _menuButton._text.color = _menuButton._button.colors.pressedColor;
-            _menuButton._button.image.color = _menuButton._button.colors.pressedColor;
-            _navState = NavigationState.MENU;
-        }*/
-    }
-    void LoadMain()
-    {
-        if(_currentView != null)
-            _currentView.Deactivate();
-
-        _currentView = _mainView;
-        _mainView.Activate();
     }
     #endregion
 
@@ -259,18 +221,14 @@ public class AppNavigationController : UIViewController
         //Debug.Log(_viewStack.Count);
 
         _viewStack.Peek().Activate();
-        _currentView = _viewStack.Peek();
+        CurrentView = _viewStack.Peek();
 
         CheckNavigationState();
 
-        if (_viewStack.Count == 1)
-            _backButton.Remove();
+        if (_viewStack.Count == 1 && BackButton)
+            BackButton.Remove();
         /*else if(_viewStack.Count == 2)
             _backButton._button.image.sprite = _homeSprite;*/
-    }
-    public void GoToUsersView()
-    {
-        PresentSingleView(_usersView,true);
     }
     #endregion
 

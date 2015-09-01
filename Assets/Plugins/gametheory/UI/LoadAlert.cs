@@ -1,9 +1,9 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 using gametheory.UI;
 using System.Collections;
 
-public class LoadAlert : UIAlert 
+public class LoadAlert : UIView 
 {
     #region Events
     System.Action timedOut;
@@ -17,25 +17,34 @@ public class LoadAlert : UIAlert
     #endregion
 
     #region Overriden Methods
-    protected override void Init()
+    protected override void OnInit()
     {
-        base.Init();
-
-        SkipStack = true;
+        base.OnInit();
 
         Instance = this;
     }
-    protected override void CleanUp()
+    protected override void OnCleanUp()
     {
-        base.CleanUp();
+        base.OnCleanUp();
 
         Instance = null;
+    }
+    protected override void OnShow()
+    {
+        base.OnShow();
+
+        //indicates loading timed out or is done
+        if(!Loader.enabled)
+            Deactivate();
     }
     #endregion
 
     #region Methods
-    public void StartLoad(string text, System.Action timeOutCallback=null, float timeOut=10.0f, float fillTime=1.0f, float pauseTime=0.15f)
+    public void StartLoad(string text, System.Action timeOutCallback=null, 
+                          float timeOut=10.0f, float fillTime=1.0f, float pauseTime=0.15f)
     {
+        UIAlertController.Instance.PresentAlert(this);//base.Open();
+
         LoadingText.text = text;
         
         timedOut = timeOutCallback;
@@ -44,10 +53,12 @@ public class LoadAlert : UIAlert
         Loader._waitTime = timeOut;
         Loader._fillPause = pauseTime;
 
-        Loader.Start(TimedOut);
+        Loader.StartLoading(TimedOut);
         Loader.extraneousTime += ExtranesouTime;
-
-        base.Open();
+    }
+    public void SetText(string text)
+    {
+        LoadingText.text = text;
     }
     public void Done()
     {
@@ -61,7 +72,7 @@ public class LoadAlert : UIAlert
 
         Loader.extraneousTime -= ExtranesouTime;
 
-		Close();
+        Deactivate();//Close();
     }
 
     void TimedOut()
@@ -69,7 +80,7 @@ public class LoadAlert : UIAlert
         if(timedOut != null)
             timedOut();
 
-        Close();
+        Deactivate();//Close();
     }
     void ExtranesouTime()
     {

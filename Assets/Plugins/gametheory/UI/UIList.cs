@@ -22,6 +22,10 @@ namespace gametheory.UI
         public List<VisualElement> ListItems;
         #endregion
 
+        #region Private Vars
+        int _endOfOriginalItems;
+        #endregion
+
         #region Overriden Methods
         protected override void OnInit()
         {
@@ -29,6 +33,7 @@ namespace gametheory.UI
 
             if (StartsWithItems)
             {
+                _endOfOriginalItems = ListItems.Count;
                 for (int i = 0; i < ListItems.Count; i++)
                 {
                     ListItems[i].Init();
@@ -38,9 +43,9 @@ namespace gametheory.UI
             else
                 ListItems = new List<VisualElement>();
         }
-        protected override void OnActivate ()
+        protected override void OnPresent ()
 		{
-			base.OnActivate ();
+			base.OnPresent ();
 
             for(int i = 0; i < ListItems.Count; i++)
             {
@@ -50,9 +55,9 @@ namespace gametheory.UI
 
             CheckToHideScrollbar();
         }
-        protected override void OnDeactivate ()
+        protected override void OnRemove ()
 		{
-			base.OnDeactivate ();
+			base.OnRemove ();
 
             for(int i = 0; i < ListItems.Count; i++)
             {
@@ -62,21 +67,21 @@ namespace gametheory.UI
             if(ZeroScrollBar)
                 Scroll.normalizedPosition = Vector2.zero;
         }
-        public override void GainedFocus()
+        public override void OnGainedFocus()
         {
-            base.GainedFocus();
+            base.OnGainedFocus();
 
             for(int i = 0; i < ListItems.Count; i++)
             {
-                ListItems[i].GainedFocus();
+                ListItems[i].OnGainedFocus();
             }
         }
-        public override void LostFocus()
+        public override void OnLostFocus()
         {
-            base.LostFocus();
+            base.OnLostFocus();
             for(int i = 0; i < ListItems.Count; i++)
             {
-                ListItems[i].LostFocus();
+                ListItems[i].OnLostFocus();
             }
         }
         #endregion
@@ -106,7 +111,12 @@ namespace gametheory.UI
 
             (element.transform as RectTransform).SetParent(LiistTransform,false);
             ListItems.Add(element);
-            element.Present();
+
+
+            if(_active)
+                element.Present();
+            else
+                element.PresentVisuals(false);
 
             CheckToShowScrollBar();
         }
@@ -118,7 +128,11 @@ namespace gametheory.UI
             {
                 (elements[i].transform as RectTransform).SetParent(LiistTransform,false);
                 ListItems.Add(elements[i]);
-                elements[i].Present();
+
+                if(_active)
+                    elements[i].Present();
+                else
+                    elements[i].PresentVisuals(false);
             }
 
             CheckToShowScrollBar();
@@ -162,11 +176,11 @@ namespace gametheory.UI
         }
         public void ClearElements()
         {
-            while(ListItems.Count > 0)
+            while(ListItems.Count > _endOfOriginalItems)
             {
-                Destroy(ListItems[0].gameObject);
+                Destroy(ListItems[ListItems.Count - 1].gameObject);
                 
-                ListItems.RemoveAt(0);
+                ListItems.RemoveAt(ListItems.Count - 1);
             }
 
             CheckToHideScrollbar();

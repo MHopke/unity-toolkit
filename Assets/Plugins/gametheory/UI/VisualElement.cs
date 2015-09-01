@@ -28,7 +28,7 @@ namespace gametheory.UI
     	bool _initialized;
     	#endregion
 
-    	#region Init, Activation, Deactivation Methods
+    	#region Methods
     	public void Init()
     	{
     		if(!_initialized)
@@ -45,16 +45,11 @@ namespace gametheory.UI
     		}
     	}
 
-    	protected virtual void OnInit()
-        {
-            if (!Animator)
-                Animator = GetComponent<Animator>();
-        }
+    	
         public void CleanUp()
         {
             OnCleanUp();
         }
-        protected virtual void OnCleanUp(){}
 
         /// <summary>
         /// Activates the UI element.
@@ -66,7 +61,7 @@ namespace gametheory.UI
 
     		_active = true;
 
-    		OnActivate();
+    		OnPresent();
 
             if(StartsDisabled)
                 Disable();
@@ -76,11 +71,6 @@ namespace gametheory.UI
     		#endif
     	}
 
-    	protected virtual void OnActivate()
-        {
-            PresentVisuals(true);
-        }
-
     	public void Remove()
     	{
     		if(!_active)
@@ -88,16 +78,12 @@ namespace gametheory.UI
 
     		_active = false;
 
-    		OnDeactivate();
+    		OnRemove();
 
     		#if LOG
     		Debug.Log(name + " deactivated");
     		#endif
     	}
-    	protected virtual void OnDeactivate()
-        {
-            PresentVisuals(false);
-        }
 
     	//used for disabling interactive elements
         public void Disable(bool force=false)
@@ -106,8 +92,6 @@ namespace gametheory.UI
                 Disabled();
     	}
 
-    	protected virtual void Disabled(){}
-
     	public void Enable()
     	{
     		if(!_active)
@@ -115,38 +99,25 @@ namespace gametheory.UI
 
     		Enabled();
     	}
-    	protected virtual void Enabled(){}
-
-        public virtual void LostFocus(){}
-        public virtual void GainedFocus(){}
-
-        public virtual void PresentVisuals(bool display) 
+    	
+        public void LostFocus()
         {
-            #if LOG
-            Debug.Log(name + " : " + display);
-            #endif
+            if(!_active)
+                return;
 
-            if (display)
-                Enabled();
-            else
-                Disabled();
+            OnLostFocus();
         }
-    	#endregion
+        public void GainedFocus()
+        {
+            if(!_active)
+                return;
 
-    	#region Exit Methods
-        public virtual void Exit()
-    	{
-    		if(!_active)
-    			return;
+            OnGainedFocus();
+        }
 
-    		Remove();
-    	}
-    	#endregion
-
-        #region Animation Methods
         public void SetTrigger(string triggerName)
         {
-            if (Animator && Animator.runtimeAnimatorController)
+            if (Animator)
             {
                 //Debug.Log(triggerName);
                 Animator.SetTrigger(triggerName);
@@ -155,20 +126,45 @@ namespace gametheory.UI
         }
         public void SetBool(string name, bool value)
         {
-            if (Animator && Animator.runtimeAnimatorController)
+            if (Animator)
             {
                 Animator.SetBool(name, value);
                 //enabled = true;
             }
         }
-        #endregion
-
-    	#region Accessors
-    	public bool Active
-    	{
-    		get { return _active; }
-    		set { _active = value; }
-    	}
     	#endregion
+
+        #region Virtual Methods
+        protected virtual void OnInit()
+        {
+            if (!Animator)
+                Animator = GetComponent<Animator>();
+        }
+
+        protected virtual void OnCleanUp(){}
+
+        protected virtual void OnPresent()
+        {
+            PresentVisuals(true);
+        }
+        
+        protected virtual void OnRemove()
+        {
+            PresentVisuals(false);
+        }
+
+        protected virtual void Disabled(){}
+        protected virtual void Enabled(){}
+        
+        public virtual void OnLostFocus(){}
+        public virtual void OnGainedFocus(){}
+        
+        public virtual void PresentVisuals(bool display) 
+        {
+            #if LOG
+            Debug.Log(name + " : " + display);
+            #endif
+        }
+        #endregion
     }
 }

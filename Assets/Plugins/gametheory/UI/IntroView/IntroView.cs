@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using gametheory.UI;
@@ -21,9 +21,9 @@ public class IntroView : UIView
     #endregion
 
     #region Overidden Methods
-    protected override void Activation()
+    protected override void OnActivate()
     {
-        base.Activation();
+        base.OnActivate();
 
         if(UsesResources)
         {
@@ -37,9 +37,9 @@ public class IntroView : UIView
         _pageIndex = 0;
         Tabs[_pageIndex].SwitchStatus(true);
     }
-    protected override void Deactivation()
+    protected override void OnDeactivate()
     {
-        base.Deactivation();
+        base.OnDeactivate();
 
         if(UsesResources)
         {
