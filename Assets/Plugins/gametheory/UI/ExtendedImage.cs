@@ -6,6 +6,7 @@ namespace gametheory.UI
     /// <summary>
     /// Representation of a graphical UI element. Uses Unity 4.3 Sprite System.
     /// </summary>
+	[RequireComponent(typeof(Image))]
     public class ExtendedImage : VisualElement
     {
         #region Public Vars

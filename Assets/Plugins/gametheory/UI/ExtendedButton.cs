@@ -3,6 +3,7 @@ using UnityEngine.UI;
 
 namespace gametheory.UI
 {
+	[RequireComponent(typeof(Button))]
     public class ExtendedButton : VisualElement
     {
         #region Public Vars
@@ -102,6 +103,9 @@ namespace gametheory.UI
                 if(Button.image)
                     Button.image.enabled = display;
             }
+
+            if(ButtonIconImage)
+                ButtonIconImage.enabled = display;
 
             if (Label)
                 Label.enabled = display;

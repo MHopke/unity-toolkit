@@ -180,13 +180,15 @@ namespace gametheory.UI
 
         public void Hide()
         {
-            gameObject.SetActive(false);
-            OnHide();
+            //gameObject.SetActive(false);
+			LostFocus();
+            //OnHide();
         }
         public void Show()
         {
-            gameObject.SetActive(true);
-            OnShow();
+            //gameObject.SetActive(true);
+			GainedFocus();
+            //OnShow();
         }
     	#endregion
 

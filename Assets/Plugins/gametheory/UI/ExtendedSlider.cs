@@ -4,6 +4,7 @@ using System.Collections;
 
 namespace gametheory.UI
 {
+	[RequireComponent(typeof(Slider))]
     public class ExtendedSlider : VisualElement
     {
         #region Public Vars

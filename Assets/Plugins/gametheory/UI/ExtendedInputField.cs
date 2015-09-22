@@ -3,6 +3,7 @@ using UnityEngine.UI;
 
 namespace gametheory.UI
 {
+	[RequireComponent(typeof(InputField))]
     public class ExtendedInputField : VisualElement
     {
         #region Events

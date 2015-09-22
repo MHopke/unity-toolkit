@@ -3,6 +3,7 @@ using UnityEngine.UI;
 
 namespace gametheory.UI
 {
+	[RequireComponent(typeof(Toggle))]
     public class ExtendedToggle : VisualElement
     {
         #region Public Vars

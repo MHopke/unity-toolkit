@@ -3,6 +3,7 @@ using UnityEngine.UI;
 
 namespace gametheory.UI
 {
+	[RequireComponent(typeof(Text))]
     public class ExtendedText : VisualElement
     {
         #region Public Vars

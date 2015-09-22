@@ -50,11 +50,11 @@ public class AppNavigationController : UIViewController
     string _backConfirmInfo;
 
     UIView _viewForConfirm;
-    UIView _homeView;
+    protected UIView _homeView;
 
     //NavigationState _navState;
 
-    Stack<UIView> _viewStack;
+    protected Stack<UIView> _viewStack;
     #endregion
 
     #region Overriden Methods
@@ -69,8 +69,11 @@ public class AppNavigationController : UIViewController
 
         _viewStack = new Stack<UIView>();
 
-        _homeView = CurrentView;
-        _viewStack.Push(_homeView);
+		if(CurrentView != null)
+		{
+        	_homeView = CurrentView;
+        	_viewStack.Push(_homeView);
+		}
     }
     protected override void OnDeactivate()
     {
@@ -80,7 +83,7 @@ public class AppNavigationController : UIViewController
     }
     protected override void OnPresent(UIView view)
     {
-        if (CurrentView.name == view.name)
+        if (CurrentView && CurrentView.name == view.name)
             return;
 
         base.OnPresent(view);
@@ -130,7 +133,7 @@ public class AppNavigationController : UIViewController
             //AlertView.Present(_backConfirmTitle, _backConfirmInfo, Confirm, Cancel,true);
             return;
         }
-        
+
         if (CurrentView.name == view.name)
             return;
         
