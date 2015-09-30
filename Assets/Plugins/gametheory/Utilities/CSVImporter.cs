@@ -126,11 +126,18 @@ namespace gametheory.Utilities
     		string fileContent = "";
     		string[] rows = null;
 
-            /*text = (TextAsset)Resources.Load(filePath, typeof(TextAsset));
-            fileContent = text.text;*/
-			StreamReader streamReader = new StreamReader(filePath);
-			
-			fileContent = streamReader.ReadToEnd();
+			try
+			{
+	            TextAsset asset = (TextAsset)Resources.Load(filePath, typeof(TextAsset));
+
+				fileContent = asset.text;
+			}
+			catch(Exception exp)
+			{
+				StreamReader streamReader = new StreamReader(filePath);
+				
+				fileContent = streamReader.ReadToEnd();
+			}
 
             rows = fileContent.Split(ROW);
 

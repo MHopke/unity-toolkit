@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 
+using gametheory.Utilities;
+
 namespace gametheory.Localization
 {
     public enum Language
@@ -27,7 +29,7 @@ namespace gametheory.Localization
         /// Occurs when the language changed. Triggers LocalizationComponents to 
         /// get new text data.
         /// </summary>
-        public static event System.Action languageChanged;
+        public static event System.Action<Dictionary<string,string>> languageChanged;
 
         /// <summary>
         /// Occurs when language fails to load.
@@ -40,7 +42,7 @@ namespace gametheory.Localization
         #endregion
 
     	#region Public Variables
-    	public string BaseFileName;
+    	public string BaseFileName="Localizations";
     	public Language DefaultLanguage;
 
         public LanguageToggle _english;
@@ -61,13 +63,11 @@ namespace gametheory.Localization
         string LANGUAGE_ERROR_BODY = "Unable to load the chosen language.";
 
         private Language _currentLanguage = Language.None;
-        private XmlReader _reader;
-        private FileStream _file;
 
         DateTimeFormatInfo _dateTimeFormatInfo;
         CultureInfo _cultureInfo;
 
-    	private Dictionary<string, Dictionary<string, string>> _gameText;
+    	private Dictionary<Language, Dictionary<string, string>> _localizations;
     	#endregion
 
     	#region Unity Methods
@@ -80,16 +80,11 @@ namespace gametheory.Localization
 
                 Instance = this;
 
-                _gameText = new Dictionary<string, Dictionary<string, string>>();
+                _localizations = new Dictionary<Language, Dictionary<string, string>>();
             }
             else
                 Destroy(gameObject);
     	}
-        void Start()
-        {
-            enabled = false;
-            Load();
-        }
         void OnDestroy()
         {
             LanguageToggle.changeLanguage -= SetCurrentLanguage;
@@ -97,17 +92,14 @@ namespace gametheory.Localization
     	#endregion
 
     	#region Methods
-        void Load()
+        public void Load()
         {
             string lang = PlayerPrefs.GetString(LANGUAGE_KEY, "");
 
             if (string.IsNullOrEmpty(lang))
                 _currentLanguage = DefaultLanguage;
 
-            if (LoadLocalization())
-                FinishLanguageChange();
-
-            SetToggle();
+			StartCoroutine(LoadLocalizationCoroutine());
         }
         void Save()
         {
@@ -139,125 +131,48 @@ namespace gametheory.Localization
             }
         }
 
-        public bool LoadLocalization()
-    	{
-            TextAsset asset = (TextAsset)Resources.Load(Path.Combine(BaseFileName, _currentLanguage.ToString()));
-
-            if (asset == null)
-            {
-                LoadAlert.Instance.Done();
-                LoadTimeout();
-                return false;
-            }
-
-            _gameText = new Dictionary<string, Dictionary<string, string>>();
-
-            StringReader strReader = new StringReader(asset.text);
-
-            using(_reader = XmlReader.Create(strReader))
-            {
-                _reader.ReadToDescendant("Classes");
-
-                XmlReader subReader = _reader.ReadSubtree();
-                while(subReader.ReadToFollowing("Class"))
-                {
-                    var viewName = subReader.GetAttribute("name");
-
-    				if(!_gameText.ContainsKey(viewName))
-    					_gameText.Add(viewName, new Dictionary<string, string>());
-
-                    XmlReader classReader = subReader.ReadSubtree();
-                    while (classReader.ReadToFollowing("Variable"))
-                    {
-                        string content = "", name ="";
-                        classReader.MoveToAttribute("name");
-
-                        name = subReader.Value;
-                        classReader.MoveToContent();
-                        content = subReader.ReadString();
-                        classReader.MoveToElement();
-
-                        //Debug.Log(viewName + " " + name + " " + content);
-
-                        _gameText[viewName].Add(name, content);
-                    }
-                    classReader.Close();
-    			}
-                subReader.Close();
-
-                //read in other application specific data here
-    		}
-
-            return true;
-    	}
-
         public IEnumerator LoadLocalizationCoroutine()
         {
-            LoadAlert.Instance.StartLoad(LOADING_LANGUAGE, LoadTimeout, 1.0f, 10.0f, 0.15f);
+            LoadAlert.Instance.StartLoad(LOADING_LANGUAGE, LoadTimeout, 1.0f, 15.0f, 0.15f);
 
-            TextAsset asset = (TextAsset)Resources.Load(Path.Combine(BaseFileName, _currentLanguage.ToString()));
+			_localizations = new Dictionary<Language, Dictionary<string, string>>();
+			
+			CSVMap map = new CSVMap(BaseFileName);
+			
+			int sub = 0;
+			string field = "";
 
-            if (asset != null)
-            {
-                _gameText = new Dictionary<string, Dictionary<string, string>>();
+			for(sub = 1; sub < map.Headers.Count; sub++)
+		    {
+				field = map.Headers[sub];
+				if(!string.IsNullOrEmpty(field))
+					_localizations.Add(EnumUtility.ParseEnum<Language>(field),new Dictionary<string, string>());
+			}
+			yield return null;
 
-                StringReader strReader = new StringReader(asset.text);
+			for(int index = 0; index < map.Contents.Count; index++)
+			{
+				for(sub = 1; sub < map.Headers.Count; sub++)
+				{
+					field = map.Headers[sub];
+					if(!string.IsNullOrEmpty(field))
+						_localizations[EnumUtility.ParseEnum<Language>(field)].
+							Add(map.Contents[index][map.Headers[0]],map.Contents[index][map.Headers[sub]]);
+				}
+				yield return null;
+			}
 
-                using (_reader = XmlReader.Create(strReader))
-                {
-                    _reader.ReadToDescendant("Classes");
+            FinishLanguageChange();
 
-                    XmlReader subReader = _reader.ReadSubtree();
-                    while (subReader.ReadToFollowing("Class"))
-                    {
-                        var viewName = subReader.GetAttribute("name");
+			SetToggle();
 
-                        if (!_gameText.ContainsKey(viewName))
-                            _gameText.Add(viewName, new Dictionary<string, string>());
-
-                        XmlReader classReader = subReader.ReadSubtree();
-                        while (classReader.ReadToFollowing("Variable"))
-                        {
-                            string content = "", name = "";
-                            classReader.MoveToAttribute("name");
-
-                            name = subReader.Value;
-                            classReader.MoveToContent();
-                            content = subReader.ReadString();
-                            classReader.MoveToElement();
-
-                            //Debug.Log(viewName + " " + name + " " + content);
-
-                            _gameText[viewName].Add(name, content);
-                        }
-                        classReader.Close();
-
-                        yield return null;
-                    }
-                    subReader.Close();
-
-                    //read in other application specific data here
-                }
-
-                FinishLanguageChange();
-
-                LoadAlert.Instance.Done();
-            }
-            else
-            {
-                LoadAlert.Instance.Done();
-                LoadTimeout();
-            }
+            LoadAlert.Instance.Done();
         }
 
-        public Dictionary<string, string> GetVariableText(string key)
-        {
-            return (_gameText.ContainsKey(key)) ? _gameText[key] : new Dictionary<string,string>();
-        }
         void FinishLanguageChange()
         {
             if (languageChanged != null)
-                languageChanged();
+                languageChanged(_localizations[_currentLanguage]);
 
             Save();
 
@@ -274,7 +189,7 @@ namespace gametheory.Localization
             {
                 _currentLanguage = language;
 
-                StartCoroutine(LoadLocalizationCoroutine());
+				FinishLanguageChange();
             }
     	}
         void LoadTimeout()

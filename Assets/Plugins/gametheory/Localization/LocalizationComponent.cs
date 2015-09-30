@@ -11,13 +11,11 @@ namespace gametheory.Localization
     public class LocalizationComponent : MonoBehaviour 
     {
     	#region Public Variables
-        public MonoBehaviour _targetObject;
+        public MonoBehaviour TargetObject;
     	#endregion 
 
     	#region Private Variables
         System.Type _targetType;
-
-    	Dictionary<string, string> _text;
     	#endregion
 
     	#region Unity Methods
@@ -25,7 +23,7 @@ namespace gametheory.Localization
         {
             LocalizationDictionary.languageChanged += AssignText;
 
-            _targetType = _targetObject.GetType();
+            _targetType = TargetObject.GetType();
         }
         void OnDestroy()
         {
@@ -33,11 +31,9 @@ namespace gametheory.Localization
         }
     	#endregion
 
-    	#region Methods
-        void AssignText()
+    	#region Event Listeners
+        void AssignText(Dictionary<string,string> content)
         {
-            _text = LocalizationDictionary.Instance.GetVariableText(_targetType.Name);
-
             foreach (var prop in _targetType.GetFields())
             {
                 if (prop.FieldType == typeof(string))
@@ -45,16 +41,17 @@ namespace gametheory.Localization
                     var attrs = (LocalizationKey[])prop.GetCustomAttributes
                         (typeof(LocalizationKey),false);
 
-                    if (attrs.Length > 0 && _text.ContainsKey(attrs[0].Key))
+                    if (attrs.Length > 0)
                     {
                         //Debug.Log(_text[attrs[0].Key]);
-                        prop.SetValue(_targetObject, _text[attrs[0].Key]);
+						if(content.ContainsKey(attrs[0].Key))
+                        	prop.SetValue(TargetObject, content[attrs[0].Key]);
                     }
                 }
             }
 
             //Tell the target object that it's localized data has changed
-            _targetObject.SendMessage("LanguageChanged", SendMessageOptions.DontRequireReceiver);
+            TargetObject.SendMessage("LanguageChanged", SendMessageOptions.DontRequireReceiver);
         }
     	#endregion
     }
