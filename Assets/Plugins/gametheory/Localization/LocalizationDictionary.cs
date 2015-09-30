@@ -45,11 +45,11 @@ namespace gametheory.Localization
     	public string BaseFileName="Localizations";
     	public Language DefaultLanguage;
 
-        public LanguageToggle _english;
-        public LanguageToggle _french;
-        public LanguageToggle _spanish;
-        public LanguageToggle _italian;
-        public LanguageToggle _german;
+        public LanguageToggle English;
+        public LanguageToggle French;
+        public LanguageToggle Spanish;
+        public LanguageToggle Italian;
+        public LanguageToggle German;
 
         public static LocalizationDictionary Instance = null;
     	#endregion
@@ -98,6 +98,8 @@ namespace gametheory.Localization
 
             if (string.IsNullOrEmpty(lang))
                 _currentLanguage = DefaultLanguage;
+			else
+				_currentLanguage = EnumUtility.ParseEnum<Language>(lang);
 
 			StartCoroutine(LoadLocalizationCoroutine());
         }
@@ -110,23 +112,25 @@ namespace gametheory.Localization
         {
             switch (_currentLanguage)
             {
-                case Language.English:
-                    _english.IsOn = true;
-                    break;
                 case Language.French:
-                    _french.IsOn = true;
+					if(French)
+	                    French.IsOn = true;
                     break;
                 case Language.German:
-                    _german.IsOn = true;
+					if(German)
+	                    German.IsOn = true;
                     break;
                 case Language.Italian:
-                    _italian.IsOn = true;
+					if(Italian)
+	                    Italian.IsOn = true;
                     break;
                 case Language.Spanish:
-                    _spanish.IsOn = true;
+					if(Spanish)
+	                    Spanish.IsOn = true;
                     break;
                 default:
-                    _english.IsOn = true;
+					if(English)
+	                    English.IsOn = true;
                     break;
             }
         }
