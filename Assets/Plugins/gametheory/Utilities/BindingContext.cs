@@ -5,7 +5,7 @@ using System;
 using System.Collections;
 using System.Reflection;
 
-namespace gametheory.UI
+namespace gametheory
 {
 	public interface IBindingContext  
 	{

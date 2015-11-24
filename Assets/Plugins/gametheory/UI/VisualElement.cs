@@ -1,6 +1,8 @@
 //#define LOG
 using UnityEngine;
 
+using System.Collections.Generic;
+
 namespace gametheory.UI
 {
     /// <summary>
@@ -22,7 +24,9 @@ namespace gametheory.UI
     	#region Protected Variables
     	//Determines if the element is currently active
     	protected bool _active;
-        protected bool _previousEnabledState;
+		protected bool _previousEnabledState;
+		protected IBindingContext _context;
+		protected Dictionary<string,Binding> _bindings;
     	#endregion
 
     	#region Private Variables
@@ -142,7 +146,14 @@ namespace gametheory.UI
                 Animator = GetComponent<Animator>();
         }
 
-        protected virtual void OnCleanUp(){}
+        protected virtual void OnCleanUp()
+		{
+			if(_context != null)
+				_context.propertyChanged -= OnPropertyChanged;
+			
+			if(_bindings != null)
+				_bindings.Clear();
+		}
 
         protected virtual void OnPresent()
         {
@@ -166,6 +177,32 @@ namespace gametheory.UI
             Debug.Log(name + " : " + display);
             #endif
         }
+		public virtual void SetContext(object obj)
+		{
+			if(obj is IBindingContext)
+			{
+				_context = obj as IBindingContext;
+				_context.propertyChanged += OnPropertyChanged;
+			}
+		}
+		protected virtual void SetBinding(string propName, Binding binding)
+		{
+			if(_bindings == null)
+				_bindings = new Dictionary<string, Binding>();
+			
+			if(_bindings.ContainsKey(propName))
+				_bindings[propName] = binding;
+			else
+				_bindings.Add(propName,binding);
+		}
+		protected virtual void OnPropertyChanged(object obj, string propName)
+		{
+			if(_bindings != null)
+			{
+				if(_bindings.ContainsKey(propName))
+					_bindings[propName].PropertyChanged(obj,obj.GetType().GetProperty(propName));
+			}
+		}
         #endregion
     }
 }

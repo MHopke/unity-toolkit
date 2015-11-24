@@ -24,6 +24,7 @@
 		public virtual void Setup(object obj)
 		{
 			_obj = obj;
+			SetContext(obj);
 		}
 		protected virtual void OnSelected(){}
 		#endregion

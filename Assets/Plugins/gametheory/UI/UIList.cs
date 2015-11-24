@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+
 using System.Collections.Generic;
 
 namespace gametheory.UI
@@ -26,6 +27,10 @@ namespace gametheory.UI
 
         #region Private Vars
         int _endOfOriginalItems;
+
+		VisualElement _itemPrefab;
+
+		ObservableList<object> _listContext;
         #endregion
 
         #region Overriden Methods
@@ -45,6 +50,16 @@ namespace gametheory.UI
             else
                 ListItems = new List<VisualElement>();
         }
+		protected override void OnCleanUp ()
+		{
+			if(_listContext != null)
+			{
+				_listContext.itemChanged -= ItemChanged;
+				_listContext.cleared -= ListCleared;
+			}
+
+			base.OnCleanUp ();
+		}
         protected override void OnPresent ()
 		{
 			base.OnPresent ();
@@ -115,7 +130,7 @@ namespace gametheory.UI
             element.Init();
 
 			ListElement temp = element as ListElement;
-			if(element != null)
+			if(temp != null)
 				temp.selected += ItemSelected;
 
             if(_active)
@@ -123,6 +138,29 @@ namespace gametheory.UI
             else
                 element.PresentVisuals(false);
         }
+		public void AddItem(object obj)
+		{
+			DeactivateEmptyItem();
+
+			VisualElement element = (VisualElement)GameObject.Instantiate(_itemPrefab,Vector3.zero,Quaternion.identity);
+
+			(element.transform as RectTransform).SetParent(Scroll.content,false);
+			ListItems.Add(element);
+			
+			element.Init();
+			
+			ListElement temp = element as ListElement;
+			if(temp != null)
+			{
+				temp.Setup(obj);
+				temp.selected += ItemSelected;
+			}
+			
+			if(_active)
+				element.Present();
+			else
+				element.PresentVisuals(false);
+		}
         public void AddListElements(List<VisualElement> elements)
         {
             DeactivateEmptyItem();
@@ -221,6 +259,32 @@ namespace gametheory.UI
 			if(itemSelected != null)
 				itemSelected(obj);
 		}
+
+		public void SetItemPrefab(VisualElement element)
+		{
+			_itemPrefab = element;
+		}
+
+		public void SetContext(ObservableList<object> list)
+		{
+			_listContext = list;
+			_listContext.itemChanged += ItemChanged;
+			_listContext.cleared += ListCleared;
+		}
         #endregion
+
+		#region Event Listeners
+		void ItemChanged(int index, object obj)
+		{
+			if(obj == null)
+				RemoveListElement(index);
+			else if(ListItems.Count < index)
+				AddItem(obj);
+		}
+		void ListCleared()
+		{
+			ClearElements();
+		}
+		#endregion
     }
 }
