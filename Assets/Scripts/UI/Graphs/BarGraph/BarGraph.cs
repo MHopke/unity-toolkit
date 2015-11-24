@@ -40,5 +40,11 @@ public class BarGraph : Graph
     {
         TitleText.Text = title;
     }
+	public override void ClearData()
+	{
+		base.ClearData();
+		
+		Bars.Clear();
+	}
     #endregion
 }

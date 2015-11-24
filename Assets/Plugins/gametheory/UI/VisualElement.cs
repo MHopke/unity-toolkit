@@ -14,6 +14,7 @@ namespace gametheory.UI
     	//Used in situations when an element should be hidden by default
         public bool SkipUIViewActivation;
         public bool StartsDisabled;
+		public bool InSubGroup;
 
         public Animator Animator;
     	#endregion

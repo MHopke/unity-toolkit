@@ -32,6 +32,7 @@ namespace gametheory.UI
         public bool Animates;
         public bool SkipActivation;
         public bool DelayedDeactivation;
+		public bool LoadedFromResources;
 
         public string AnimationInKey;
         public string AnimationOutKey;
@@ -72,8 +73,14 @@ namespace gametheory.UI
             {
                 VisualElement[] ui = GetComponentsInChildren<VisualElement>();
 
+				VisualElement element = null;
                 for (int i = 0; i < ui.Length; i++)
-                    Elements.Add(ui[i]);
+				{
+					element = ui[i];
+
+					if(element != null && !element.InSubGroup)
+                    	Elements.Add(ui[i]);
+				}
             }
 
             OnInit();
@@ -272,6 +279,15 @@ namespace gametheory.UI
         #endregion
 
         #region Other Methods
+		public static UIView Load(string path)
+		{
+			UIView obj = (UIView)GameObject.Instantiate(Resources.Load<UIView>(path),Vector3.zero,Quaternion.identity);
+			(obj.transform as RectTransform).SetParent(UIViewController.CanvasTransform,false);
+			
+			obj.Initialize();
+			
+			return obj;
+		}
         public void AddUIElement(VisualElement element, bool activate)
         {
             Elements.Add(element);
@@ -355,6 +371,9 @@ namespace gametheory.UI
             gameObject.SetActive(false);
 
             TransitionOutEvent();
+
+			if(LoadedFromResources)
+				Destroy(gameObject);
 
             #if LOG
             Debug.Log(name + " deactivated.");

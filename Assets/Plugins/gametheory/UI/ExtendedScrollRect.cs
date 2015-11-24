@@ -8,7 +8,6 @@ namespace gametheory.UI
 	{
 	    #region Public Vars
 	    public ScrollRect ScrollRect;
-	    public Image MaskImage;
 	    #endregion
 
 	    #region Overriden Methods
@@ -18,9 +17,6 @@ namespace gametheory.UI
 
 	        if (!ScrollRect)
 	            ScrollRect = GetComponent<ScrollRect>();
-
-	        if (!MaskImage)
-	            MaskImage = GetComponent<Image>();
 	    }
 	    /*protected override void Enabled()
 	    {
@@ -66,9 +62,6 @@ namespace gametheory.UI
 	            if (ScrollRect.verticalScrollbar)
 	                ScrollRect.verticalScrollbar.interactable = display;
 	        }
-
-	        if (MaskImage)
-	            MaskImage.enabled = display;
 	    }
 	    #endregion
 	}

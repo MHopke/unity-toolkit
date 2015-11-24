@@ -37,8 +37,6 @@ public class AppNavigationController : UIViewController
     public UIView CurrentView;
     public UIView NavView;
     public UIView TopView;
-
-    public static AppNavigationController Navigation = null;
     #endregion
 
     #region Private Vars
@@ -61,8 +59,6 @@ public class AppNavigationController : UIViewController
     protected override void OnActivate()
     {
         base.OnActivate();
-
-        Navigation = this;
 
         /*if(_backButton)
             _defaultBack = _backButton._button.image.sprite;*/
@@ -272,4 +268,11 @@ public class AppNavigationController : UIViewController
         confirmedBack = null;
     }
     #endregion
+
+	#region Properties
+	public AppNavigationController Navigation
+	{
+		get { return Instance as AppNavigationController; }
+	}
+	#endregion
 }

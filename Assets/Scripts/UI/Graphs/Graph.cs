@@ -155,7 +155,26 @@ public class Graph : MonoBehaviour
     #region Virtual Methods
     public virtual void OnInitialize(){}
     public virtual void CleanUp(){}
-    public virtual void ClearData(){}
+	public virtual void ClearData()
+	{
+		_seriesDisplayed = 0;
+		
+		int sub = 0;
+		GraphData[] series = null;
+		GraphData data = null;
+		for(int index = 0; index < _seriesData.Count; index++)
+		{
+			series = _seriesData[index];
+			
+			for (sub = 0; sub < series.Length; sub++)
+			{
+				data = series[sub];
+				data.Label = "";
+				data.Value = 0f;
+				data.Date = DateTime.MinValue;
+			}
+		}
+	}
 
     protected virtual void OnSetData(params GraphData[] data){}
     protected virtual void OnSetValues(params float[] data){}

@@ -42,5 +42,15 @@ public class BarLayout : MonoBehaviour
             _sections[i]._label.text = labels[i];
         }
     }
+	public void Clear()
+	{
+		BarGraphSection section = null;
+		for (int index = 0; index < _sections.Length; index++)
+		{
+			section = _sections[index];
+			section.SetLabel("");
+			section.Fill(0f);
+		}
+	}
     #endregion
 }
