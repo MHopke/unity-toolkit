@@ -148,16 +148,18 @@ namespace gametheory.Utilities
             {
                 for (int index = 1; index < rows.Length; index++)
                 {
-					string[] row = rows[index].Split(COLUMN);
-					
-					Dictionary<string,string> dict =new Dictionary<string, string>();
-
-					for(int sub = 0; sub < Headers.Count; sub++)
+					if(!string.IsNullOrEmpty(rows[index]))
 					{
-						dict.Add(Headers[sub],row[sub]);
+						string[] row = rows[index].Split(COLUMN);
+						
+						Dictionary<string,string> dict =new Dictionary<string, string>();
+						for(int sub = 0; sub < Headers.Count; sub++)
+						{
+							dict.Add(Headers[sub],row[sub]);
+						}
+						
+						Contents.Add(dict);
 					}
-
-					Contents.Add(dict);
                 }
             }
     	}
