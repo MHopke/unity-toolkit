@@ -34,7 +34,8 @@ namespace gametheory.Localization
     	#region Event Listeners
         void AssignText(Dictionary<string,string> content)
         {
-            foreach (var prop in _targetType.GetFields())
+			foreach (var prop in _targetType.GetFields(BindingFlags.Instance|BindingFlags.NonPublic
+				|BindingFlags.Public|BindingFlags.Static))
             {
                 if (prop.FieldType == typeof(string))
                 {
