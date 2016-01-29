@@ -10,7 +10,12 @@ namespace gametheory.Localization
     /// </summary>
     public class LocalizationComponent : MonoBehaviour 
     {
-    	#region Public Variables
+		#region Events
+		public event System.Action componentLocalized;
+		#endregion
+
+		#region Public Variables
+		public bool SetOnAwake;
         public MonoBehaviour TargetObject;
     	#endregion 
 
@@ -24,12 +29,22 @@ namespace gametheory.Localization
             LocalizationDictionary.languageChanged += AssignText;
 
             _targetType = TargetObject.GetType();
+
+			if(SetOnAwake)
+				PullData();
         }
         void OnDestroy()
         {
             LocalizationDictionary.languageChanged -= AssignText;
         }
     	#endregion
+
+		#region Methods
+		public void PullData()
+		{
+			AssignText(LocalizationDictionary.Instance.GetCurrentLocalization());
+		}
+		#endregion
 
     	#region Event Listeners
         void AssignText(Dictionary<string,string> content)
@@ -51,8 +66,20 @@ namespace gametheory.Localization
                 }
             }
 
-            //Tell the target object that it's localized data has changed
-            TargetObject.SendMessage("LanguageChanged", SendMessageOptions.DontRequireReceiver);
+			//if(componentLocalized != null)
+			//	componentLocalized();
+			//Tell the target object that it's localized data has changed
+			bool wasInactive = false;
+			if(!gameObject.activeSelf)
+			{
+				gameObject.SetActive(true);
+				wasInactive = true;
+			}
+
+			TargetObject.SendMessage("LanguageChanged", SendMessageOptions.DontRequireReceiver);
+
+			if(wasInactive)
+				gameObject.SetActive(false);
         }
     	#endregion
     }

@@ -92,7 +92,7 @@ namespace gametheory.Localization
     	#endregion
 
     	#region Methods
-        public void Load()
+		public void Load()
         {
             string lang = PlayerPrefs.GetString(LANGUAGE_KEY, "");
 
@@ -135,10 +135,22 @@ namespace gametheory.Localization
             }
         }
 
+		public Dictionary<string,string> GetCurrentLocalization()
+		{
+			return _localizations[_currentLanguage];
+		}
+
+		public string GetSpecificLocalization(string key)
+		{
+			Dictionary<string,string> localization = _localizations[_currentLanguage];
+			if(localization.ContainsKey(key))
+				return localization[key];
+			else
+				return key;
+		}
+
         public IEnumerator LoadLocalizationCoroutine()
         {
-            LoadAlert.Instance.StartLoad(LOADING_LANGUAGE, LoadTimeout, 1.0f, 15.0f, 0.15f);
-
 			_localizations = new Dictionary<Language, Dictionary<string, string>>();
 			
 			CSVMap map = new CSVMap(BaseFileName);

@@ -185,7 +185,7 @@ namespace gametheory.UI
 				_context.propertyChanged += OnPropertyChanged;
 			}
 		}
-		protected virtual void SetBinding(string propName, Binding binding)
+		public virtual void SetBinding(string propName, Binding binding)
 		{
 			if(_bindings == null)
 				_bindings = new Dictionary<string, Binding>();

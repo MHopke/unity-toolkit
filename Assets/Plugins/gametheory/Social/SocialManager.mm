@@ -19,7 +19,7 @@ extern "C"
         {
             SLComposeViewController *tweetSheet = [SLComposeViewController
                                                    composeViewControllerForServiceType:SLServiceTypeTwitter];
-            [tweetSheet setInitialText:[[[NSString alloc] initWithUTF8String:postMessage] autorelease]];
+            [tweetSheet setInitialText:[[NSString alloc] initWithUTF8String:postMessage]];
             
             [GetAppController().rootViewController presentViewController:tweetSheet animated:YES completion:nil];
             //[GetAppController().rootViewController presentViewController:tweetSheet animated:YES completion:nil];
@@ -36,7 +36,7 @@ extern "C"
         {
             SLComposeViewController *statusSheet = [SLComposeViewController
                                                     composeViewControllerForServiceType:SLServiceTypeFacebook];
-            [statusSheet setInitialText:[[[NSString alloc] initWithUTF8String:status] autorelease]];
+            [statusSheet setInitialText:[[NSString alloc] initWithUTF8String:status]];
             [GetAppController().rootViewController presentViewController:statusSheet animated:YES completion:nil];
             /*if ([statusSheet respondsToSelector:@selector(popoverPresentationController)])
             {

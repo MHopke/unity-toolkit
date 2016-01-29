@@ -336,6 +336,11 @@ static public class Helper
         else
             return "<color=#39C4E5>" + colorSection + "</color>" + mainString;
     }
+
+	public static string ReplaceValue(string baseStr, object value,string delim="{x}")
+	{
+		return baseStr.Replace(delim,value.ToString());
+	}
     public static string InsertValuesIntoString(string baseString, params object[] values)
     {
         string newString = "";

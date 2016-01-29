@@ -20,6 +20,10 @@ namespace gametheory.UI
     	#endregion
 
 		#region Unity Methods
+		void Awake()
+		{
+			OnAwake();	
+		}
 		void Start()
 		{
             enabled = false;
@@ -155,6 +159,7 @@ namespace gametheory.UI
     	#endregion
 
         #region Virtual Methods
+		protected virtual void OnAwake(){}
         protected virtual void OnActivate()
         {
 			if(CanvasTransform == null)

@@ -27,7 +27,14 @@ namespace gametheory.UI
         }
         #endregion
 
-        #region Accessors
+		#region Methods
+		public void SetTextBinding(string propName, string format="{0}")
+		{
+			SetBinding(propName,new TextBinding(Label,format));
+		}
+		#endregion
+
+        #region Propeties
         public string Text
         {
             get { return ((Label) ? Label.text : ""); }

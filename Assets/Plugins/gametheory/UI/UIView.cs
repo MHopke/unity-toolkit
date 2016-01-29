@@ -41,7 +41,7 @@ namespace gametheory.UI
 
         public Animator Animator;
 
-        public CanvasGroup CanvasGroup;
+		public CanvasGroup CanvasGroup;
 
     	public List<VisualElement> Elements;
     	#endregion

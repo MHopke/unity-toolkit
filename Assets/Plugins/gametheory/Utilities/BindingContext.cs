@@ -70,4 +70,28 @@ namespace gametheory
 		}
 		#endregion
 	}
+
+	public class FuncBinding : Binding
+	{
+		#region Private Vars
+		Action _func;
+		#endregion
+
+		#region Constructors
+		public FuncBinding(Action callback) : base(null)
+		{
+			_func = callback;
+		}
+		#endregion
+
+		#region Overridden Methods
+		public override void PropertyChanged (object obj, PropertyInfo info)
+		{
+			base.PropertyChanged (obj, info);
+
+			if(_func != null)
+				_func();
+		}
+		#endregion
+	}
 }
