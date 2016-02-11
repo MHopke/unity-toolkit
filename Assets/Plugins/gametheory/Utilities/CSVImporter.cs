@@ -46,15 +46,21 @@ namespace gametheory.Utilities
 
 					header = "";
 
-					object[] att = System.Attribute.GetCustomAttributes(info,typeof(CSVColumn),true);
+					object att = System.Attribute.GetCustomAttribute(info,typeof(CSVColumn),true);
+					object converter = System.Attribute.GetCustomAttribute(info,typeof(IColumnConverter),true);
 					//Debug.Log(att.Length);
 
-					if(att.Length > 0)
+					if(att != null)
 					{
-						header = (att[0] as CSVColumn).Name;
+						header = (att as CSVColumn).Name;
+
 						if(map.Headers.Contains(header))
 						{
-							info.SetValue(obj,Convert.ChangeType(map.Contents[index][header],info.PropertyType) ,null);
+
+							if(converter != null)
+								info.SetValue(obj,(converter as IColumnConverter).Convert(map.Contents[index][header]) ,null);
+							else
+								info.SetValue(obj,Convert.ChangeType(map.Contents[index][header],info.PropertyType) ,null);
 						}
 
 						hasInfo = true;
@@ -67,14 +73,20 @@ namespace gametheory.Utilities
 
 					header = "";
 
-					object[] att = System.Attribute.GetCustomAttributes(fInfo,typeof(CSVColumn),true);
+					object att = System.Attribute.GetCustomAttribute(fInfo,typeof(CSVColumn),true);
+					object converter = System.Attribute.GetCustomAttribute(fInfo,typeof(IColumnConverter),true);
+					//Debug.Log(att.Length);
 
-					if(att.Length > 0)
+					if(att != null)
 					{
-						header = (att[0] as CSVColumn).Name;
+						header = (att as CSVColumn).Name;
+
 						if(map.Headers.Contains(header))
 						{
-							fInfo.SetValue(obj,Convert.ChangeType(map.Contents[index][header],fInfo.FieldType));
+							if(converter != null)
+								fInfo.SetValue(obj,(converter as IColumnConverter).Convert(map.Contents[index][header]));
+							else
+								fInfo.SetValue(obj,Convert.ChangeType(map.Contents[index][header],fInfo.FieldType));
 						}
 						hasInfo = true;
 					}
@@ -126,15 +138,21 @@ namespace gametheory.Utilities
 
 					header = "";
 
-					object[] att = System.Attribute.GetCustomAttributes(info,typeof(CSVColumn),true);
+					object att = System.Attribute.GetCustomAttribute(info,typeof(CSVColumn),true);
+					object converter = System.Attribute.GetCustomAttribute(info,typeof(IColumnConverter),true);
 					//Debug.Log(att.Length);
 
-					if(att.Length > 0)
+					if(att != null)
 					{
-						header = (att[0] as CSVColumn).Name;
+						header = (att as CSVColumn).Name;
+
 						if(map.Headers.Contains(header))
 						{
-							info.SetValue(obj,Convert.ChangeType(map.Contents[index][header],info.PropertyType) ,null);
+
+							if(converter != null)
+								info.SetValue(obj,(converter as IColumnConverter).Convert(map.Contents[index][header]) ,null);
+							else
+								info.SetValue(obj,Convert.ChangeType(map.Contents[index][header],info.PropertyType) ,null);
 						}
 
 						hasInfo = true;
@@ -147,14 +165,21 @@ namespace gametheory.Utilities
 
 					header = "";
 
-					object[] att = System.Attribute.GetCustomAttributes(fInfo,typeof(CSVColumn),true);
+					object att = System.Attribute.GetCustomAttribute(fInfo,typeof(CSVColumn),true);
+					object converter = System.Attribute.GetCustomAttribute(fInfo,typeof(IColumnConverter),true);
+					//Debug.Log(att.Length);
 
-					if(att.Length > 0)
+					if(att != null)
 					{
-						header = (att[0] as CSVColumn).Name;
+						header = (att as CSVColumn).Name;
+
 						if(map.Headers.Contains(header))
 						{
-							fInfo.SetValue(obj,Convert.ChangeType(map.Contents[index][header],fInfo.FieldType));
+
+							if(converter != null)
+								fInfo.SetValue(obj,(converter as IColumnConverter).Convert(map.Contents[index][header]));
+							else
+								fInfo.SetValue(obj,Convert.ChangeType(map.Contents[index][header],fInfo.FieldType));
 						}
 						hasInfo = true;
 					}
@@ -265,6 +290,44 @@ namespace gametheory.Utilities
 		public CSVColumn(string name)
 		{
 			Name = name;
+		}
+		#endregion
+	}
+
+	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field,Inherited = true)]
+	public abstract class IColumnConverter : Attribute
+	{
+		#region P Vars
+		protected Type _type;
+		#endregion
+
+		#region Constructors
+		public IColumnConverter(Type type)
+		{
+			_type = type;
+		}
+		#endregion
+
+		#region Methods
+		public virtual object Convert(object obj)
+		{
+			return obj;
+		}
+		#endregion
+	}
+
+	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field,Inherited = true)]
+	public class EnumConverter : IColumnConverter
+	{
+		#region Constructors
+		public EnumConverter(Type type) : base(type){}
+		#endregion
+
+		#region Methods
+		public override object Convert(object obj)
+		{
+			Debug.Log(obj);
+			return Enum.Parse(_type,(string)obj);
 		}
 		#endregion
 	}
