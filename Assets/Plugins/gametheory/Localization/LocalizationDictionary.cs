@@ -45,12 +45,6 @@ namespace gametheory.Localization
     	public string BaseFileName="Localizations";
     	public Language DefaultLanguage;
 
-        public LanguageToggle English;
-        public LanguageToggle French;
-        public LanguageToggle Spanish;
-        public LanguageToggle Italian;
-        public LanguageToggle German;
-
         public static LocalizationDictionary Instance = null;
     	#endregion
 
@@ -108,32 +102,6 @@ namespace gametheory.Localization
             PlayerPrefs.SetString(LANGUAGE_KEY, _currentLanguage.ToString());
             PlayerPrefs.Save();
         }
-        void SetToggle()
-        {
-            switch (_currentLanguage)
-            {
-                case Language.French:
-					if(French)
-	                    French.IsOn = true;
-                    break;
-                case Language.German:
-					if(German)
-	                    German.IsOn = true;
-                    break;
-                case Language.Italian:
-					if(Italian)
-	                    Italian.IsOn = true;
-                    break;
-                case Language.Spanish:
-					if(Spanish)
-	                    Spanish.IsOn = true;
-                    break;
-                default:
-					if(English)
-	                    English.IsOn = true;
-                    break;
-            }
-        }
 
 		public Dictionary<string,string> GetCurrentLocalization()
 		{
@@ -180,8 +148,6 @@ namespace gametheory.Localization
 
             FinishLanguageChange();
 
-			SetToggle();
-
             LoadAlert.Instance.Done();
         }
 
@@ -195,19 +161,20 @@ namespace gametheory.Localization
             _cultureInfo = CultureInfo.GetCultureInfo(CultureString);
             _dateTimeFormatInfo = DateTimeFormatInfo.GetInstance(_cultureInfo);
         }
+
+		public void SetCurrentLanguage(Language language)
+		{
+			//Debug.Log(language);
+			if (language != _currentLanguage)
+			{
+				_currentLanguage = language;
+
+				FinishLanguageChange();
+			}
+		}
     	#endregion
 
     	#region Event Hooks
-    	void SetCurrentLanguage(Language language)
-    	{
-            //Debug.Log(language);
-            if (language != _currentLanguage)
-            {
-                _currentLanguage = language;
-
-				FinishLanguageChange();
-            }
-    	}
         void LoadTimeout()
         {
             DefaultAlert.Present(LANGUAGE_ERROR_HEADER, LANGUAGE_ERROR_BODY, null, null);
@@ -246,6 +213,10 @@ namespace gametheory.Localization
         {
             get { return _cultureInfo; }
         }
+		public Language CurrentLanguage
+		{
+			get { return _currentLanguage; }
+		}
         #endregion
     }
 }
