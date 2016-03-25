@@ -9,7 +9,7 @@ namespace gametheory.Localization
     public class LanguageDropdown : ExtendedDropdown 
     {
         #region Private Vars
-        List<Language> _languages;
+        List<SystemLanguage> _languages;
         #endregion
 
         #region Overridden Methods
@@ -17,13 +17,7 @@ namespace gametheory.Localization
         {
             base.OnInit();
 
-            _languages = new List<Language>();
-            var enums = EnumUtility.GetValues<Language>();
-
-            for(int index = 0; index < enums.Length; index++)
-            {
-                _languages.Add((Language)enums.GetValue(index));
-            }
+			_languages = LocalizationManager.Instance.SupportedLanguages;
         }
         protected override void OnPresent()
         {

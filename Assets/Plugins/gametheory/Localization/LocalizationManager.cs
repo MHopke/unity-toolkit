@@ -9,13 +9,6 @@ using gametheory.Utilities;
 
 namespace gametheory.Localization
 {
-    public enum Language
-    {
-    	English = 0,
-		Spanish,
-		Portugese,
-    }
-
     /// <summary>
     /// Manages language settings and loads new localizations when neccessary.
     /// </summary>
@@ -40,18 +33,18 @@ namespace gametheory.Localization
         #endregion
 
     	#region Public Variables
-    	public Language DefaultLanguage;
-
+		public List<SystemLanguage> SupportedLanguages;
         public static LocalizationManager Instance = null;
     	#endregion
 
     	#region Protected Variables
-		protected Language _currentLanguage = Language.English;
+		protected SystemLanguage _defaultLanguage;
+		protected SystemLanguage _currentLanguage;
 
         protected DateTimeFormatInfo _dateTimeFormatInfo;
         protected CultureInfo _cultureInfo;
 
-		protected LocalizationDictionary _localizations;
+		protected Dictionary<string,string> _stringContent;//LocalizationDictionary _localizations;
     	#endregion
 
 		#region Localization Strings
@@ -69,53 +62,28 @@ namespace gametheory.Localization
     	{
             if (Instance == null)
             {
-                LanguageToggle.changeLanguage += SetCurrentLanguage;
+				_defaultLanguage = Application.systemLanguage;
 
                 Instance = this;
 
-				ConvertSystemLanguage(Application.systemLanguage);
-
-				_localizations = new LocalizationDictionary();
+				_stringContent = new Dictionary<string, string>();//_localizations = new LocalizationDictionary();
             }
             else
                 Destroy(gameObject);
     	}
-        void OnDestroy()
-        {
-            LanguageToggle.changeLanguage -= SetCurrentLanguage;
-        }
     	#endregion
 
     	#region Methods
-		void ConvertSystemLanguage(SystemLanguage lang)
-		{
-			switch(lang)
-			{
-			case SystemLanguage.English:
-				DefaultLanguage = Language.English;
-				break;
-			case SystemLanguage.Spanish:
-				DefaultLanguage = Language.Spanish;
-				break;
-			case SystemLanguage.Portuguese:
-				DefaultLanguage = Language.Portugese;
-				break;
-			default:
-				DefaultLanguage = Language.English;
-				break;
-			}
-		}
-
 		public void Load()
         {
             string lang = PlayerPrefs.GetString(LANGUAGE_KEY, "");
 
             if (string.IsNullOrEmpty(lang))
-                _currentLanguage = DefaultLanguage;
+                _currentLanguage = _defaultLanguage;
 			else
-				_currentLanguage = EnumUtility.ParseEnum<Language>(lang);
+				_currentLanguage = EnumUtility.ParseEnum<SystemLanguage>(lang);
 
-			LoadLocalizations();
+			LoadLocalization();
         }
         void Save()
         {
@@ -125,86 +93,45 @@ namespace gametheory.Localization
 
 		public Dictionary<string,string> GetCurrentLocalization()
 		{
-			return _localizations.GetLocalization(_currentLanguage);
+			return _stringContent;//_localizations.GetLocalization(_currentLanguage);
 		}
 
 		public string GetSpecificLocalization(string key)
 		{
-			Dictionary<string,string> localization = _localizations.GetLocalization(_currentLanguage);
-			if(localization.ContainsKey(key))
-				return localization[key];
+			if(_stringContent.ContainsKey(key))
+				return _stringContent[key];
 			else
 				return key;
 		}
 
-        public void LoadLocalizations()
+        public void LoadLocalization()
         {
-			_localizations = new LocalizationDictionary();
-			
-			CSVMap map = new CSVMap(FILE_PATH);
-			
-			int sub = 0;
-			string field = "";
-
-			for(sub = 1; sub < map.Headers.Count; sub++)
-		    {
-				field = map.Headers[sub];
-				if(!string.IsNullOrEmpty(field))
-					_localizations.AddLanguage(EnumUtility.ParseEnum<Language>(field),
-						new Dictionary<string, string>());
-			}
-
-			for(int index = 0; index < map.Contents.Count; index++)
-			{
-				for(sub = 1; sub < map.Headers.Count; sub++)
-				{
-					field = map.Headers[sub];
-					if(!string.IsNullOrEmpty(field))
-						_localizations.AddKeyToLanguage(EnumUtility.ParseEnum<Language>(field),
-							map.Contents[index][map.Headers[0]],map.Contents[index][map.Headers[sub]]);
-				}
-			}
+			_stringContent = CreateDictionary(FILE_PATH);
 
 			OnLoadLocalizations();
 
             FinishLanguageChange();
         }
 
-		public static LocalizationDictionary CreateLocalizationDictionary(string path)
+		public static Dictionary<string,string> CreateDictionary(string path)
 		{
-			LocalizationDictionary localizations = new LocalizationDictionary();
+			Dictionary<string,string> dict = new Dictionary<string,string>();
 
 			CSVMap map = new CSVMap(path);
 
-			int sub = 0;
-			string field = "";
+			int index = 0, langIndex =0;;
+			string field = "", langStr = Instance._currentLanguage.ToString();
 
-			for(sub = 1; sub < map.Headers.Count; sub++)
-			{
-				field = map.Headers[sub];
-				if(!string.IsNullOrEmpty(field))
-					localizations.AddLanguage(EnumUtility.ParseEnum<Language>(field),
-						new Dictionary<string, string>());
-			}
+			for(index = 0; index < map.Contents.Count; index++)
+				dict.Add(map.Contents[index][map.Headers[0]],map.Contents[index][langStr]);
 
-			for(int index = 0; index < map.Contents.Count; index++)
-			{
-				for(sub = 1; sub < map.Headers.Count; sub++)
-				{
-					field = map.Headers[sub];
-					if(!string.IsNullOrEmpty(field))
-						localizations.AddKeyToLanguage(EnumUtility.ParseEnum<Language>(field),
-						map.Contents[index][map.Headers[0]],map.Contents[index][map.Headers[sub]]);
-				}
-			}
-
-			return localizations;
+			return dict;
 		}
 
         void FinishLanguageChange()
         {
             if (languageChanged != null)
-				languageChanged(_localizations.GetLocalization(_currentLanguage));
+				languageChanged(_stringContent);
 
             Save();
 
@@ -212,14 +139,14 @@ namespace gametheory.Localization
             _dateTimeFormatInfo = DateTimeFormatInfo.GetInstance(_cultureInfo);
         }
 
-		public void SetCurrentLanguage(Language language)
+		public void SetCurrentLanguage(SystemLanguage language)
 		{
 			//Debug.Log(language);
 			if (language != _currentLanguage)
 			{
 				_currentLanguage = language;
 
-				FinishLanguageChange();
+				LoadLocalization();
 			}
 		}
     	#endregion
@@ -244,7 +171,7 @@ namespace gametheory.Localization
             get {
                 switch (_currentLanguage)
                 {
-                    case Language.English:
+                    case SystemLanguage.English:
                         return "en-US";
                     /*case Language.French:
                         return "fr-FR";
@@ -252,9 +179,9 @@ namespace gametheory.Localization
                         return "de-DE";
                     case Language.Italian:
                         return "it-IT";*/
-                    case Language.Spanish:
+				case SystemLanguage.Spanish:
                         return "es-ES";
-				case Language.Portugese:
+				case SystemLanguage.Portuguese:
 					return "pt-BR";
                     default:
                         return "en-US";
@@ -269,71 +196,10 @@ namespace gametheory.Localization
         {
             get { return _cultureInfo; }
         }
-		public Language CurrentLanguage
+		public SystemLanguage CurrentLanguage
 		{
 			get { return _currentLanguage; }
 		}
         #endregion
     }
-
-	public class LocalizationDictionary
-	{
-		#region Private Vars
-		Dictionary<Language,Dictionary<string,string>> _dict;
-		#endregion
-
-		#region Constructors
-		public LocalizationDictionary()
-		{
-			_dict = new Dictionary<Language, Dictionary<string, string>>();
-		}
-		#endregion
-
-		#region Methods
-		public void AddLanguage(Language key, Dictionary<string,string> values)
-		{
-			_dict.Add(key,values);
-		}
-		public void AddKeyToLanguage(Language lang, string key, string value)
-		{
-			_dict[lang].Add(key,value);
-		}
-		public void AddNewKey(Language lang, string key, string value, bool otherLanguages=false)
-		{
-			foreach(KeyValuePair<Language,Dictionary<string,string>> pair in _dict)
-			{
-				if(pair.Key == lang)
-					pair.Value.Add(key,value);
-				else
-					pair.Value.Add(key,(otherLanguages) ? value :"");
-			}
-		}
-		public void UpdateKey(Language lang, string key, string value, bool keepOtherValues=false)
-		{
-			foreach(KeyValuePair<Language,Dictionary<string,string>> pair in _dict)
-			{
-				if(pair.Key == lang)
-					pair.Value[key] = value;
-				else if(!keepOtherValues)
-					pair.Value[key] = "";
-			}
-		}
-		public Dictionary<string,string> GetLocalization(Language lang)
-		{
-			if(_dict.ContainsKey(lang))
-				return _dict[lang];
-			else
-				return null;
-		}
-		public string GetValue(Language lang, string key)
-		{
-			if(!_dict.ContainsKey(lang))
-				return "";
-			else if(!_dict[lang].ContainsKey(key))
-				return "";
-			else
-				return _dict[lang][key];
-		}
-		#endregion
-	}
 }
