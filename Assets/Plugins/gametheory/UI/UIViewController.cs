@@ -15,7 +15,6 @@ namespace gametheory.UI
         public List<UIView> Views;
         public List<UIViewTransition> Transitions;
 
-		public static Transform CanvasTransform;
         public static UIViewController Instance = null;
     	#endregion
 
@@ -159,15 +158,18 @@ namespace gametheory.UI
     	#endregion
 
         #region Virtual Methods
-		protected virtual void OnAwake(){}
+		protected virtual void OnAwake()
+		{
+			for (int i = 0; i < Views.Count; i++)
+			{
+				Views[i].Initialize();
+			}
+		}
         protected virtual void OnActivate()
         {
-			if(CanvasTransform == null)
-				CanvasTransform = GameObject.FindGameObjectWithTag("Canvas").transform;
-
             for (int i = 0; i < Views.Count; i++)
             {
-                if (!Views[i].SkipActivation)
+                if (!Views[i].HiddenByDefault)
                     Views[i].Activate();
             }
         }

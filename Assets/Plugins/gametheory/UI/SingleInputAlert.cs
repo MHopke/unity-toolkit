@@ -2,7 +2,7 @@ using UnityEngine.UI;
 using gametheory.UI;
 using System.Collections;
 
-public class SingleInputAlert : UIView
+public class SingleInputAlert : UIAlert
 {
     #region Events
     static event System.Action<string> confirm;

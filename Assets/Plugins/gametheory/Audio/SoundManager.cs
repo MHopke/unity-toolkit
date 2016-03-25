@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-namespace gametheory
+namespace gametheory.Audio
 {
     /// <summary>
     /// Queues Sounds in a list and will play each one after

@@ -17,12 +17,12 @@ namespace gametheory
 	public class Binding
 	{
 		#region Private Vars
-		protected Graphic _graphic;
+		protected ICanvasElement _graphic;
 		#endregion
 
 		#region Constructors
 		public Binding() {}
-		public Binding(Graphic graphic)
+		public Binding(ICanvasElement graphic)
 		{
 			_graphic = graphic;
 		}
@@ -55,7 +55,7 @@ namespace gametheory
 		#endregion
 
 		#region Constructors
-		public TextBinding(Graphic graphic,string formatting="{0}") : base(graphic)
+		public TextBinding(ICanvasElement graphic,string formatting="{0}") : base(graphic)
 		{
 			_formatting = formatting;
 		}
@@ -65,8 +65,23 @@ namespace gametheory
 		public override void PropertyChanged (object obj, PropertyInfo info)
 		{
 			base.PropertyChanged (obj, info);
-
 			(_graphic as Text).text = string.Format(_formatting,info.GetValue(obj,null));
+		}
+		#endregion
+	}
+
+	public class SliderBinding : Binding
+	{
+		#region Constructors
+		public SliderBinding(){}
+		public SliderBinding(ICanvasElement graphic) : base(graphic){}
+		#endregion
+
+		#region Overridden Methods
+		public override void PropertyChanged (object obj, PropertyInfo info)
+		{
+			base.PropertyChanged (obj, info);
+			(_graphic as Slider).value = (float)System.Convert.ToDouble(info.GetValue(obj,null));
 		}
 		#endregion
 	}
@@ -91,6 +106,44 @@ namespace gametheory
 
 			if(_func != null)
 				_func();
+		}
+		#endregion
+	}
+
+	public class TimeSpanBinding : Binding
+	{
+		#region Constructors
+		public TimeSpanBinding(){}
+		public TimeSpanBinding(ICanvasElement graphic) : base(graphic){}
+		#endregion
+
+		#region Overridden Methods
+		public override void PropertyChanged (object obj, PropertyInfo info)
+		{
+			base.PropertyChanged (obj, info);
+			(_graphic as Text).text = Helper.ConvertTimeSpanToString((TimeSpan)info.GetValue(obj,null));
+		}
+		#endregion
+	}
+
+	public class FillBinding : Binding
+	{
+		#region Private Vars
+		float _max;
+		#endregion
+
+		#region Constructors
+		public FillBinding(Graphic graphic, float max) : base(graphic)
+		{
+			_max = max;
+		}
+		#endregion
+
+		#region Overridden Methods
+		public override void PropertyChanged (object obj, PropertyInfo info)
+		{
+			base.PropertyChanged (obj, info);
+			(_graphic as Image).fillAmount = (float)((int)(info.GetValue(obj,null))) / (float)_max;
 		}
 		#endregion
 	}

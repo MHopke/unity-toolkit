@@ -28,5 +28,12 @@
 		}
 		protected virtual void OnSelected(){}
 		#endregion
+
+		#region Properties
+		public object Object
+		{
+			get { return _obj; }
+		}
+		#endregion
 	}
 }

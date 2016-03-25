@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using gametheory.UI;
 using System.Collections;
 
-public class LoadAlert : UIView 
+public class LoadAlert : UIAlert 
 {
     #region Events
     System.Action timedOut;
@@ -13,22 +13,9 @@ public class LoadAlert : UIView
     public string ExtraneousInfo;
     public Text LoadingText;
     public Loader Loader;
-    public static LoadAlert Instance = null;
     #endregion
 
     #region Overriden Methods
-    protected override void OnInit()
-    {
-        base.OnInit();
-
-        Instance = this;
-    }
-    protected override void OnCleanUp()
-    {
-        base.OnCleanUp();
-
-        Instance = null;
-    }
     protected override void OnShow()
     {
         base.OnShow();
@@ -87,4 +74,11 @@ public class LoadAlert : UIView
         LoadingText.text = ExtraneousInfo;
     }
     #endregion
+
+	#region Properties
+	public static LoadAlert Instance
+	{
+		get { return UIView.Load("Alerts/LoadAlert") as LoadAlert; }
+	}
+	#endregion
 }

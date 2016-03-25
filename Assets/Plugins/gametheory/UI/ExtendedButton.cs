@@ -17,6 +17,7 @@ namespace gametheory.UI
         #endregion
 
         #region Private Vars
+		bool _iconWasEnabled;
         Color _originalColor;
         #endregion
 
@@ -92,6 +93,21 @@ namespace gametheory.UI
                 Enable();
         }
 
+		protected override void OnShow ()
+		{
+			base.OnShow ();
+
+			if(ButtonIconImage)
+				ButtonIconImage.enabled = _iconWasEnabled;
+		}
+		protected override void OnHide ()
+		{
+			base.OnHide ();
+
+			if(ButtonIconImage)
+				_iconWasEnabled = ButtonIconImage.enabled;
+		}
+
         public override void PresentVisuals(bool display)
         {
             base.PresentVisuals(display);
@@ -105,12 +121,26 @@ namespace gametheory.UI
             }
 
             if(ButtonIconImage)
+			{
                 ButtonIconImage.enabled = display;
+				_iconWasEnabled = display;
+			}
 
             if (Label)
                 Label.enabled = display;
         }
         #endregion
+
+		#region UI Methods
+		public void Selected()
+		{
+			OnSelected();
+		}
+		#endregion
+
+		#region Virtual Methods
+		protected virtual void OnSelected(){}
+		#endregion
 
         #region Accessors
         public bool Interactable

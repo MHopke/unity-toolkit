@@ -56,7 +56,6 @@ namespace gametheory.Utilities
 
 						if(map.Headers.Contains(header))
 						{
-
 							if(converter != null)
 								info.SetValue(obj,(converter as IColumnConverter).Convert(map.Contents[index][header]) ,null);
 							else
@@ -80,7 +79,6 @@ namespace gametheory.Utilities
 					if(att != null)
 					{
 						header = (att as CSVColumn).Name;
-
 						if(map.Headers.Contains(header))
 						{
 							if(converter != null)
@@ -268,7 +266,7 @@ namespace gametheory.Utilities
 						Dictionary<string,string> dict =new Dictionary<string, string>();
 						for(int sub = 0; sub < Headers.Count; sub++)
 						{
-							dict.Add(Headers[sub],row[sub]);
+							dict.Add(Headers[sub],row[sub].Trim());
 						}
 
 						Contents.Add(dict);
@@ -297,14 +295,9 @@ namespace gametheory.Utilities
 	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field,Inherited = true)]
 	public abstract class IColumnConverter : Attribute
 	{
-		#region P Vars
-		protected Type _type;
-		#endregion
-
 		#region Constructors
-		public IColumnConverter(Type type)
+		public IColumnConverter()
 		{
-			_type = type;
 		}
 		#endregion
 
@@ -319,15 +312,52 @@ namespace gametheory.Utilities
 	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field,Inherited = true)]
 	public class EnumConverter : IColumnConverter
 	{
+		#region P Vars
+		protected Type _type;
+		#endregion
+
 		#region Constructors
-		public EnumConverter(Type type) : base(type){}
+		public EnumConverter(Type type)
+		{
+			_type = type;
+		}
 		#endregion
 
 		#region Methods
 		public override object Convert(object obj)
 		{
-			Debug.Log(obj);
-			return Enum.Parse(_type,(string)obj);
+			string str = (string)obj;
+			if(string.IsNullOrEmpty(str))
+				return null;
+			else
+				return Enum.Parse(_type,str);
+		}
+		#endregion
+	}
+
+	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field,Inherited = true)]
+	public class ArrayConverter : IColumnConverter
+	{
+		#region Public Vars
+		public char Delimeter;
+		#endregion
+
+		#region Constructors
+		public ArrayConverter(char delim)
+		{
+			Delimeter = delim;
+		}
+		#endregion
+
+		#region Overriden Methods
+		public override object Convert (object obj)
+		{
+			string str = (string)obj;
+
+			if(string.IsNullOrEmpty(str))
+				return null;
+			else
+				return (obj as string).Split(Delimeter);
 		}
 		#endregion
 	}

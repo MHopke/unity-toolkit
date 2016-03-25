@@ -29,14 +29,14 @@ namespace gametheory.Localization
         {
             base.OnPresent();
 
-            Dropdown.value = (int)LocalizationDictionary.Instance.CurrentLanguage;
+			Dropdown.value = (int)LocalizationManager.Instance.CurrentLanguage;
         }
         #endregion
 
         #region UI Methods
         public void LanguageDropdownChanged(int value)
         {
-            LocalizationDictionary.Instance.SetCurrentLanguage(_languages[value]);
+			LocalizationManager.Instance.SetCurrentLanguage(_languages[value]);
         }
         #endregion
     }

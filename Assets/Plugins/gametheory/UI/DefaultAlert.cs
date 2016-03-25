@@ -5,7 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-public class DefaultAlert : UIView 
+public class DefaultAlert : UIAlert
 {
     #region Events
     static event System.Action confirm;
@@ -63,15 +63,15 @@ public class DefaultAlert : UIView
             cancel = cancelCallback;
         
             if (showClose)
-                instance.CloseButton.Present();
+				instance.CloseButton.Enable();
             else
-                instance.CloseButton.Remove();
+				instance.CloseButton.Disable();
         
             instance.TitleText.text = title;
             instance.MessageText.text = message;
             instance.ConfirmText.text = confirmText;
 
-            UIAlertController.Instance.PresentAlert(instance);//instance.Open();
+			UIAlertController.Instance.PresentAlert(instance);//instance.Open();
 
             IsOpen = true;
         }
@@ -87,15 +87,16 @@ public class DefaultAlert : UIView
         cancel = content.Cancel;
         
         if(content.ShowClose)
-            CloseButton.Present();
+			CloseButton.Enable();
         else
-            CloseButton.Remove();
+			CloseButton.Disable();
         
         TitleText.text = content.Title;
         MessageText.text = content.Message;
         ConfirmText.text = content.ConfirmText;
 
-        UIAlertController.Instance.PresentAlert(this);//Open();
+		UIAlertController.Instance.PresentAlert(this);//Open();
+		transform.SetAsLastSibling();
     }
 
     public void Confirm()

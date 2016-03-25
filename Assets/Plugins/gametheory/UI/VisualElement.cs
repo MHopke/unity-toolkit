@@ -1,6 +1,7 @@
 //#define LOG
 using UnityEngine;
 
+using System.Reflection;
 using System.Collections.Generic;
 
 namespace gametheory.UI
@@ -12,10 +13,12 @@ namespace gametheory.UI
     public class VisualElement : MonoBehaviour 
     {
     	#region Public Variables
-    	//Allows the UI element to skip activation from a UIView.
-    	//Used in situations when an element should be hidden by default
-        public bool SkipUIViewActivation;
+		[Tooltip("Prevents the element from being displayed " +
+			"when the parent view is Activated")]
+        public bool HiddenByDefault;
         public bool StartsDisabled;
+		[Tooltip("Indicates if the element is in a UIGroup, " +
+			"in which case it should not be added to the parent view's Elements list")]
 		public bool InSubGroup;
 
         public Animator Animator;
@@ -40,10 +43,9 @@ namespace gametheory.UI
     		{
     			OnInit();
 
-    			//_primaryStyle.style.fontSize = UIScreen.AspectRatio.x
     			_initialized = true;
 
-                if (SkipUIViewActivation)
+                if (HiddenByDefault)
                 {
                     PresentVisuals(false);
                 }
@@ -137,6 +139,22 @@ namespace gametheory.UI
                 //enabled = true;
             }
         }
+
+		public void Hide()
+		{
+			if(_active)
+				OnHide();
+		}
+		public void Show()
+		{
+			if(_active)
+				OnShow();
+		}
+
+		public void SetParent(Transform parent)
+		{
+			(transform as RectTransform).SetParent(parent,false);
+		}
     	#endregion
 
         #region Virtual Methods
@@ -148,11 +166,7 @@ namespace gametheory.UI
 
         protected virtual void OnCleanUp()
 		{
-			if(_context != null)
-				_context.propertyChanged -= OnPropertyChanged;
-			
-			if(_bindings != null)
-				_bindings.Clear();
+			ClearContext();	
 		}
 
         protected virtual void OnPresent()
@@ -170,6 +184,15 @@ namespace gametheory.UI
         
         public virtual void OnLostFocus(){}
         public virtual void OnGainedFocus(){}
+
+		protected virtual void OnHide()
+		{
+			PresentVisuals(false);
+		}
+		protected virtual void OnShow()
+		{
+			PresentVisuals(true);
+		}
         
         public virtual void PresentVisuals(bool display) 
         {
@@ -187,6 +210,9 @@ namespace gametheory.UI
 		}
 		public virtual void SetBinding(string propName, Binding binding)
 		{
+			if(_context == null)
+				return;
+
 			if(_bindings == null)
 				_bindings = new Dictionary<string, Binding>();
 			
@@ -194,6 +220,9 @@ namespace gametheory.UI
 				_bindings[propName] = binding;
 			else
 				_bindings.Add(propName,binding);
+
+			//setup the info initially
+			OnPropertyChanged(_context,propName);
 		}
 		protected virtual void OnPropertyChanged(object obj, string propName)
 		{
@@ -202,6 +231,32 @@ namespace gametheory.UI
 				if(_bindings.ContainsKey(propName))
 					_bindings[propName].PropertyChanged(obj,obj.GetType().GetProperty(propName));
 			}
+		}
+		public void ClearContext()
+		{
+			if(_context != null)
+				_context.propertyChanged -= OnPropertyChanged;
+
+			if(_bindings != null)
+				_bindings.Clear();
+		}
+		protected void SetProperty(string name, object value)
+		{
+			if(_context != null)
+			{
+				PropertyInfo info = _context.GetType().GetProperty(name);
+				info.SetValue(_context,value,null);
+			}
+		}
+		protected object GetProperty(string name)
+		{
+			if(_context != null)
+			{
+				PropertyInfo info = _context.GetType().GetProperty(name);
+				return info.GetValue(_context,null);
+			}
+
+			return null;
 		}
         #endregion
     }

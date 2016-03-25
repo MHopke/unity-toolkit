@@ -26,7 +26,7 @@ namespace gametheory.Localization
     	#region Unity Methods
         void Awake()
         {
-            LocalizationDictionary.languageChanged += AssignText;
+            LocalizationManager.languageChanged += AssignText;
 
             _targetType = TargetObject.GetType();
 
@@ -35,14 +35,14 @@ namespace gametheory.Localization
         }
         void OnDestroy()
         {
-            LocalizationDictionary.languageChanged -= AssignText;
+            LocalizationManager.languageChanged -= AssignText;
         }
     	#endregion
 
 		#region Methods
 		public void PullData()
 		{
-			AssignText(LocalizationDictionary.Instance.GetCurrentLocalization());
+			AssignText(LocalizationManager.Instance.GetCurrentLocalization());
 		}
 		#endregion
 

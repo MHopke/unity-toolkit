@@ -1,14 +1,14 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-using System.Collections;
+using System.Collections.Generic;
 
 namespace gametheory.UI
 {
 	public class UIGroup : VisualElement 
 	{
 		#region Public Vars
-		public VisualElement[] Items;
+		public List<VisualElement> Items;
 		#endregion
 
 		#region Overridden Methods
@@ -18,7 +18,7 @@ namespace gametheory.UI
 
 			if(!display)
 			{
-				for(int index = 0; index < Items.Length; index++)
+				for(int index = 0; index < Items.Count; index++)
 					Items[index].PresentVisuals(display);
 			}
 		}
@@ -26,56 +26,69 @@ namespace gametheory.UI
 		{
 			base.Disabled();
 
-			for(int index = 0; index < Items.Length; index++)
+			for(int index = 0; index < Items.Count; index++)
 				Items[index].Disable();
 		}
 		protected override void Enabled()
 		{
 			base.Enabled();
 
-			for(int index = 0; index < Items.Length; index++)
+			for(int index = 0; index < Items.Count; index++)
 				Items[index].Enable();
 		}
 		public override void OnGainedFocus()
 		{
 			base.OnGainedFocus();
-
-			for(int index = 0; index < Items.Length; index++)
+			for(int index = 0; index < Items.Count; index++)
 				Items[index].GainedFocus();
 		}
 		public override void OnLostFocus()
 		{
 			base.OnLostFocus();
 
-			for(int index = 0; index < Items.Length; index++)
+			for(int index = 0; index < Items.Count; index++)
 				Items[index].LostFocus();
+		}
+		protected override void OnHide()
+		{
+			base.OnGainedFocus();
+			for(int index = 0; index < Items.Count; index++)
+				Items[index].Hide();
+		}
+		protected override void OnShow()
+		{
+			base.OnLostFocus();
+
+			for(int index = 0; index < Items.Count; index++)
+				Items[index].Show();
 		}
 		protected override void OnPresent()
 		{
 			base.OnPresent();
 
-			for(int index = 0; index < Items.Length; index++)
+			for(int index = 0; index < Items.Count; index++)
 			{
-				if(!Items[index].SkipUIViewActivation)
+				if(!Items[index].HiddenByDefault)
 					Items[index].Present();
 			}
 		}
 		protected override void OnRemove()
 		{
 			base.OnRemove();
-			for(int index = 0; index < Items.Length; index++)
+			for(int index = 0; index < Items.Count; index++)
 				Items[index].Remove();
 		}
 		protected override void OnCleanUp()
 		{
 			base.OnCleanUp();
-			for(int index = 0; index < Items.Length; index++)
+			for(int index = 0; index < Items.Count; index++)
 				Items[index].CleanUp();
 		}
 		protected override void OnInit()
 		{
 			base.OnInit();
-			for(int index = 0; index < Items.Length; index++)
+
+			for(int index = 0; index < Items.Count; index++)
 				Items[index].Init();
 		}
 		#endregion

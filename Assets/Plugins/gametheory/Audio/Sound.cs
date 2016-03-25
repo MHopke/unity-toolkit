@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace gametheory
+namespace gametheory.Audio
 {
     /// <summary>
     /// This class contains all functionality for a stored AudioClip and its related

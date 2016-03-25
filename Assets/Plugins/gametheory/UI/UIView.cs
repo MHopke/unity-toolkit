@@ -28,9 +28,16 @@ namespace gametheory.UI
     	#endregion
 
     	#region Public Variables
-    	public bool UseHierarchy;
+		[Tooltip("Determines if the view tranverses it's " +
+			"heirachry to add Elements upon Init. You almost " +
+			"always want this set to true")]
+		public bool UseHierarchy = true;
         public bool Animates;
-        public bool SkipActivation;
+		[Tooltip("Determines if the view is " +
+			"displayed when the parent ViewController is Activated")]
+        public bool HiddenByDefault;
+		[Tooltip("Used to keep the view's gameobject active " +
+			"until a long running process has finished")]
         public bool DelayedDeactivation;
 		public bool LoadedFromResources;
 
@@ -52,10 +59,6 @@ namespace gametheory.UI
         #endregion
 
         #region Unity Methods
-        void Awake()
-        {
-            Initialize();
-        }
         void OnDestroy()
         {
             CleanUp();
@@ -185,18 +188,10 @@ namespace gametheory.UI
             OnCleanUp();
         }
 
-        public void Hide()
-        {
-            //gameObject.SetActive(false);
-			LostFocus();
-            //OnHide();
-        }
-        public void Show()
-        {
-            //gameObject.SetActive(true);
-			GainedFocus();
-            //OnShow();
-        }
+		public void SetToFront()
+		{
+			transform.SetAsLastSibling();
+		}
     	#endregion
 
     	#region Interaction Methods
@@ -281,11 +276,15 @@ namespace gametheory.UI
         #region Other Methods
 		public static UIView Load(string path)
 		{
+			return Load(path,UIAlertController.Instance.CanvasRect);
+		}
+		public static UIView Load(string path, Transform parent)
+		{
 			UIView obj = (UIView)GameObject.Instantiate(Resources.Load<UIView>(path),Vector3.zero,Quaternion.identity);
-			(obj.transform as RectTransform).SetParent(UIViewController.CanvasTransform,false);
-			
+			(obj.transform as RectTransform).SetParent(parent,false);
+
 			obj.Initialize();
-			
+
 			return obj;
 		}
         public void AddUIElement(VisualElement element, bool activate)
@@ -308,7 +307,7 @@ namespace gametheory.UI
         #region Virtual Methods
         protected virtual void OnInit()
         {
-            if (SkipActivation && CanvasGroup)
+            if (HiddenByDefault && CanvasGroup)
                 CanvasGroup.blocksRaycasts = false;
             
             if(Elements != null)
@@ -322,7 +321,7 @@ namespace gametheory.UI
                         Elements[i].Init();
                         
                         //Disables all renders, etc so that you don't have to manually do it
-                        if (SkipActivation)
+                        if (HiddenByDefault)
                         {
                             Elements[i].PresentVisuals(false);
                         }
@@ -344,7 +343,7 @@ namespace gametheory.UI
             {
                 for(int i = 0; i < Elements.Count; i++)
                 {
-                    if(Elements[i] && !Elements[i].SkipUIViewActivation)
+                    if(Elements[i] && !Elements[i].HiddenByDefault)
                         Elements[i].Present();
                 }
             }
@@ -430,9 +429,6 @@ namespace gametheory.UI
                     Elements[i].GainedFocus();
             }
         }
-
-        protected virtual void OnHide(){}
-        protected virtual void OnShow(){}
         #endregion
     }
 }

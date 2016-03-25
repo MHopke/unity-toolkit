@@ -19,6 +19,8 @@ namespace gametheory.UI
         public VisualElement EmptyListItem;
         public Text DefaultListItemText;
 
+		public RectTransform ContentTransform;
+
         public ScrollRect Scroll;
         public ExtendedScrollbar ScrollBar;
 
@@ -34,9 +36,19 @@ namespace gametheory.UI
         #endregion
 
         #region Overriden Methods
+		public override void PresentVisuals (bool display)
+		{
+			base.PresentVisuals (display);
+
+			if(Scroll)
+				Scroll.enabled = display;
+		}
         protected override void OnInit()
         {
             base.OnInit();
+
+			if(ContentTransform == null && Scroll != null)
+				ContentTransform = Scroll.content;
 
             if (StartsWithItems)
             {
@@ -66,7 +78,7 @@ namespace gametheory.UI
 
             for(int i = 0; i < ListItems.Count; i++)
             {
-                if(!ListItems[i].SkipUIViewActivation)
+                if(!ListItems[i].HiddenByDefault)
                     ListItems[i].Present();
             }
         }
@@ -99,6 +111,22 @@ namespace gametheory.UI
                 ListItems[i].OnLostFocus();
             }
         }
+		protected override void OnHide ()
+		{
+			base.OnHide ();
+			for(int i = 0; i < ListItems.Count; i++)
+			{
+				ListItems[i].Hide();
+			}
+		}
+		protected override void OnShow ()
+		{
+			base.OnShow ();
+			for(int i = 0; i < ListItems.Count; i++)
+			{
+				ListItems[i].Show();
+			}
+		}
         #endregion
 
         #region Methods
@@ -124,7 +152,7 @@ namespace gametheory.UI
         {
             DeactivateEmptyItem();
 
-            (element.transform as RectTransform).SetParent(Scroll.content,false);
+			(element.transform as RectTransform).SetParent(ContentTransform,false);
             ListItems.Add(element);
 
             element.Init();
@@ -138,13 +166,18 @@ namespace gametheory.UI
             else
                 element.PresentVisuals(false);
         }
+		public void AddListElementToTop(VisualElement element)
+		{
+			AddListElement(element);
+			element.transform.SetAsFirstSibling();
+		}
 		public void AddItem(object obj)
 		{
 			DeactivateEmptyItem();
 
 			VisualElement element = (VisualElement)GameObject.Instantiate(_itemPrefab,Vector3.zero,Quaternion.identity);
 
-			(element.transform as RectTransform).SetParent(Scroll.content,false);
+			(element.transform as RectTransform).SetParent(ContentTransform,false);
 			ListItems.Add(element);
 			
 			element.Init();

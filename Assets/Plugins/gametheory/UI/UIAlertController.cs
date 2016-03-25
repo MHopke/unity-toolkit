@@ -7,11 +7,15 @@ namespace gametheory.UI
     public class UIAlertController : MonoBehaviour 
     {
         #region Public Vars
+		[Tooltip("Whether or not alerts are in a separate Canvas. " +
+			"Used to determine if the gameobject/canvas can be turned off/on.")]
+		public bool SeparateCanvas;
+		public RectTransform CanvasRect;
         public static UIAlertController Instance = null;
         #endregion
 
         #region Private Vars
-        Stack<UIView> _alertStack;
+		Stack<UIAlert> _alertStack;
         #endregion
 
         #region Unity Methods
@@ -20,7 +24,10 @@ namespace gametheory.UI
             if(Instance == null)
             {
                 Instance = this;
-                _alertStack = new Stack<UIView>();
+                _alertStack = new Stack<UIAlert>();
+
+				if(SeparateCanvas)
+					gameObject.SetActive(false);
             }
             else
                 Destroy(gameObject);
@@ -28,15 +35,20 @@ namespace gametheory.UI
         #endregion
 
         #region Methods
-        public void PresentAlert(UIView alert)
+        public void PresentAlert(UIAlert alert)
         {
             if(_alertStack.Count == 0)
             {
                 UIViewController.LoseFocus();
+
+				if(SeparateCanvas)
+					gameObject.SetActive(true);
             }
             else
                 _alertStack.Peek().Hide();
             
+			alert.SetToFront();
+
             HookUpClose(alert);
 
             _alertStack.Push(alert);
@@ -53,6 +65,8 @@ namespace gametheory.UI
 
             if(_alertStack.Count == 0)
             {
+				if(SeparateCanvas)
+					gameObject.SetActive(false);
                 UIViewController.GainFocus();
             }
             else
@@ -69,7 +83,7 @@ namespace gametheory.UI
 
             UIViewController.GainFocus();
         }
-        void HookUpClose(UIView alert)
+        void HookUpClose(UIAlert alert)
         {
             alert.transitionOutEvent += RemoveAlert;
             alert.Activate();
