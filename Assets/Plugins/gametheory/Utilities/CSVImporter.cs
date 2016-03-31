@@ -27,73 +27,18 @@ namespace gametheory.Utilities
 			List<T> list = new List<T>();
 
 			bool hasInfo = false;
-			string header = "";
-			int index =0,sub=0;
-			System.Type type = typeof(T);
-			PropertyInfo info = null;
-			PropertyInfo[] properties = type.GetProperties();
-			FieldInfo fInfo = null;
-			FieldInfo[] fields = type.GetFields();
 
-			for (index = 0; index < map.Contents.Count; index++)
+			for (int index = 0; index < map.Contents.Count; index++)
 			{
 				T obj = Activator.CreateInstance<T>();
 
-				hasInfo = false;
-				for(sub = 0; sub < properties.Length; sub++)
-				{
-					info = properties[sub];
-
-					header = "";
-
-					object att = System.Attribute.GetCustomAttribute(info,typeof(CSVColumn),true);
-					object converter = System.Attribute.GetCustomAttribute(info,typeof(IColumnConverter),true);
-					//Debug.Log(att.Length);
-
-					if(att != null)
-					{
-						header = (att as CSVColumn).Name;
-
-						if(map.Headers.Contains(header))
-						{
-							if(converter != null)
-								info.SetValue(obj,(converter as IColumnConverter).Convert(map.Contents[index][header]) ,null);
-							else
-								info.SetValue(obj,Convert.ChangeType(map.Contents[index][header],info.PropertyType) ,null);
-						}
-
-						hasInfo = true;
-					}
-				}
-
-				for(sub = 0; sub < fields.Length; sub++)
-				{
-					fInfo = fields[sub];
-
-					header = "";
-
-					object att = System.Attribute.GetCustomAttribute(fInfo,typeof(CSVColumn),true);
-					object converter = System.Attribute.GetCustomAttribute(fInfo,typeof(IColumnConverter),true);
-					//Debug.Log(att.Length);
-
-					if(att != null)
-					{
-						header = (att as CSVColumn).Name;
-						if(map.Headers.Contains(header))
-						{
-							if(converter != null)
-								fInfo.SetValue(obj,(converter as IColumnConverter).Convert(map.Contents[index][header]));
-							else
-								fInfo.SetValue(obj,Convert.ChangeType(map.Contents[index][header],fInfo.FieldType));
-						}
-						hasInfo = true;
-					}
-				}
+				hasInfo = PopulateObject<T>(map.Contents[index], ref obj);
 
 				if(LogInfo)
 					Debug.Log(obj.ToString());
 
-				list.Add(obj);
+				if(hasInfo)
+					list.Add(obj);
 			}
 
 			return list;
@@ -115,73 +60,13 @@ namespace gametheory.Utilities
 			ObservableList<T> list = new ObservableList<T>();
 
 			bool hasInfo = false;
-			string header = "";
-			int index =0, sub = 0;
-
-			System.Type type = typeof(T);
-			PropertyInfo info = null;
-			PropertyInfo[] properties = type.GetProperties();
-
-			FieldInfo fInfo = null;
-			FieldInfo[] fields = type.GetFields();
+			int index =0;
 
 			for (index = 0; index < map.Contents.Count; index++)
 			{
 				T obj = Activator.CreateInstance<T>();
 
-				hasInfo = false;
-				for(sub = 0; sub < properties.Length; sub++)
-				{
-					info = properties[sub];
-
-					header = "";
-
-					object att = System.Attribute.GetCustomAttribute(info,typeof(CSVColumn),true);
-					object converter = System.Attribute.GetCustomAttribute(info,typeof(IColumnConverter),true);
-					//Debug.Log(att.Length);
-
-					if(att != null)
-					{
-						header = (att as CSVColumn).Name;
-
-						if(map.Headers.Contains(header))
-						{
-
-							if(converter != null)
-								info.SetValue(obj,(converter as IColumnConverter).Convert(map.Contents[index][header]) ,null);
-							else
-								info.SetValue(obj,Convert.ChangeType(map.Contents[index][header],info.PropertyType) ,null);
-						}
-
-						hasInfo = true;
-					}
-				}
-
-				for(sub = 0; sub < fields.Length; sub++)
-				{
-					fInfo = fields[sub];
-
-					header = "";
-
-					object att = System.Attribute.GetCustomAttribute(fInfo,typeof(CSVColumn),true);
-					object converter = System.Attribute.GetCustomAttribute(fInfo,typeof(IColumnConverter),true);
-					//Debug.Log(att.Length);
-
-					if(att != null)
-					{
-						header = (att as CSVColumn).Name;
-
-						if(map.Headers.Contains(header))
-						{
-
-							if(converter != null)
-								fInfo.SetValue(obj,(converter as IColumnConverter).Convert(map.Contents[index][header]));
-							else
-								fInfo.SetValue(obj,Convert.ChangeType(map.Contents[index][header],fInfo.FieldType));
-						}
-						hasInfo = true;
-					}
-				}
+				hasInfo = PopulateObject<T>(map.Contents[index], ref obj);
 
 				if(hasInfo)
 				{
@@ -195,6 +80,88 @@ namespace gametheory.Utilities
 			return list;
 		}
     	#endregion
+
+		#region Methods
+		static bool PopulateObject<T>(Dictionary<string,string> entry, ref T obj)
+		{
+			bool hasInfo = false;
+			string header = "";
+			int sub=0;
+			System.Type type = typeof(T);
+			PropertyInfo info = null;
+			PropertyInfo[] properties = type.GetProperties();
+			FieldInfo fInfo = null;
+			FieldInfo[] fields = type.GetFields();
+			for(sub = 0; sub < properties.Length; sub++)
+			{
+				info = properties[sub];
+
+				header = info.Name;
+
+				object att = System.Attribute.GetCustomAttribute(info,typeof(CSVIgnore),true);
+				//Debug.Log(att.Length);
+
+				//Debug.Log(header + " " + att);
+
+				if(att == null)
+				{
+					att = System.Attribute.GetCustomAttribute(info,typeof(CSVColumn),true);
+					object converter = System.Attribute.GetCustomAttribute(info,
+						typeof(IColumnConverter),true);
+
+					if(att != null)
+						header = (att as CSVColumn).Name;
+
+					if(entry.ContainsKey(header))
+					{
+						if(converter != null)
+							info.SetValue(obj,(converter as IColumnConverter).
+								Convert(entry[header]) ,null);
+						else
+							info.SetValue(obj,Convert.ChangeType(entry[header]
+								,info.PropertyType) ,null);
+					}
+
+					hasInfo = true;
+				}
+			}
+
+			for(sub = 0; sub < fields.Length; sub++)
+			{
+				fInfo = fields[sub];
+
+				header = fInfo.Name;//"";
+
+				object att = System.Attribute.GetCustomAttribute(fInfo,typeof(CSVIgnore),true);
+				//Debug.Log(att.Length);
+
+				//Debug.Log(header + " " + att);
+
+				if(att == null)
+				{
+					att = System.Attribute.GetCustomAttribute(fInfo,typeof(CSVColumn),true);
+					object converter = System.Attribute.GetCustomAttribute(fInfo,
+						typeof(IColumnConverter),true);
+
+					if(att != null)
+						header = (att as CSVColumn).Name;
+
+					if(entry.ContainsKey(header))
+					{
+						if(converter != null)
+							fInfo.SetValue(obj,(converter as IColumnConverter)
+								.Convert(entry[header]));
+						else
+							fInfo.SetValue(obj,Convert.ChangeType(entry[header],
+								fInfo.FieldType));
+					}
+					hasInfo = true;
+				}
+			}
+
+			return hasInfo;
+		}
+		#endregion
     }
     public class CSVMap
     {
@@ -276,6 +243,14 @@ namespace gametheory.Utilities
 		}
 		#endregion
     }
+
+	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field,Inherited = true)]
+	public class CSVIgnore : Attribute
+	{
+		#region Constructors
+		public CSVIgnore(){}
+		#endregion
+	}
 
 	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field,Inherited = true)]
 	public class CSVColumn : Attribute
