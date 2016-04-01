@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
 using System;
+using System.IO;
+using System.Linq;
 using System.Collections;
 using System.Reflection;
 using System.Collections.Generic;
-using System.IO;
 
 namespace gametheory.Utilities
 {
@@ -306,6 +307,47 @@ namespace gametheory.Utilities
 				return null;
 			else
 				return Enum.Parse(_type,str);
+		}
+		#endregion
+	}
+
+	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field,Inherited = true)]
+	public class EnumArrayConverter : IColumnConverter
+	{
+		#region P Vars
+		protected char _delimeter;
+		protected Type _type;
+		#endregion
+
+		#region Constructors
+		public EnumArrayConverter(Type type,char delim='|')
+		{
+			_type = type;
+			_delimeter = delim;
+		}
+		#endregion
+
+		#region Methods
+		public override object Convert(object obj)
+		{
+			string str = (string)obj;
+			if(string.IsNullOrEmpty(str))
+				return null;
+			else
+			{
+				var listType = typeof(List<>);
+				var constructedListType = listType.MakeGenericType(_type);
+				IList instance = (IList)Activator.CreateInstance(constructedListType);
+
+				string[] arr = str.Split(_delimeter);
+
+				for(int index =0; index < arr.Length; index++)
+				{
+					instance.Add(Enum.Parse(_type,arr[index]));
+				}
+
+				return instance;
+			}
 		}
 		#endregion
 	}
