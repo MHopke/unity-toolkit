@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 
 using gametheory.UI;
-using gametheory.Localization;
 
 public class OverriddenViewController : UIViewController 
 {

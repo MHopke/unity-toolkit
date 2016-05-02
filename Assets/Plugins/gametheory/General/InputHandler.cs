@@ -6,7 +6,8 @@ namespace gametheory
     /// <summary>
     /// Watches for base input and translates it into custom events.
     /// </summary>
-    public class InputHandler : MonoBehaviour
+	[Obsolete("Use the Unity's new UI/Event System")]
+	public class InputHandler : MonoBehaviour
     {
     	#region Events
         /// <summary>
