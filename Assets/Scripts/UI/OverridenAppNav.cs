@@ -18,5 +18,12 @@ namespace gametheory.UI
 			base.OnActivate ();
 		}
 		#endregion
+
+		#region Propeties
+		public OverridenAppNav Nav
+		{
+			get { return Instance as OverridenAppNav; }
+		}
+		#endregion
 	}
 }

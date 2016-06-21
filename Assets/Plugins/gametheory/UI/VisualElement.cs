@@ -232,6 +232,7 @@ namespace gametheory.UI
 					_bindings[propName].PropertyChanged(obj,obj.GetType().GetProperty(propName));
 			}
 		}
+
 		public void ClearContext()
 		{
 			if(_context != null)
