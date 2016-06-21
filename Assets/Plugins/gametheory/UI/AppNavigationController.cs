@@ -92,6 +92,8 @@ public class AppNavigationController : UIViewController
             }
         }
 
+		view.SetInNavigation(true);
+
         _viewStack.Push(view);
 
         CurrentView = view;
@@ -133,6 +135,8 @@ public class AppNavigationController : UIViewController
         if (CurrentView.name == view.name)
             return;
         
+		AddViewToList(view);
+
         RemoveUIView(CurrentView);
         PresentUIView(view);
     }
@@ -179,6 +183,12 @@ public class AppNavigationController : UIViewController
         confirmedBack = null;
     }
 
+	public void BringBackbuttonToTop()
+	{
+		if(BackButton != null)
+			BackButton.transform.SetAsLastSibling();
+	}
+
     void RestoreStackToFlowStart()
     {
         PopStackToHome();
@@ -193,6 +203,13 @@ public class AppNavigationController : UIViewController
     
     void ClearStack()
     {
+		UIView view = null;
+		while(_viewStack.Count > 0)
+		{
+			view = _viewStack.Pop();
+			view.SetInNavigation(false);
+			RemoveViewFromList(view);
+		}
         _viewStack.Clear(); 
     }
     void CheckNavigationState()
@@ -210,11 +227,15 @@ public class AppNavigationController : UIViewController
             return;
         }
 
-        _viewStack.Peek().Deactivate();
+		UIView current = _viewStack.Peek();
+
+		current.SetInNavigation(false);
+		current.Deactivate();
 
         if (back != null)
-            back(_viewStack.Peek().name);
+			back(current.name);
 
+		RemoveViewFromList(current);
         _viewStack.Pop();
 
         //Debug.Log(_viewStack.Count);

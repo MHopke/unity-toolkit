@@ -6,6 +6,10 @@ namespace gametheory.UI
 	[RequireComponent(typeof(Toggle))]
     public class ExtendedToggle : VisualElement
     {
+		#region Events
+		public event System.Action<VisualElement,bool> toggled;
+		#endregion
+
         #region Public Vars
         public Toggle Toggle;
         public Text Text;
@@ -59,6 +63,13 @@ namespace gametheory.UI
         }
         #endregion
 
+		#region UI Method
+		public void ToggleStatus(bool toggled)
+		{
+			OnToggle(toggled);
+		}
+		#endregion
+
         #region Methods
         protected virtual void HandleVisuals()
         {
@@ -71,6 +82,14 @@ namespace gametheory.UI
                 Toggle.graphic.enabled = false;
         }
         #endregion
+
+		#region Virtual Methods
+		protected virtual void OnToggle(bool status)
+		{
+			if(toggled != null)
+				toggled(this,status);
+		}
+		#endregion
 
         #region Accessors
         public bool IsOn

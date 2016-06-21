@@ -155,6 +155,16 @@ namespace gametheory.UI
     				Instance.Views[i].LostFocus();
     		}
     	}
+
+		public void AddViewToList(UIView view)
+		{
+			if(!Views.Contains(view))
+				Views.Add(view);
+		}
+		public void RemoveViewFromList(UIView view)
+		{
+			Views.Remove(view);
+		}
     	#endregion
 
         #region Virtual Methods

@@ -25,7 +25,7 @@ public class DefaultAlert : UIAlert
     #region Private Vars
     string CONFIRM_TEXT = "CONFIRM";
     static Queue<AlertContent> _alertQueue;
-    static DefaultAlert instance = null;
+	static DefaultAlert _instance = null;
     #endregion
 
     #region Overriden Methods
@@ -33,45 +33,69 @@ public class DefaultAlert : UIAlert
     {
         base.OnInit();
 
-        if(instance == null)
-            instance = this;
-
 		IsOpen = false;
 
         _alertQueue = new Queue<AlertContent>();
     }
     protected override void OnDeactivate()
     {
-        base.OnDeactivate();
-
-        _alertQueue.Dequeue();
-        
-        if(_alertQueue.Count > 0)
-            OpenNext();
+		base.OnDeactivate();
+		_instance = null;
     }
     #endregion
+
+	#region UI Methods
+	public void Confirm()
+	{
+		if(IsQueueEmpty())
+		{
+			Deactivate();
+			IsOpen = false;
+		}
+
+		if (confirm != null)
+			confirm();
+
+		confirm = null;
+		cancel = null;
+	}
+	public void Cancel()
+	{
+		if(IsQueueEmpty())
+		{
+			Deactivate();
+			IsOpen = false;
+		}
+
+		if (cancel != null)
+			cancel();
+
+		confirm = null;
+		cancel = null;
+	}
+	#endregion
 
     #region Methods
     public static void Present(string title, string message, Action confirmCallback=null, Action cancelCallback=null, bool showClose = false, string confirmText="")
     {
+		GetInstance();
+
         if (confirmText == "")
-            confirmText = instance.CONFIRM_TEXT;
+            confirmText = _instance.CONFIRM_TEXT;
 
         if (_alertQueue.Count == 0)
         {
             confirm = confirmCallback;
             cancel = cancelCallback;
         
-            if (showClose)
-				instance.CloseButton.Enable();
-            else
-				instance.CloseButton.Disable();
-        
-            instance.TitleText.text = title;
-            instance.MessageText.text = message;
-            instance.ConfirmText.text = confirmText;
+            _instance.TitleText.text = title;
+            _instance.MessageText.text = message;
+            _instance.ConfirmText.text = confirmText;
 
-			UIAlertController.Instance.PresentAlert(instance);//instance.Open();
+			UIAlertController.Instance.PresentAlert(_instance);
+
+			if (showClose)
+				_instance.CloseButton.Present();
 
             IsOpen = true;
         }
@@ -87,44 +111,41 @@ public class DefaultAlert : UIAlert
         cancel = content.Cancel;
         
         if(content.ShowClose)
-			CloseButton.Enable();
+			CloseButton.Present();
         else
-			CloseButton.Disable();
+			CloseButton.Remove();
         
         TitleText.text = content.Title;
         MessageText.text = content.Message;
         ConfirmText.text = content.ConfirmText;
 
-		UIAlertController.Instance.PresentAlert(this);//Open();
 		transform.SetAsLastSibling();
+
+		CanvasGroup.interactable = true;
+		CanvasGroup.blocksRaycasts = true;
     }
 
-    public void Confirm()
-    {
-        Deactivate();//Close();
+	bool IsQueueEmpty()
+	{
+		_alertQueue.Dequeue();
 
-        if (confirm != null)
-        {
-            confirm();
-        }
+		if(_alertQueue.Count > 0)
+		{
+			OpenNext();
+			return false;
+		}
+		else
+			return true;
+	}
 
-		IsOpen = false;
-
-        confirm = null;
-        cancel = null;
-    }
-    public void Cancel()
-    {
-        Deactivate();//Close();
-        
-        if (cancel != null)
-            cancel();
-
-		IsOpen = false;
-
-        confirm = null;
-        cancel = null;
-    }
+	static void GetInstance()
+	{
+		if(_instance == null)
+		{
+			_instance = Load("Alerts/DefaultAlert",
+				UIAlertController.Instance.CanvasRect) as DefaultAlert;
+		}
+	}
     #endregion
 
     #region LocalizationComponent Event Listeners

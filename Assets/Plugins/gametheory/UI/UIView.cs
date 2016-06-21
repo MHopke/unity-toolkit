@@ -56,6 +56,7 @@ namespace gametheory.UI
         #region Protected Vars
 		protected bool _init;
         protected bool _active;
+		protected bool _inNavigation;
         #endregion
 
         #region Unity Methods
@@ -302,6 +303,10 @@ namespace gametheory.UI
 
             Elements.Remove(element);
         }
+		public void SetInNavigation(bool status)
+		{
+			_inNavigation = status;
+		}
         #endregion
 
         #region Virtual Methods
@@ -371,7 +376,7 @@ namespace gametheory.UI
 
             TransitionOutEvent();
 
-			if(LoadedFromResources)
+			if(LoadedFromResources && !_inNavigation)
 				Destroy(gameObject);
 
             #if LOG

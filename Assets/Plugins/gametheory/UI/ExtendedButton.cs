@@ -6,6 +6,10 @@ namespace gametheory.UI
 	[RequireComponent(typeof(Button))]
     public class ExtendedButton : VisualElement
     {
+		#region Events
+		public event System.Action<VisualElement> selected;
+		#endregion
+
         #region Public Vars
         public Button Button;
 
@@ -139,7 +143,11 @@ namespace gametheory.UI
 		#endregion
 
 		#region Virtual Methods
-		protected virtual void OnSelected(){}
+		protected virtual void OnSelected()
+		{
+			if(selected != null)
+				selected(this);
+		}
 		#endregion
 
         #region Accessors

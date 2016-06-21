@@ -8,7 +8,8 @@ namespace gametheory.UI
     public class UIList : VisualElement 
     {
 		#region Events
-		public event System.Action<object> itemSelected;
+		public event System.Action<VisualElement> itemDeleted;
+		public event System.Action<VisualElement,object> itemSelected;
 		#endregion
 
         #region Public Vars
@@ -157,9 +158,7 @@ namespace gametheory.UI
 
             element.Init();
 
-			ListElement temp = element as ListElement;
-			if(temp != null)
-				temp.selected += ItemSelected;
+			AddListeners(element as ListElement);
 
             if(_active)
                 element.Present();
@@ -182,12 +181,7 @@ namespace gametheory.UI
 			
 			element.Init();
 			
-			ListElement temp = element as ListElement;
-			if(temp != null)
-			{
-				temp.Setup(obj);
-				temp.selected += ItemSelected;
-			}
+			AddListeners(element as ListElement,obj);
 			
 			if(_active)
 				element.Present();
@@ -210,15 +204,12 @@ namespace gametheory.UI
 
             int lastItem = ListItems.Count - 1;
 			VisualElement element = null;
-			ListElement temp = null;
 
             for(int i = 0; i < count; i++)
             {
                 lastItem = ListItems.Count - 1;
 
-				temp = ListItems[lastItem] as ListElement;
-				if(temp != null)
-					temp.selected -= ItemSelected;
+				ClearListeners(ListItems[lastItem] as ListElement);
 
                 element.CleanUp();
 
@@ -230,15 +221,12 @@ namespace gametheory.UI
         public void RemoveListElement(VisualElement element)
         {
 			VisualElement listItem = null;
-			ListElement temp = null;
             for(int i = 0; i < ListItems.Count; i++)
             {
 				listItem = ListItems[i];
                 if(listItem == element)
                 {
-					temp = listItem as ListElement;
-					if(temp != null)
-						temp.selected -= ItemSelected;
+					ClearListeners(listItem as ListElement);
 
                     listItem.CleanUp();
                     Destroy(listItem.gameObject);
@@ -250,8 +238,7 @@ namespace gametheory.UI
         public void RemoveListElement(int index)
         {
 			ListElement temp = ListItems[index] as ListElement;
-			if(temp != null)
-				temp.selected -= ItemSelected;
+			ClearListeners(temp);
 
             Destroy(ListItems[index].gameObject);
             ListItems.RemoveAt(index);
@@ -259,14 +246,11 @@ namespace gametheory.UI
         public void ClearElements()
         {
 			VisualElement element = null;
-			ListElement temp = null;
             while(ListItems.Count > _endOfOriginalItems)
             {
 				element = ListItems[ListItems.Count - 1];
                 
-				temp = element as ListElement;
-				if(temp != null)
-					temp.selected -= ItemSelected;
+				ClearListeners(element as ListElement);
 
 				element.CleanUp();
 
@@ -287,11 +271,33 @@ namespace gametheory.UI
             }
         }
 
-		void ItemSelected(object obj)
+		void ClearListeners(ListElement element)
 		{
-			if(itemSelected != null)
-				itemSelected(obj);
+			if(element != null)
+			{
+				element.selected -= ItemSelected;
+				element.delete -= ItemDeleted;
+			}
 		}
+		void AddListeners(ListElement element)
+		{
+			if(element != null)
+			{
+				element.selected += ItemSelected;
+				element.delete += ItemDeleted;
+			}
+		}
+		void AddListeners(ListElement element,object obj)
+		{
+			if(element != null)
+			{
+				element.Setup(obj);
+				
+				element.selected += ItemSelected;
+				element.delete += ItemDeleted;
+			}
+		}
+
 
 		public void SetItemPrefab(VisualElement element)
 		{
@@ -317,6 +323,16 @@ namespace gametheory.UI
 		void ListCleared()
 		{
 			ClearElements();
+		}
+		void ItemSelected(VisualElement sender, object obj)
+		{
+			if(itemSelected != null)
+				itemSelected(sender, obj);
+		}
+		void ItemDeleted(VisualElement sender)
+		{
+			if(itemDeleted != null)
+				itemDeleted(sender);
 		}
 		#endregion
     }

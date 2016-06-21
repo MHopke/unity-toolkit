@@ -3,7 +3,8 @@
 	public class ListElement : VisualElement
 	{
 		#region Events
-		public event System.Action<object> selected;
+		public event System.Action<VisualElement,object> selected;
+		public event System.Action<VisualElement> delete;
 		#endregion
 
 		#region Protected Vars
@@ -14,9 +15,10 @@
 		public void Selected()
 		{
 			OnSelected();
-
-			if(selected != null)
-				selected(_obj);
+		}
+		public void Delete()
+		{
+			OnDelete();
 		}
 		#endregion
 
@@ -24,8 +26,18 @@
 		public virtual void Setup(object obj)
 		{
 			_obj = obj;
+			SetContext(obj);
 		}
-		protected virtual void OnSelected(){}
+		protected virtual void OnSelected()
+		{
+			if(selected != null)
+				selected(this,_obj);
+		}
+		protected virtual void OnDelete()
+		{
+			if(delete != null)
+				delete(this);
+		}
 		#endregion
 
 		#region Properties
