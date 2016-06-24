@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 
 namespace gametheory.iOS
 {
+	[System.Obsolete]
     /// <summary>
     /// Provides access to iOS 7's text-to-speech functionality.
     /// </summary>

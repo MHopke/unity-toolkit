@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 
 namespace gametheory.iOS.Social
 {
+	[System.Obsolete]
     /// <summary>
     /// Provides access to iOS' social functionality.
     /// </summary>

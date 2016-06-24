@@ -2,6 +2,8 @@ using UnityEngine.UI;
 using gametheory.UI;
 using System.Collections;
 
+using gametheory.Utilities;
+
 public class SingleInputAlert : UIAlert
 {
     #region Events

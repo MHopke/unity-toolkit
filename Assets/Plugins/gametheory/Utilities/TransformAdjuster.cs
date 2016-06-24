@@ -2,20 +2,23 @@
 using System.Collections;
 using gametheory.UI;
 
-/// <summary>
-/// Allows a GameObject to have its position in the same manner as UI elements.
-/// </summary>
-public class TransformAdjuster : MonoBehaviour 
+namespace gametheory.Utilities
 {
-    #region Public Vars
-    public ScaleSettings ScaleSetting;
-    #endregion
-
-    #region Unity Methods
-	// Use this for initialization
-	void Start () 
+	/// <summary>
+	/// Allows a GameObject to have its position in the same manner as UI elements.
+	/// </summary>
+	public class TransformAdjuster : MonoBehaviour 
 	{
-        UIScreen.Instance.AdjustTransform(transform, ScaleSetting);
+	    #region Public Vars
+	    public ScaleSettings ScaleSetting;
+	    #endregion
+
+	    #region Unity Methods
+		// Use this for initialization
+		void Start () 
+		{
+	        UIScreen.Instance.AdjustTransform(transform, ScaleSetting);
+		}
+	    #endregion
 	}
-    #endregion
 }

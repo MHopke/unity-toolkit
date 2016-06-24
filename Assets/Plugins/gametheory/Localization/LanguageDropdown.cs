@@ -6,6 +6,10 @@ using gametheory.UI;
 
 namespace gametheory.Localization
 {
+	/// <summary>
+	/// Language dropdown. During setup include the possible languages in
+	/// the toggle's OptionList in the editor
+	/// </summary>
     public class LanguageDropdown : ExtendedDropdown 
     {
         #region Private Vars

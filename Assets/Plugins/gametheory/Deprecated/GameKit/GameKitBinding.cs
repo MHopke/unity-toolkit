@@ -2,6 +2,7 @@ using System.Runtime.InteropServices;
 
 namespace gametheory.iOS.GameKit
 {
+	[System.Obsolete]
     /// <summary>
     /// Provides access to iOS' GameKit functionality.
     /// </summary>

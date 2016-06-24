@@ -5,6 +5,7 @@ namespace gametheory.iOS.HealthKit
 {
     public enum BiologicalSex { MALE, FEMALE, NOT_SET, NOT_AVAILABLE }
 
+	[System.Obsolete]
     public static class HealthKitBinding 
     {
         #region Methods

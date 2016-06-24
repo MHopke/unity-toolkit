@@ -7,6 +7,7 @@ using System.Collections.Generic;
 
 namespace gametheory
 {
+	[System.Obsolete]
     /// <summary>
     /// Manages progress, saving, and loading of achievements.
     /// </summary>

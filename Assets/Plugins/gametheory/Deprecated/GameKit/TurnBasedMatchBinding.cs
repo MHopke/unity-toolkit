@@ -2,6 +2,7 @@
 
 namespace gametheory.iOS.GameKit
 {
+	[System.Obsolete]
     /// <summary>
     /// Provides access to iOS' Turnbased Match functionality.
     /// </summary>

@@ -3,6 +3,7 @@ using System;
 
 namespace gametheory.iOS.GameKit
 {
+	[System.Obsolete]
     /// <summary>
     /// Handles callbacks from native code accessed by GameKitBinding.
     /// </summary>

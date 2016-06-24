@@ -3,14 +3,17 @@
 using System;
 using System.Collections.Generic;
 
-public static class EnumUtility 
+namespace gametheory.Utilities
 {
-    public static T ParseEnum<T>( string value )
-    {
-        return (T) Enum.Parse( typeof( T ), value, true );
-    }
+	public static class EnumUtility 
+	{
+	    public static T ParseEnum<T>( string value )
+	    {
+	        return (T) Enum.Parse( typeof( T ), value, true );
+	    }
 
-	public static Array GetValues<T>() {
-		return Enum.GetValues(typeof(T));
+		public static Array GetValues<T>() {
+			return Enum.GetValues(typeof(T));
+		}
 	}
 }

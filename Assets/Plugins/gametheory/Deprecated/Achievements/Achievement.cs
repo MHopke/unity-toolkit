@@ -2,6 +2,7 @@ using gametheory.iOS.GameKit;
 
 namespace gametheory
 {
+	[System.Obsolete]
     /// <summary>
     /// Representation of an achievement.
     /// </summary>

@@ -2,6 +2,7 @@
 
 namespace gametheory.iOS.HealthKit
 {
+	[System.Obsolete]
     public class HealthKitManager : MonoBehaviour 
     {
         #region Events

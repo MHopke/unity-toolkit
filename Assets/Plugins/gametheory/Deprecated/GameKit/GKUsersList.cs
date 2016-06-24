@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace gametheory.iOS.GameKit
 {
+	[System.Obsolete]
     /// <summary>
     /// Wrapper class that holds a user's GameCenter display name and player id.
     /// </summary>
@@ -28,6 +29,7 @@ namespace gametheory.iOS.GameKit
         #endregion
     }
 
+	[System.Obsolete]
     /// <summary>
     /// Wrapper class containing GKUser list representing the local player's GameCenter friends.
     /// </summary>

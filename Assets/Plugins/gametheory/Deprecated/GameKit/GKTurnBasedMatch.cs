@@ -2,6 +2,7 @@
 
 namespace gametheory.iOS.GameKit
 {
+	[System.Obsolete]
     /// <summary>
     /// Simple abstraction of the iOS GKTurnBasedMath. It is
     /// designed to be a base class which your actual "matches" inherit
