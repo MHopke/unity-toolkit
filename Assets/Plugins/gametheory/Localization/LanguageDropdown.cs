@@ -23,9 +23,9 @@ namespace gametheory.Localization
 
 			_languages = LocalizationManager.Instance.SupportedLanguages;
         }
-        protected override void OnPresent()
+        protected override void OnActivate()
         {
-            base.OnPresent();
+            base.OnActivate();
 
 			Dropdown.value = (int)LocalizationManager.Instance.CurrentLanguage;
         }

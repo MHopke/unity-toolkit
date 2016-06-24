@@ -294,7 +294,7 @@ namespace gametheory.UI
             element.Init();
 
             if (activate)
-                element.Present();
+                element.Activate();
         }
         public void RemoveUIElement(VisualElement element)
         {
@@ -349,7 +349,7 @@ namespace gametheory.UI
                 for(int i = 0; i < Elements.Count; i++)
                 {
                     if(Elements[i] && !Elements[i].HiddenByDefault)
-                        Elements[i].Present();
+                        Elements[i].Activate();
                 }
             }
             
@@ -368,7 +368,7 @@ namespace gametheory.UI
                 for(int i = 0; i < Elements.Count; i++)
                 {
                     if(Elements[i])
-                        Elements[i].Remove();
+                        Elements[i].Deactivate();
                 }
             }
             

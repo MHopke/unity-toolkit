@@ -62,21 +62,21 @@ namespace gametheory.UI
 			for(int index = 0; index < Items.Count; index++)
 				Items[index].Show();
 		}
-		protected override void OnPresent()
+		protected override void OnActivate()
 		{
-			base.OnPresent();
+			base.OnActivate();
 
 			for(int index = 0; index < Items.Count; index++)
 			{
 				if(!Items[index].HiddenByDefault)
-					Items[index].Present();
+					Items[index].Activate();
 			}
 		}
-		protected override void OnRemove()
+		protected override void OnDeactivate()
 		{
-			base.OnRemove();
+			base.OnDeactivate();
 			for(int index = 0; index < Items.Count; index++)
-				Items[index].Remove();
+				Items[index].Deactivate();
 		}
 		protected override void OnCleanUp()
 		{

@@ -73,23 +73,23 @@ namespace gametheory.UI
 
 			base.OnCleanUp ();
 		}
-        protected override void OnPresent ()
+        protected override void OnActivate ()
 		{
-			base.OnPresent ();
+			base.OnActivate ();
 
             for(int i = 0; i < ListItems.Count; i++)
             {
                 if(!ListItems[i].HiddenByDefault)
-                    ListItems[i].Present();
+                    ListItems[i].Activate();
             }
         }
-        protected override void OnRemove ()
+        protected override void OnDeactivate ()
 		{
-			base.OnRemove ();
+			base.OnDeactivate ();
 
             for(int i = 0; i < ListItems.Count; i++)
             {
-                ListItems[i].Remove();
+                ListItems[i].Deactivate();
             }
 
             if(ZeroScrollBar)
@@ -136,7 +136,7 @@ namespace gametheory.UI
             if(EmptyListItem)
             {
                 EmptyListItem.gameObject.SetActive(true);
-                EmptyListItem.Present();
+                EmptyListItem.Activate();
             }
         }
         public void DeactivateEmptyItem()
@@ -145,7 +145,7 @@ namespace gametheory.UI
             if(EmptyListItem && EmptyListItem.gameObject.activeSelf)
             {
                 EmptyListItem.gameObject.SetActive(false);
-                EmptyListItem.Remove();
+                EmptyListItem.Deactivate();
             }
         }
 
@@ -161,7 +161,7 @@ namespace gametheory.UI
 			AddListeners(element as ListElement);
 
             if(_active)
-                element.Present();
+                element.Activate();
             else
                 element.PresentVisuals(false);
         }
@@ -184,7 +184,7 @@ namespace gametheory.UI
 			AddListeners(element as ListElement,obj);
 			
 			if(_active)
-				element.Present();
+				element.Activate();
 			else
 				element.PresentVisuals(false);
 		}

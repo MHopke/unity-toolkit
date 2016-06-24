@@ -95,7 +95,7 @@ public class DefaultAlert : UIAlert
 			UIAlertController.Instance.PresentAlert(_instance);
 
 			if (showClose)
-				_instance.CloseButton.Present();
+				_instance.CloseButton.Activate();
 
             IsOpen = true;
         }
@@ -111,9 +111,9 @@ public class DefaultAlert : UIAlert
         cancel = content.Cancel;
         
         if(content.ShowClose)
-			CloseButton.Present();
+			CloseButton.Activate();
         else
-			CloseButton.Remove();
+			CloseButton.Deactivate();
         
         TitleText.text = content.Title;
         MessageText.text = content.Message;

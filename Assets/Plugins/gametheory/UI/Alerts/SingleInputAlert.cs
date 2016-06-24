@@ -40,7 +40,7 @@ public class SingleInputAlert : UIAlert
         InputField.Text = "";
 
         if(showClose)
-            CloseButton.Present();
+            CloseButton.Activate();
         
         TitleText.text = title;
         MessageText.text = message;

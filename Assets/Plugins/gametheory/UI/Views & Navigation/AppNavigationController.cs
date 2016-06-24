@@ -88,7 +88,7 @@ public class AppNavigationController : UIViewController
         {
             if(_viewStack.Count == 1)
             {
-                BackButton.Present();
+                BackButton.Activate();
             }
         }
 
@@ -101,7 +101,7 @@ public class AppNavigationController : UIViewController
     #endregion
 
     #region Methods
-    void PresentSingleView(UIView view, bool clearStackHistory=false)
+    void ActivateSingleView(UIView view, bool clearStackHistory=false)
     {
         if (_viewChangeRequiresConfirm)
         {
@@ -114,8 +114,8 @@ public class AppNavigationController : UIViewController
         if (CurrentView.name == view.name)
             return;
 
-        RemoveUIView(CurrentView);
-        PresentUIView(view);
+        DeactivateUIView(CurrentView);
+        ActivateUIView(view);
 
         CheckNavigationState();
 
@@ -137,8 +137,8 @@ public class AppNavigationController : UIViewController
         
 		AddViewToList(view);
 
-        RemoveUIView(CurrentView);
-        PresentUIView(view);
+        DeactivateUIView(CurrentView);
+        ActivateUIView(view);
     }
     public void PopView()
     {
@@ -148,8 +148,8 @@ public class AppNavigationController : UIViewController
     {
         ClearStack();
 
-        RemoveUIView(CurrentView);
-        PresentUIView(_homeView);
+        DeactivateUIView(CurrentView);
+        ActivateUIView(_homeView);
     }
     public void ViewChangeRequiresConfirm(string title, string message, System.Action callback)
     {
@@ -246,7 +246,7 @@ public class AppNavigationController : UIViewController
         CheckNavigationState();
 
         if (_viewStack.Count == 1 && BackButton)
-            BackButton.Remove();
+            BackButton.Deactivate();
         /*else if(_viewStack.Count == 2)
             _backButton._button.image.sprite = _homeSprite;*/
     }
@@ -263,7 +263,7 @@ public class AppNavigationController : UIViewController
             Back();
         else
         {
-            PresentSingleView(_viewForConfirm,_clearStackHistoryWithConfirm);
+            ActivateSingleView(_viewForConfirm,_clearStackHistoryWithConfirm);
         }
 
         if (confirmedBack != null)
@@ -281,7 +281,7 @@ public class AppNavigationController : UIViewController
         _viewChangeRequiresConfirm = false;
         _backRequiresConfirm = false;
 
-        PresentSingleView(_viewForConfirm,_clearStackHistoryWithConfirm);
+        ActivateSingleView(_viewForConfirm,_clearStackHistoryWithConfirm);
 
         if (confirmedBack != null)
             confirmedBack();

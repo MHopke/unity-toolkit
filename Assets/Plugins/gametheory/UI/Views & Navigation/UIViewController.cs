@@ -67,7 +67,7 @@ namespace gametheory.UI
         }
 
     	//Present view methods
-        public static void PresentUIView(UIView view,string animation="")
+        public static void ActivateUIView(UIView view,string animation="")
     	{
             view.Activate(animation);
 
@@ -75,27 +75,27 @@ namespace gametheory.UI
 
             //Debug.Log(instance._viewStack.Count);
     	}
-    	public static void PresentUIView(string view)
+    	public static void ActivateUIView(string view)
     	{
     		UIView temp = Instance.GetUIView(view);
 
             if (temp)
-                PresentUIView(temp);
+                ActivateUIView(temp);
     	}
 
     	//Remove view methods
-        public static void RemoveUIView(UIView view,string animation="")
+        public static void DeactivateUIView(UIView view,string animation="")
     	{
             view.Deactivate(animation);
 
             Instance.OnRemove(view);
     	}
-    	public static void RemoveUIView(string view)
+    	public static void DeactivateUIView(string view)
     	{
     		UIView temp = Instance.GetUIView(view);
 
             if (temp)
-                RemoveUIView(temp);
+                DeactivateUIView(temp);
     	}
 
     	//Other methods

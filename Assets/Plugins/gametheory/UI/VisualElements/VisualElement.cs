@@ -61,14 +61,14 @@ namespace gametheory.UI
         /// <summary>
         /// Activates the UI element.
         /// </summary>
-    	public void Present()
+    	public void Activate()
     	{
     		if(_active)
     			return;
 
     		_active = true;
 
-    		OnPresent();
+    		OnActivate();
 
             if(StartsDisabled)
                 Disable();
@@ -78,14 +78,14 @@ namespace gametheory.UI
     		#endif
     	}
 
-    	public void Remove()
+    	public void Deactivate()
     	{
     		if(!_active)
     			return;
 
     		_active = false;
 
-    		OnRemove();
+    		OnDeactivate();
 
     		#if LOG
     		Debug.Log(name + " deactivated");
@@ -169,12 +169,12 @@ namespace gametheory.UI
 			ClearContext();	
 		}
 
-        protected virtual void OnPresent()
+        protected virtual void OnActivate()
         {
             PresentVisuals(true);
         }
         
-        protected virtual void OnRemove()
+        protected virtual void OnDeactivate()
         {
             PresentVisuals(false);
         }
