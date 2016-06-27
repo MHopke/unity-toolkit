@@ -5,10 +5,16 @@ using System;
 using System.Reflection;
 using System.Collections.Generic;
 
+using MiniJSON;
+
 namespace gametheory.Architecture
 {
 	public class ArchitectureTracker : EditorWindow 
 	{
+		#region Constants
+		const string DESC_KEY = "architectureDescriptions";
+		#endregion
+
 		#region Private Vars
 		int _index;
 		Architecture _arch;
@@ -30,6 +36,9 @@ namespace gametheory.Architecture
 			if(GUILayout.Button("Setup List"))
 				SetupList();
 
+			if(GUILayout.Button("Save Descriptions"))
+				SaveDescriptions();
+
 			// "target" can be any class derrived from ScriptableObject 
 			// (could be EditorWindow, MonoBehaviour, etc)
 			ScriptableObject target = this;
@@ -38,13 +47,29 @@ namespace gametheory.Architecture
 
 			if(stringsProperty != null)
 			{
-				EditorGUILayout.PropertyField(stringsProperty, true); // True means show children
+				EditorGUILayout.PropertyField(stringsProperty, true);
+
 				so.ApplyModifiedProperties(); // Remember to apply modified properties
 			}
 		}
 		#endregion
 
 		#region Methods
+		void SaveDescriptions()
+		{
+			Dictionary<string,string> dict = new Dictionary<string, string>();
+			for(_index = 0; _index <Architectures.Count; _index++)
+			{
+				_arch = Architectures[_index];
+
+				if(!dict.ContainsKey(_arch.Name))
+					dict.Add(_arch.Name,_arch.Description);
+			}
+
+			PlayerPrefs.SetString(DESC_KEY,Json.Serialize(dict));
+			PlayerPrefs.Save();
+		}
+
 		void SetupList()
 		{
 			Architectures = new List<Architecture>();
@@ -75,7 +100,7 @@ namespace gametheory.Architecture
 
 					infoList = type.GetCustomAttributes(typeof(ArchitectureTag),true);
 
-					Debug.Log(obj.name + " " + infoList.Length);
+					//Debug.Log(obj.name + " " + infoList.Length);
 
 					//monobehavior has a tag
 					if(infoList.Length > 0)
@@ -89,11 +114,23 @@ namespace gametheory.Architecture
 				}//end component loop
 			}//end object loop
 
+			//load pre-existing descriptions
+			Dictionary<string,object> dict = null;
+			string json = PlayerPrefs.GetString(DESC_KEY,"");
+			if(string.IsNullOrEmpty(json))
+				dict = new Dictionary<string, object>();
+			else
+				dict = Json.Deserialize(json) as Dictionary<string,object>;
+
 			//add classes to each 
 			foreach(KeyValuePair<string,List<MonoBehaviour>> pair in behaviors)
 			{
 				Architecture arch = new Architecture() { Name = pair.Key };
 				arch.Behaviors = new List<MonoBehaviour>(pair.Value);
+
+				if(dict.ContainsKey(arch.Name))
+					arch.Description = (string)dict[arch.Name];
+
 				Architectures.Add(arch);
 			}
 		}
