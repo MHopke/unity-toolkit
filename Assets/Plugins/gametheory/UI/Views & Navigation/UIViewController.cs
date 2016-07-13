@@ -165,22 +165,39 @@ namespace gametheory.UI
 		{
 			Views.Remove(view);
 		}
+
+		public void SetupViewList()
+		{
+			UIView[] views = GetComponentsInChildren<UIView>();
+
+			Views.Clear();
+
+			for(int index = 0; index< views.Length; index++)
+			{
+				Views.Add(views[index]);
+			}
+		}
     	#endregion
 
         #region Virtual Methods
 		protected virtual void OnAwake()
 		{
+			UIView view=null;
 			for (int i = 0; i < Views.Count; i++)
 			{
-				Views[i].Initialize();
+				view = Views[i];
+				if(view != null)
+					view.Initialize();
 			}
 		}
         protected virtual void OnActivate()
         {
+			UIView view = null;
             for (int i = 0; i < Views.Count; i++)
             {
-                if (!Views[i].HiddenByDefault)
-                    Views[i].Activate();
+				view = Views[i];
+				if (view != null && !view.HiddenByDefault)
+					view.Activate();
             }
         }
         protected virtual void OnDeactivate(){}
