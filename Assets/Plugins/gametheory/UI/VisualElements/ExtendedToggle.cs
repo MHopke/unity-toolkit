@@ -13,6 +13,7 @@ namespace gametheory.UI
         #region Public Vars
         public Toggle Toggle;
         public Text Text;
+		public Image Icon;
         #endregion
 
         #region Overriden Methods

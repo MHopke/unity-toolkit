@@ -134,9 +134,9 @@ public static class UnityExtensions
 		return (Mathf.Abs(color.r - otherColor.r) <= closeness && Mathf.Abs(color.g - otherColor.g) <= closeness
 			&& Mathf.Abs(color.b - otherColor.b) <= closeness && Mathf.Abs(color.a - otherColor.a) <= closeness);
 	}
-	public static void SetAlpha(this Color color, float alpha)
+	public static Color SetAlpha(Color color, float alpha)
 	{
-		color = new Color(color.r, color.g, color.b, alpha);
+		return new Color(color.r, color.g, color.b, alpha);
 	}
     /// <summary>
     /// Creates a Unity Color from an RGBA color set.
