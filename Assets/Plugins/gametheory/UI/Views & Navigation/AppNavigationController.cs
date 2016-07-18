@@ -134,8 +134,6 @@ public class AppNavigationController : UIViewController
 
         if (CurrentView.name == view.name)
             return;
-        
-		AddViewToList(view);
 
         DeactivateUIView(CurrentView);
         ActivateUIView(view);
@@ -234,8 +232,7 @@ public class AppNavigationController : UIViewController
 
         if (back != null)
 			back(current.name);
-
-		RemoveViewFromList(current);
+		
         _viewStack.Pop();
 
         //Debug.Log(_viewStack.Count);

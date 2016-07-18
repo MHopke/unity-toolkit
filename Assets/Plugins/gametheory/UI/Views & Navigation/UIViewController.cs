@@ -71,6 +71,9 @@ namespace gametheory.UI
     	{
             view.Activate(animation);
 
+			if(view.LoadedFromResources)
+				Instance.AddViewToList(view);
+
             Instance.OnPresent(view);
 
             //Debug.Log(instance._viewStack.Count);
@@ -86,6 +89,11 @@ namespace gametheory.UI
     	//Remove view methods
         public static void DeactivateUIView(UIView view,string animation="")
     	{
+			//must come before the view is deactivated so that 
+			//the object is not null
+			if(view.LoadedFromResources)
+				Instance.RemoveViewFromList(view);
+
             view.Deactivate(animation);
 
             Instance.OnRemove(view);
