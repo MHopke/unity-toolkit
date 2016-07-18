@@ -353,6 +353,9 @@ namespace gametheory.UI
                 }
             }
             
+			if(LoadedFromResources)
+				UIViewController.Instance.AddViewToList(this);
+
             #if LOG
             Debug.Log(name + " activated.");
             #endif
@@ -377,7 +380,10 @@ namespace gametheory.UI
             TransitionOutEvent();
 
 			if(LoadedFromResources && !_inNavigation)
+			{
+				UIViewController.Instance.RemoveViewFromList(this);
 				Destroy(gameObject);
+			}
 
             #if LOG
             Debug.Log(name + " deactivated.");

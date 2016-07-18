@@ -232,8 +232,8 @@ public class AppNavigationController : UIViewController
 
         if (back != null)
 			back(current.name);
-		
-        _viewStack.Pop();
+        
+		_viewStack.Pop();
 
         //Debug.Log(_viewStack.Count);
 
