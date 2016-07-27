@@ -7,10 +7,6 @@
 		public event System.Action<VisualElement> delete;
 		#endregion
 
-		#region Protected Vars
-		protected object _obj;
-		#endregion
-
 		#region UI Methods
 		public void Selected()
 		{
@@ -23,15 +19,10 @@
 		#endregion
 
 		#region Virtual Methods
-		public virtual void Setup(object obj)
-		{
-			_obj = obj;
-			SetContext(obj);
-		}
 		protected virtual void OnSelected()
 		{
 			if(selected != null)
-				selected(this,_obj);
+				selected(this,_context);
 		}
 		protected virtual void OnDelete()
 		{
@@ -43,7 +34,7 @@
 		#region Properties
 		public object Object
 		{
-			get { return _obj; }
+			get { return _context; }
 		}
 		#endregion
 	}

@@ -28,12 +28,12 @@ namespace gametheory.UI
         public List<VisualElement> ListItems;
         #endregion
 
-        #region Private Vars
-        int _endOfOriginalItems;
+        #region Protected Vars
+        protected int _endOfOriginalItems;
 
-		VisualElement _itemPrefab;
+		protected VisualElement _itemPrefab;
 
-		ObservableList<object> _listContext;
+		protected ObservableList<object> _listContext;
         #endregion
 
         #region Overriden Methods
@@ -291,7 +291,7 @@ namespace gametheory.UI
 		{
 			if(element != null)
 			{
-				element.Setup(obj);
+				element.SetContext(obj);
 				
 				element.selected += ItemSelected;
 				element.delete += ItemDeleted;

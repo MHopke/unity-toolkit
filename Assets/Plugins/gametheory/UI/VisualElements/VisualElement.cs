@@ -28,7 +28,7 @@ namespace gametheory.UI
     	//Determines if the element is currently active
     	protected bool _active;
 		protected bool _previousEnabledState;
-		protected IBindingContext _context;
+		protected object _context;
 		protected Dictionary<string,Binding> _bindings;
     	#endregion
 
@@ -202,12 +202,22 @@ namespace gametheory.UI
         }
 		public virtual void SetContext(object obj)
 		{
+			//clear any old information
+			if(_context != null)
+				ClearContext();
+
+			_context = obj;
+
 			if(obj is IBindingContext)
 			{
-				_context = obj as IBindingContext;
-				_context.propertyChanged += OnPropertyChanged;
+				IBindingContext context = _context as IBindingContext;
+				context.propertyChanged += OnPropertyChanged;
 			}
+
+			OnContextSet();
 		}
+		protected virtual void OnContextSet(){}
+
 		public virtual void SetBinding(string propName, Binding binding)
 		{
 			if(_context == null)
@@ -235,8 +245,11 @@ namespace gametheory.UI
 
 		public void ClearContext()
 		{
-			if(_context != null)
-				_context.propertyChanged -= OnPropertyChanged;
+			if(_context != null && _context is IBindingContext)
+			{
+				IBindingContext context = _context as IBindingContext;
+				context.propertyChanged -= OnPropertyChanged;
+			}
 
 			if(_bindings != null)
 				_bindings.Clear();
