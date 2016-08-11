@@ -2,13 +2,10 @@
 #if BEST_HTTP
 
 using UnityEngine;
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
-
 using BestHTTP;
-
 using MiniJSON;
 
 namespace gametheory.Utilities
@@ -80,15 +77,24 @@ namespace gametheory.Utilities
 	        else
 	            return null;
 	    }
-        public IEnumerator CallToServer(string url, HTTPMethods method, Dictionary<string, string> parameters, Action<Dictionary<string, object>> successCallback = null, Action<string> requestNotOKCallback = null, Action<string> failureCallback = null, Action requestFailureCallback = null)
+        public IEnumerator CallToServer(string url, HTTPMethods method, Dictionary<string, string> dictParameters, WWWForm formParameters, List<HTTPTuple> tupleParameters, Action<Dictionary<string, object>> successCallback = null, Action<string> requestNotOKCallback = null, Action<string> failureCallback = null, Action requestFailureCallback = null)
         {
             HTTPRequest request = new HTTPRequest(new Uri(url), method);
             request.SetHeader("Accept", "application/json");
-            if (parameters != null)
+            if (dictParameters != null)
             {
-                foreach (KeyValuePair<string, string> parameter in parameters)
+                foreach (KeyValuePair<string, string> parameter in dictParameters)
                 {
                     request.AddField(parameter.Key, parameter.Value);
+                }
+            }
+            if (formParameters != null)
+                request.SetFields(formParameters);
+            if (tupleParameters != null)
+            {
+                for (int i = 0; i < tupleParameters.Count; i++)
+                {
+                    request.AddField(tupleParameters[i].Key, tupleParameters[i].Value);
                 }
             }
             request.Send();
@@ -123,6 +129,18 @@ namespace gametheory.Utilities
             }
         }
         #endregion
+    }
+
+    public class HTTPTuple
+    {
+        public string Key;
+        public string Value;
+
+        public HTTPTuple(string key, string value)
+        {
+            Key = key;
+            Value = value;
+        }
     }
 }
 #endif
