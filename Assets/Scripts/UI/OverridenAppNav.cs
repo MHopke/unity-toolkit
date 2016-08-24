@@ -20,7 +20,7 @@ namespace gametheory.UI
 		#endregion
 
 		#region Propeties
-		public OverridenAppNav Nav
+		public static OverridenAppNav Nav
 		{
 			get { return Instance as OverridenAppNav; }
 		}
