@@ -12,16 +12,6 @@ namespace gametheory.UI
 		#endregion
 
 		#region Overridden Methods
-		public override void PresentVisuals (bool display)
-		{
-			base.PresentVisuals(display);
-
-			if(!display)
-			{
-				for(int index = 0; index < Items.Count; index++)
-					Items[index].PresentVisuals(display);
-			}
-		}
 		protected override void Disabled()
 		{
 			base.Disabled();
@@ -88,8 +78,23 @@ namespace gametheory.UI
 		{
 			base.OnInit();
 
-			for(int index = 0; index < Items.Count; index++)
-				Items[index].Init();
+			VisualElement ele = null;
+			for(int i = 0; i < Items.Count; i++)
+			{
+				ele = Items[i];
+				if (ele != null)
+				{
+					//Debug.Log(_elements[i].name);
+
+					ele.Init();
+
+					//Disables all renders, etc so that you don't have to manually do it
+					if (HiddenByDefault)
+					{
+						ele.PresentVisuals(false);
+					}
+				}
+			}
 		}
 		#endregion
 	}

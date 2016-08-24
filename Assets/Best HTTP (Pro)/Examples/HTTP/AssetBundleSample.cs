@@ -109,7 +109,7 @@ namespace BestHTTP.Examples
 #if UNITY_5_3
                             AssetBundle.LoadFromMemoryAsync(request.Response.Data);
 #else
-                            AssetBundle.CreateFromMemory(request.Response.Data);
+                            AssetBundle.LoadFromMemoryAsync(request.Response.Data);
 #endif
 
                         // wait for it

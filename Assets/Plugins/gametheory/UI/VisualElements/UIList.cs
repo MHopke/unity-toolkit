@@ -177,6 +177,7 @@ namespace gametheory.UI
 			VisualElement element = (VisualElement)GameObject.Instantiate(_itemPrefab,Vector3.zero,Quaternion.identity);
 
 			(element.transform as RectTransform).SetParent(ContentTransform,false);
+
 			ListItems.Add(element);
 			
 			element.Init();
@@ -271,7 +272,7 @@ namespace gametheory.UI
             }
         }
 
-		void ClearListeners(ListElement element)
+		protected void ClearListeners(ListElement element)
 		{
 			if(element != null)
 			{
@@ -279,7 +280,7 @@ namespace gametheory.UI
 				element.delete -= ItemDeleted;
 			}
 		}
-		void AddListeners(ListElement element)
+		protected void AddListeners(ListElement element)
 		{
 			if(element != null)
 			{
@@ -287,7 +288,7 @@ namespace gametheory.UI
 				element.delete += ItemDeleted;
 			}
 		}
-		void AddListeners(ListElement element,object obj)
+		protected void AddListeners(ListElement element,object obj)
 		{
 			if(element != null)
 			{

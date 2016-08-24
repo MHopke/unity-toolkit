@@ -317,18 +317,20 @@ namespace gametheory.UI
             
             if(Elements != null)
             {
+				VisualElement ele = null;
                 for(int i = 0; i < Elements.Count; i++)
                 {
-                    if (Elements[i])
+					ele = Elements[i];
+					if (ele != null)
                     {
                         //Debug.Log(_elements[i].name);
                         
-                        Elements[i].Init();
+						ele.Init();
                         
                         //Disables all renders, etc so that you don't have to manually do it
                         if (HiddenByDefault)
                         {
-                            Elements[i].PresentVisuals(false);
+							ele.PresentVisuals(false);
                         }
                     }
                 }
@@ -441,5 +443,12 @@ namespace gametheory.UI
             }
         }
         #endregion
+
+		#region Properties
+		public bool Active
+		{
+			get { return _active; }
+		}
+		#endregion
     }
 }

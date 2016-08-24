@@ -273,5 +273,12 @@ namespace gametheory.UI
 			return null;
 		}
         #endregion
+
+		#region Properties
+		public bool Active
+		{
+			get { return _active; }
+		}
+		#endregion
     }
 }

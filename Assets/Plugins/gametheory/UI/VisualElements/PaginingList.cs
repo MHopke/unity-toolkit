@@ -13,11 +13,15 @@ namespace gametheory.UI
 		[Tooltip("Used to determine if the scrollbars should hide or not")]
 		public int ItemsBeforeScroll;
 
+		public bool PageButtonsInList;
+
 		public ExtendedButton NextButton;
 		public ExtendedButton PreviousButton;
 		#endregion
 
 		#region Private Vars
+		bool _isVertical, _isHorizontal;
+
 		int _pageIndex, _lastPage, _itemsOnPage;
 		#endregion
 
@@ -41,12 +45,16 @@ namespace gametheory.UI
 			_itemPrefab = prefab;
 			SetContext(data);
 
-			//set up initial page
-			int min = Mathf.Min(ItemsPerPage,data.Count);
-			for(int index=0; index < min; index++)
+			_isVertical = Scroll.vertical;
+			_isHorizontal = Scroll.horizontal;
+
+			int dif = ItemsPerPage - ListItems.Count;
+			if(dif > 0)
 			{
-				AddItem(data[index]);
-				_itemsOnPage++;
+				for(int index=0; index < dif; index++)
+				{
+					AddItem(null);
+				}
 			}
 
 			_pageIndex = 0;
@@ -54,8 +62,31 @@ namespace gametheory.UI
 			//calculate the last page
 			_lastPage = Mathf.CeilToInt((float)data.Count / (float)ItemsPerPage) - 1;
 
+			AdjustPage();
 			AdjustButtons();
 			AdjustBars();
+		}
+
+		public void AddItem(object obj)
+		{
+			DeactivateEmptyItem();
+
+			VisualElement element = (VisualElement)GameObject.Instantiate(_itemPrefab,Vector3.zero,Quaternion.identity);
+
+			(element.transform as RectTransform).SetParent(ContentTransform,false);
+			ListItems.Add(element);
+
+			if(PageButtonsInList)
+				element.transform.SetSiblingIndex(ListItems.Count - 1);
+
+			element.Init();
+
+			AddListeners(element as ListElement,obj);
+
+			if(_active)
+				element.Activate();
+			else
+				element.PresentVisuals(false);
 		}
 
 		void AdjustPage()
@@ -77,9 +108,17 @@ namespace gametheory.UI
 					element.SetContext(_listContext[dataIndex]);
 					dataIndex++;
 					_itemsOnPage++;
+
+					if(PageButtonsInList && !element.gameObject.activeSelf)
+						element.gameObject.SetActive(true);
 				}
 				else
+				{
 					element.Deactivate();
+
+					if(PageButtonsInList && element.gameObject.activeSelf)
+						element.gameObject.SetActive(false);
+				}
 			}
 
 			if(Scroll.vertical)
@@ -93,36 +132,69 @@ namespace gametheory.UI
 
 		void AdjustButtons()
 		{
+			if(_listContext.Count < ItemsPerPage)
+			{
+				NextButton.Deactivate();
+				PreviousButton.Deactivate();
+			}
+			else
+			{
+				NextButton.Activate();
+				PreviousButton.Activate();
+			}
+
 			//somewhere in the middle so both should be active
 			if(_pageIndex >= 0 && _pageIndex <= _lastPage)
 			{
-				PreviousButton.Enable();
-				NextButton.Enable();
+				if(PreviousButton)
+					PreviousButton.Enable();
+
+				if(NextButton)
+					NextButton.Enable();
 			}
 
 			if(_pageIndex == 0)
-				PreviousButton.Disable();
+			{
+				if(PreviousButton)
+					PreviousButton.Disable();
+			}
 
 			if(_pageIndex == _lastPage)
-				NextButton.Disable();
+			{
+				if(NextButton)
+					NextButton.Disable();
+			}
 		}
 
 		void AdjustBars()
 		{
-			if(Scroll.verticalScrollbar)
+			if(_itemsOnPage < ItemsBeforeScroll)
 			{
-				if(Scroll.verticalScrollbar.gameObject.activeSelf && _itemsOnPage < ItemsBeforeScroll)
+				if(Scroll.verticalScrollbar && Scroll.verticalScrollbar.gameObject.activeSelf)
 					Scroll.verticalScrollbar.gameObject.SetActive(false);
-				else if(!Scroll.verticalScrollbar.gameObject.activeSelf && _itemsOnPage >= ItemsBeforeScroll)
-					Scroll.verticalScrollbar.gameObject.SetActive(true);
-			}
 
-			if(Scroll.horizontalScrollbar)
-			{
-				if(Scroll.horizontalScrollbar.gameObject.activeSelf && _itemsOnPage < ItemsBeforeScroll)
+				if(Scroll.horizontalScrollbar && !Scroll.horizontalScrollbar.gameObject.activeSelf)
 					Scroll.horizontalScrollbar.gameObject.SetActive(false);
-				else if(!Scroll.horizontalScrollbar.gameObject.activeSelf && _itemsOnPage >= ItemsBeforeScroll)
+
+				if(_isVertical && Scroll.vertical)
+					Scroll.vertical = false;
+
+				if(_isHorizontal && Scroll.horizontal)
+					Scroll.horizontal = false;
+			}
+			else
+			{
+				if(Scroll.verticalScrollbar && !Scroll.verticalScrollbar.gameObject.activeSelf)
+					Scroll.verticalScrollbar.gameObject.SetActive(true);
+
+				if(Scroll.horizontalScrollbar && !Scroll.horizontalScrollbar.gameObject.activeSelf)
 					Scroll.horizontalScrollbar.gameObject.SetActive(true);
+
+				if(_isVertical && !Scroll.vertical)
+					Scroll.vertical = true;
+
+				if(_isHorizontal && !Scroll.horizontal)
+					Scroll.horizontal = true;
 			}
 		}
 		#endregion
