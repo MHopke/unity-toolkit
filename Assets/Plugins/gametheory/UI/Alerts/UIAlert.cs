@@ -29,6 +29,11 @@ namespace gametheory.UI
 			//GainedFocus();
 			OnShow();
 		}
+
+		public void Open()
+		{
+			OnOpen();
+		}
 		#endregion
 
 		#region Virtual Methods
@@ -61,6 +66,10 @@ namespace gametheory.UI
 					}
 				}
 			}
+		}
+		protected virtual void OnOpen()
+		{
+			UIAlertController.Instance.PresentAlert(this);
 		}
 		#endregion
 	}
