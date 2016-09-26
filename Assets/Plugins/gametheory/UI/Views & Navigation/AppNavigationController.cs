@@ -44,9 +44,6 @@ public class AppNavigationController : UIViewController
     _backRequiresConfirm,
     _clearStackHistoryWithConfirm;
 
-    string _backConfirmTitle;
-    string _backConfirmInfo;
-
     UIView _viewForConfirm;
     protected UIView _homeView;
 
@@ -132,10 +129,13 @@ public class AppNavigationController : UIViewController
             return;
         }
 
-        if (CurrentView.name == view.name)
-            return;
+		if(CurrentView != null)
+		{
+	        if (CurrentView.name == view.name)
+	            return;
 
-        DeactivateUIView(CurrentView);
+	        DeactivateUIView(CurrentView);
+		}
         ActivateUIView(view);
     }
     public void PopView()
@@ -152,8 +152,8 @@ public class AppNavigationController : UIViewController
     public void ViewChangeRequiresConfirm(string title, string message, System.Action callback)
     {
         _viewChangeRequiresConfirm = true;
-        _backConfirmTitle = title;
-        _backConfirmInfo = message;
+        /*_backConfirmTitle = title;
+        _backConfirmInfo = message;*/
 
         confirmedBack = callback;
     }
@@ -167,8 +167,8 @@ public class AppNavigationController : UIViewController
     public void BackRequiresConfirm(string title, string message, System.Action callback,bool includeNavBar=true)
     {
         _backRequiresConfirm = true;
-        _backConfirmTitle = title;
-        _backConfirmInfo = message;
+        /*_backConfirmTitle = title;
+        _backConfirmInfo = message;*/
         //controller._includeNavBar = includeNavBar;
         
         confirmedBack = callback;
@@ -199,7 +199,7 @@ public class AppNavigationController : UIViewController
             viewStackCleared();
     }
     
-    void ClearStack()
+    public void ClearStack()
     {
 		UIView view = null;
 		while(_viewStack.Count > 0)

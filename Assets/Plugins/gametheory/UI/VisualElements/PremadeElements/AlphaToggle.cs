@@ -13,6 +13,8 @@ public class AlphaToggle : ExtendedToggle
 	#endregion
 
 	#region Public Vars
+	public Color NormalColor;
+	public Color FadedColor;
 	public bool Scale=true;
 	public bool BaseFades=true;
 	#endregion
@@ -27,12 +29,11 @@ public class AlphaToggle : ExtendedToggle
 		else
 			SetOff();
 	}
-	#endregion
-
-	#region UI Methods
-	public void ToggleStatus(bool toggled)
+	protected override void OnToggle (bool status)
 	{
-		if(toggled)
+		base.OnToggle (status);
+
+		if(status)
 		{
 			SetOn();
 			ToggledOn();
@@ -55,10 +56,10 @@ public class AlphaToggle : ExtendedToggle
 			transform.SetXYScale(ON_SCALE,ON_SCALE);
 
 		if(Icon)
-			Icon.color = UnityExtensions.SetAlpha(Icon.color,ON_ALPHA);
+			Icon.color = NormalColor;//UnityExtensions.SetAlpha(Icon.color,ON_ALPHA);
 
 		if(BaseFades)
-			Toggle.targetGraphic.color = UnityExtensions.SetAlpha(Toggle.targetGraphic.color,ON_ALPHA);
+			Toggle.targetGraphic.color = NormalColor;//UnityExtensions.SetAlpha(Toggle.targetGraphic.color,ON_ALPHA);
 	}
 	void SetOff()
 	{
@@ -66,10 +67,10 @@ public class AlphaToggle : ExtendedToggle
 			transform.SetXYScale(OFF_SCALE,OFF_SCALE);
 
 		if(Icon)
-			Icon.color = UnityExtensions.SetAlpha(Icon.color,OFF_ALPHA);
+			Icon.color = FadedColor;//UnityExtensions.SetAlpha(Icon.color,OFF_ALPHA);
 
 		if(BaseFades)
-			Toggle.targetGraphic.color = UnityExtensions.SetAlpha(Toggle.targetGraphic.color,OFF_ALPHA);
+			Toggle.targetGraphic.color = FadedColor;//UnityExtensions.SetAlpha(Toggle.targetGraphic.color,OFF_ALPHA);
 	}
 	#endregion
 }
