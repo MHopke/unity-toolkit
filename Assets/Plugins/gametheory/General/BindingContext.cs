@@ -16,6 +16,21 @@ namespace gametheory
 		#endregion
 	}
 
+	public class DataContext : IBindingContext
+	{
+		#region Events
+		public event System.Action<object,string> propertyChanged;
+		#endregion
+
+		#region Methods
+		public void OnPropertyChanged(string propName)
+		{
+			if(propertyChanged != null)
+				propertyChanged(this,propName);
+		}
+		#endregion
+	}
+
 	public class Binding
 	{
 		#region Private Vars
