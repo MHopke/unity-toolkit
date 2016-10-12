@@ -55,6 +55,8 @@ namespace gametheory
 				IBindingContext context = _context as IBindingContext;
 				context.propertyChanged += OnPropertyChanged;
 			}
+			
+			OnContextSet();
 		}
 		protected virtual void OnContextSet(){}
 
