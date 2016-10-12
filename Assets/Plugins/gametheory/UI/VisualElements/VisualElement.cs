@@ -1,5 +1,6 @@
 //#define LOG
 using UnityEngine;
+using UnityEngine.UI;
 
 using System.Reflection;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ namespace gametheory.UI
     /// The base class for UI elements. You should never use this class, instead use an existing sub-class or 
     /// create your own.
     /// </summary>
-    public class VisualElement : MonoBehaviour 
+	public class VisualElement : DataBinder
     {
     	#region Public Variables
 		[Tooltip("Prevents the element from being displayed " +
@@ -28,8 +29,6 @@ namespace gametheory.UI
     	//Determines if the element is currently active
     	protected bool _active;
 		protected bool _previousEnabledState;
-		protected object _context;
-		protected Dictionary<string,Binding> _bindings;
     	#endregion
 
     	#region Private Variables
@@ -200,77 +199,23 @@ namespace gametheory.UI
             Debug.Log(name + " : " + display);
             #endif
         }
-		public virtual void SetContext(object obj)
+
+		protected virtual void PresentComponent(Graphic element, bool display)
 		{
-			//clear any old information
-			if(_context != null)
-				ClearContext();
-
-			_context = obj;
-
-			if(obj is IBindingContext)
+			if(element)
 			{
-				IBindingContext context = _context as IBindingContext;
-				context.propertyChanged += OnPropertyChanged;
-			}
-
-			OnContextSet();
-		}
-		protected virtual void OnContextSet(){}
-
-		public virtual void SetBinding(string propName, Binding binding)
-		{
-			if(_context == null)
-				return;
-
-			if(_bindings == null)
-				_bindings = new Dictionary<string, Binding>();
-			
-			if(_bindings.ContainsKey(propName))
-				_bindings[propName] = binding;
-			else
-				_bindings.Add(propName,binding);
-
-			//setup the info initially
-			OnPropertyChanged(_context,propName);
-		}
-		protected virtual void OnPropertyChanged(object obj, string propName)
-		{
-			if(_bindings != null)
-			{
-				if(_bindings.ContainsKey(propName))
-					_bindings[propName].PropertyChanged(obj,obj.GetType().GetProperty(propName));
+				element.enabled = display;
 			}
 		}
-
-		public void ClearContext()
+		protected virtual void PresentButton(Button element, bool display)
 		{
-			if(_context != null && _context is IBindingContext)
+			if(element)
 			{
-				IBindingContext context = _context as IBindingContext;
-				context.propertyChanged -= OnPropertyChanged;
-			}
+				element.enabled = display;
 
-			if(_bindings != null)
-				_bindings.Clear();
-		}
-		protected void SetProperty(string name, object value)
-		{
-			if(_context != null)
-			{
-				PropertyInfo info = _context.GetType().GetProperty(name);
-				info.SetValue(_context,value,null);
+				if(element.targetGraphic)
+					element.targetGraphic.enabled = display;
 			}
-		}
-		protected object GetProperty(string name)
-		{
-			if(_context != null)
-			{
-				PropertyInfo info = _context.GetType().GetProperty(name);
-				return info.GetValue(_context,null);
-			}
-
-			return null;
 		}
         #endregion
 
