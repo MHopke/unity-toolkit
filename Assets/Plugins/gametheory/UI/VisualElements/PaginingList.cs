@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -22,7 +23,7 @@ namespace gametheory.UI
 		#region Private Vars
 		bool _isVertical, _isHorizontal;
 
-		int _pageIndex, _lastPage, _itemsOnPage;
+		int _pageIndex, _lastPage, _itemsOnPage, _dataCount;
 		#endregion
 
 		#region UI Methods
@@ -40,7 +41,7 @@ namespace gametheory.UI
 		#endregion
 
 		#region Methods
-		public void SetupList(VisualElement prefab, ObservableList<object> data)
+		public void SetupList(VisualElement prefab, IEnumerable data)
 		{
 			_itemPrefab = prefab;
 			SetContext(data);
@@ -60,7 +61,8 @@ namespace gametheory.UI
 			_pageIndex = 0;
 
 			//calculate the last page
-			_lastPage = Mathf.CeilToInt((float)data.Count / (float)ItemsPerPage) - 1;
+			_dataCount = data.Count();
+			_lastPage = Mathf.CeilToInt((float)_dataCount / (float)ItemsPerPage) - 1;
 
 			AdjustPage();
 			AdjustButtons();
@@ -93,32 +95,47 @@ namespace gametheory.UI
 		{
 			//set to the next dataIndex
 			int dataIndex = _pageIndex * ItemsPerPage;
+			int index = 0, elementIndex=0;
 
 			_itemsOnPage =0;
 
-			//loop through the entire list of elements
 			VisualElement element = null;
-			for(int index =0; index < ListItems.Count; index++)
+			//loop through the entire list of elements
+			foreach (var item in _listContext)
+			{
+				index++;
+				if(index > dataIndex)
+				{
+					if(dataIndex < _dataCount)
+					{
+						element = ListItems[elementIndex];
+
+						if(!element.gameObject.activeSelf)
+							element.gameObject.SetActive(true);
+						
+						element.SetContext(item);
+
+						if(_active)
+							element.Activate();
+
+						dataIndex++;
+						_itemsOnPage++;
+						elementIndex++;
+
+						//cut out if we've reached the max page items
+						if(_itemsOnPage >= ItemsPerPage)
+							break;
+					}
+				}
+			}
+
+			for(index =elementIndex; index < ListItems.Count; index++)
 			{
 				element = ListItems[index];
-				//if there is still data
-				if(dataIndex < _listContext.Count)
-				{
-					element.Activate();
-					element.SetContext(_listContext[dataIndex]);
-					dataIndex++;
-					_itemsOnPage++;
-
-					if(PageButtonsInList && !element.gameObject.activeSelf)
-						element.gameObject.SetActive(true);
-				}
-				else
-				{
 					element.Deactivate();
 
-					if(PageButtonsInList && element.gameObject.activeSelf)
-						element.gameObject.SetActive(false);
-				}
+				if(element.gameObject.activeSelf)
+					element.gameObject.SetActive(false);
 			}
 
 			if(Scroll.vertical)
@@ -132,15 +149,20 @@ namespace gametheory.UI
 
 		void AdjustButtons()
 		{
-			if(_listContext.Count < ItemsPerPage)
+			if(_dataCount < ItemsPerPage)
 			{
-				NextButton.Deactivate();
-				PreviousButton.Deactivate();
+				if(NextButton)
+					NextButton.Deactivate();
+
+				if(PreviousButton)
+					PreviousButton.Deactivate();
 			}
 			else
 			{
-				NextButton.Activate();
-				PreviousButton.Activate();
+				if(NextButton)
+					NextButton.Activate();
+				if(PreviousButton)
+					PreviousButton.Activate();
 			}
 
 			//somewhere in the middle so both should be active
@@ -199,4 +221,19 @@ namespace gametheory.UI
 		}
 		#endregion
 	}
+
+	#region IEnumerable Extenstions
+	public static class IEnumerableExtensions
+	{
+		public static int Count(this IEnumerable source)
+		{
+			int res = 0;
+
+			foreach (var item in source)
+				res++;
+
+			return res;
+		}
+	}
+	#endregion
 }

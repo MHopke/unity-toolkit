@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+using System.Collections;
 using System.Collections.Generic;
 
 namespace gametheory.UI
@@ -33,7 +34,7 @@ namespace gametheory.UI
 
 		protected VisualElement _itemPrefab;
 
-		protected ObservableList<object> _listContext;
+		protected IEnumerable _listContext;
         #endregion
 
         #region Overriden Methods
@@ -65,11 +66,11 @@ namespace gametheory.UI
         }
 		protected override void OnCleanUp ()
 		{
-			if(_listContext != null)
+			/*if(_listContext != null)
 			{
 				_listContext.itemChanged -= ItemChanged;
 				_listContext.cleared -= ListCleared;
-			}
+			}*/
 
 			base.OnCleanUp ();
 		}
@@ -77,10 +78,13 @@ namespace gametheory.UI
 		{
 			base.OnActivate ();
 
+			VisualElement el = null;
             for(int i = 0; i < ListItems.Count; i++)
             {
-                if(!ListItems[i].HiddenByDefault)
-                    ListItems[i].Activate();
+				el = ListItems[i];
+				Debug.Log(el);
+				if(!el.HiddenByDefault)
+					el.Activate();
             }
         }
         protected override void OnDeactivate ()
@@ -305,11 +309,11 @@ namespace gametheory.UI
 			_itemPrefab = element;
 		}
 
-		public void SetContext(ObservableList<object> list)
+		public void SetContext(IEnumerable list)
 		{
 			_listContext = list;
-			_listContext.itemChanged += ItemChanged;
-			_listContext.cleared += ListCleared;
+			/*_listContext.itemChanged += ItemChanged;
+			_listContext.cleared += ListCleared;*/
 		}
         #endregion
 
