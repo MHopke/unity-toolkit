@@ -10,11 +10,36 @@ namespace gametheory.Utilities
 {
     public static class CSVImporter 
     {
+		#region Constants
+		const int INVALID_INDEX = -1;
+		#endregion
+
 		#region Public Vars
 		public static bool LogInfo;
 		#endregion
 
     	#region List Methods
+		public static List<T> GenerateListFromData<T>(CSVData data)
+		{
+			List<T> list = new List<T>();
+
+			bool hasInfo = false;
+
+			for (int index = 0; index <data.Rows.Count; index++)
+			{
+				T obj = Activator.CreateInstance<T>();
+
+				hasInfo = PopulateObject<T>(data.Headers,data.Rows[index], ref obj);
+
+				if(LogInfo)
+					Debug.Log(obj.ToString() + " has info: " + hasInfo);
+
+				if(hasInfo)
+					list.Add(obj);
+			}
+
+			return list;
+		}
         public static List<T> GenerateList<T>(string filePath)
         {
 			return PopulateList<T>(new CSVMap(filePath));
@@ -83,6 +108,117 @@ namespace gametheory.Utilities
     	#endregion
 
 		#region Methods
+		static bool PopulateObject<T>(List<string> headers,List<string> row, ref T obj)
+		{
+			//Debug.Log(headers.Count + " " + row.Count);
+
+			bool hasInfo = false;
+			string header = "";
+			int sub=0, entryIndex =0;
+			System.Type type = typeof(T);
+			PropertyInfo info = null;
+			PropertyInfo[] properties = type.GetProperties();
+			FieldInfo fInfo = null;
+			FieldInfo[] fields = type.GetFields();
+			for(sub = 0; sub < properties.Length; sub++)
+			{
+				info = properties[sub];
+
+				header = info.Name;
+
+				object att = System.Attribute.GetCustomAttribute(info,typeof(CSVIgnore),true);
+				//Debug.Log(att.Length);
+
+				//Debug.Log(header + " " + att);
+
+				if(att == null)
+				{
+					att = System.Attribute.GetCustomAttribute(info,typeof(CSVColumn),true);
+					object converter = System.Attribute.GetCustomAttribute(info,
+						typeof(IColumnConverter),true);
+
+					if(att != null)
+						header = (att as CSVColumn).Name;
+
+					entryIndex = headers.IndexOf(header);
+
+					if(LogInfo)
+						Debug.Log(header + " " + entryIndex);
+					try
+					{
+						if(entryIndex != INVALID_INDEX)
+						{
+							if(converter != null)
+								info.SetValue(obj,(converter as IColumnConverter).
+									Convert(row[entryIndex]) ,null);
+							else
+								info.SetValue(obj,Convert.ChangeType(row[entryIndex]
+									,info.PropertyType) ,null);
+
+							hasInfo = true;
+						}
+					}
+					catch(Exception e)
+					{
+						if(LogInfo)
+							Debug.LogException(e);
+						hasInfo = false;
+						break;
+					}
+				}
+			}
+
+			for(sub = 0; sub < fields.Length; sub++)
+			{
+				fInfo = fields[sub];
+
+				header = fInfo.Name;//"";
+
+				object att = System.Attribute.GetCustomAttribute(fInfo,typeof(CSVIgnore),true);
+				//Debug.Log(att.Length);
+
+				//Debug.Log(header + " " + att);
+
+				if(att == null)
+				{
+					att = System.Attribute.GetCustomAttribute(fInfo,typeof(CSVColumn),true);
+					object converter = System.Attribute.GetCustomAttribute(fInfo,
+						typeof(IColumnConverter),true);
+
+					if(att != null)
+						header = (att as CSVColumn).Name;
+
+					entryIndex = headers.IndexOf(header);
+
+					if(LogInfo)
+						Debug.Log(header + " " + entryIndex);
+					try
+					{
+						if(entryIndex != INVALID_INDEX)
+						{
+							if(converter != null)
+								fInfo.SetValue(obj,(converter as IColumnConverter)
+									.Convert(row[entryIndex]));
+							else
+								fInfo.SetValue(obj,Convert.ChangeType(row[entryIndex],
+									fInfo.FieldType));
+
+							hasInfo = true;
+						}
+					}
+					catch(Exception e)
+					{
+						if(LogInfo)
+							Debug.LogException(e);
+						hasInfo = false;
+						break;
+					}
+				}
+			}
+
+			return hasInfo;
+		}
+
 		static bool PopulateObject<T>(Dictionary<string,string> entry, ref T obj)
 		{
 			bool hasInfo = false;
@@ -112,18 +248,27 @@ namespace gametheory.Utilities
 
 					if(att != null)
 						header = (att as CSVColumn).Name;
-
-					if(entry.ContainsKey(header))
+					try
 					{
-						if(converter != null)
-							info.SetValue(obj,(converter as IColumnConverter).
-								Convert(entry[header]) ,null);
-						else
-							info.SetValue(obj,Convert.ChangeType(entry[header]
-								,info.PropertyType) ,null);
-					}
+						if(entry.ContainsKey(header))
+						{
+							if(converter != null)
+								info.SetValue(obj,(converter as IColumnConverter).
+									Convert(entry[header]) ,null);
+							else
+								info.SetValue(obj,Convert.ChangeType(entry[header]
+									,info.PropertyType) ,null);
 
-					hasInfo = true;
+							hasInfo = true;
+						}
+					}
+					catch(Exception e)
+					{
+						if(LogInfo)
+							Debug.LogException(e);
+						hasInfo = false;
+						break;
+					}
 				}
 			}
 
@@ -147,16 +292,28 @@ namespace gametheory.Utilities
 					if(att != null)
 						header = (att as CSVColumn).Name;
 
-					if(entry.ContainsKey(header))
+					try
 					{
-						if(converter != null)
-							fInfo.SetValue(obj,(converter as IColumnConverter)
-								.Convert(entry[header]));
-						else
-							fInfo.SetValue(obj,Convert.ChangeType(entry[header],
-								fInfo.FieldType));
+						if(entry.ContainsKey(header))
+						{
+							if(converter != null)
+								fInfo.SetValue(obj,(converter as IColumnConverter)
+									.Convert(entry[header]));
+							else
+								fInfo.SetValue(obj,Convert.ChangeType(entry[header],
+									fInfo.FieldType));
+
+							hasInfo = true;
+						}
 					}
-					hasInfo = true;
+					catch(Exception e)
+					{
+						if(LogInfo)
+							Debug.LogException(e);
+						
+						hasInfo = false;
+						break;
+					}
 				}
 			}
 
@@ -245,6 +402,51 @@ namespace gametheory.Utilities
 		#endregion
     }
 
+	//specific class for dealing w/ fgCSVReader plugin
+	public class CSVData
+	{
+		#region Public Vars
+		public int HeaderRow=0;
+
+		public List<string> Headers;
+		public List<List<string>> Rows;
+		#endregion
+
+		#region Constructors
+		public CSVData()
+		{
+			Headers = new List<string>();
+			Rows = new List<List<string>>();
+		}
+		public CSVData(string content)
+		{
+			Headers = new List<string>();
+			Rows = new List<List<string>>();
+			SetData(content);
+		}
+		#endregion
+
+		#region MEthods
+		public void SetData(string content)
+		{
+			fgCSVReader.LoadFromString(content,ReadLine);
+		}
+
+		void ReadLine(int line_index, List<string> line)
+		{
+			if(line_index == HeaderRow)
+			{
+				Headers =  new List<string>(line);
+
+				/*for(int index =0; index < line.Count; index++)
+					Debug.Log("header: " +line[index]+"[]");*/
+			}
+			else
+				Rows.Add(new List<string>(line));
+		}
+		#endregion
+	}
+
 	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field,Inherited = true)]
 	public class CSVIgnore : Attribute
 	{
@@ -312,7 +514,7 @@ namespace gametheory.Utilities
 	}
 
 	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field,Inherited = true)]
-	public class EnumArrayConverter : IColumnConverter
+	public class EnumListConverter : IColumnConverter
 	{
 		#region P Vars
 		protected char _delimeter;
@@ -320,7 +522,7 @@ namespace gametheory.Utilities
 		#endregion
 
 		#region Constructors
-		public EnumArrayConverter(Type type,char delim='|')
+		public EnumListConverter(Type type,char delim='|')
 		{
 			_type = type;
 			_delimeter = delim;
@@ -375,6 +577,59 @@ namespace gametheory.Utilities
 				return null;
 			else
 				return (obj as string).Split(Delimeter);
+		}
+		#endregion
+	}
+
+	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field,Inherited = true)]
+	public class ListConverter : IColumnConverter
+	{
+		#region Public Vars
+		public char Delimeter;
+
+		public Type Type;
+		#endregion
+
+		#region Constructors
+		public ListConverter(char delim,Type type)
+		{
+			Delimeter = delim;
+			Type = type;
+		}
+		#endregion
+
+		#region Overriden Methods
+		public override object Convert (object obj)
+		{
+			string str = (string)obj;
+
+			//Debug.Log(obj);
+
+			if(string.IsNullOrEmpty(str))
+				return null;
+			else
+			{
+				var listType = typeof(List<>);
+				var constructedListType = listType.MakeGenericType(Type);
+				IList instance = (IList)Activator.CreateInstance(constructedListType);
+
+				string[] arr = str.Split(Delimeter);
+
+				for(int index =0; index < arr.Length; index++)
+				{
+					try
+					{
+						//Debug.Log("adding" + System.Convert.ChangeType(arr[index],Type));
+						instance.Add(System.Convert.ChangeType(arr[index],Type));
+					}
+					catch(Exception e)
+					{
+						//Debug.Log("exception: " + e);
+					}
+				}
+
+				return instance;
+			}
 		}
 		#endregion
 	}
