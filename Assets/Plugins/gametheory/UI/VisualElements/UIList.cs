@@ -55,10 +55,15 @@ namespace gametheory.UI
             if (StartsWithItems)
             {
                 _endOfOriginalItems = ListItems.Count;
+				VisualElement ele = null;
                 for (int i = 0; i < ListItems.Count; i++)
                 {
-                    ListItems[i].Init();
-                    ListItems[i].PresentVisuals(false);
+					ele = ListItems[i];
+					ele.Init();
+					ele.PresentVisuals(false);
+
+					//add listeners to starting items
+					AddListeners(ele as ListElement);
                 }
             }
             else
@@ -72,6 +77,16 @@ namespace gametheory.UI
 				_listContext.cleared -= ListCleared;
 			}*/
 
+			VisualElement ele = null;
+			for (int i = 0; i < ListItems.Count; i++)
+			{
+				ele = ListItems[i];
+				ele.CleanUp();
+				//clear listeners on starting items
+				if(i < _endOfOriginalItems)
+					ClearListeners(ele as ListElement);
+			}
+
 			base.OnCleanUp ();
 		}
         protected override void OnActivate ()
@@ -82,7 +97,7 @@ namespace gametheory.UI
             for(int i = 0; i < ListItems.Count; i++)
             {
 				el = ListItems[i];
-				Debug.Log(el);
+				//Debug.Log(el);
 				if(!el.HiddenByDefault)
 					el.Activate();
             }

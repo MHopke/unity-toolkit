@@ -26,6 +26,14 @@ namespace gametheory.UI
 		int _pageIndex, _lastPage, _itemsOnPage, _dataCount;
 		#endregion
 
+		#region Overridden Methods
+		protected override void OnActivate ()
+		{
+			base.OnActivate ();
+			AdjustButtons();
+		}
+		#endregion
+
 		#region UI Methods
 		public void NextPage()
 		{
@@ -61,7 +69,12 @@ namespace gametheory.UI
 			_pageIndex = 0;
 
 			//calculate the last page
-			_dataCount = data.Count();
+
+			if(data != null)
+				_dataCount = data.Count();
+			else
+				_dataCount = 0;
+			
 			_lastPage = Mathf.CeilToInt((float)_dataCount / (float)ItemsPerPage) - 1;
 
 			AdjustPage();
@@ -100,31 +113,34 @@ namespace gametheory.UI
 			_itemsOnPage =0;
 
 			VisualElement element = null;
-			//loop through the entire list of elements
-			foreach (var item in _listContext)
+			if(_listContext != null)
 			{
-				index++;
-				if(index > dataIndex)
+				//loop through the entire list of elements
+				foreach (var item in _listContext)
 				{
-					if(dataIndex < _dataCount)
+					index++;
+					if(index > dataIndex)
 					{
-						element = ListItems[elementIndex];
+						if(dataIndex < _dataCount)
+						{
+							element = ListItems[elementIndex];
 
-						if(!element.gameObject.activeSelf)
-							element.gameObject.SetActive(true);
-						
-						element.SetContext(item);
+							if(!element.gameObject.activeSelf)
+								element.gameObject.SetActive(true);
+							
+							element.SetContext(item);
 
-						if(_active)
-							element.Activate();
+							if(_active)
+								element.Activate();
 
-						dataIndex++;
-						_itemsOnPage++;
-						elementIndex++;
+							dataIndex++;
+							_itemsOnPage++;
+							elementIndex++;
 
-						//cut out if we've reached the max page items
-						if(_itemsOnPage >= ItemsPerPage)
-							break;
+							//cut out if we've reached the max page items
+							if(_itemsOnPage >= ItemsPerPage)
+								break;
+						}
 					}
 				}
 			}
@@ -149,6 +165,7 @@ namespace gametheory.UI
 
 		void AdjustButtons()
 		{
+			//Debug.Log(_dataCount + " " + ItemsPerPage);
 			if(_dataCount < ItemsPerPage)
 			{
 				if(NextButton)
