@@ -32,6 +32,9 @@ public class fgCSVReader
         {
             char c = file_contents[cur_file_index++];
 
+			/*if(gametheory.Utilities.CSVImporter.LogInfo && cur_file_index == file_length)
+				UnityEngine.Debug.Log(c);*/
+
             switch (c)
             {
             case '"':
@@ -73,6 +76,9 @@ public class fgCSVReader
                 }
                 else
                 {
+					if(gametheory.Utilities.CSVImporter.LogInfo)
+						UnityEngine.Debug.Log("c: " + c + " " + cur_file_index + " length: " + file_length);
+
                     // end of current item
                     cur_line.Add(cur_item.ToString());
                     cur_item.Length = 0;
@@ -87,6 +93,13 @@ public class fgCSVReader
             default:
                 // other cases, add char
                 cur_item.Append(c);
+
+				if (cur_file_index == file_length)
+				{
+					// end of file
+					inside_quotes = false;
+					goto case '\n';
+				}
                 break;
             }
         }
