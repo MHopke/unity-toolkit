@@ -10,12 +10,15 @@ namespace gametheory.UI
 	public class PaginingList : UIList 
 	{
 		#region Public Vars
+		public bool PageButtonsInList;
+
 		public int ItemsPerPage;
 		[Tooltip("Used to determine if the scrollbars should hide or not")]
 		public int ItemsBeforeScroll;
 
-		public bool PageButtonsInList;
+		//public string PageCount
 
+		public ExtendedText PageCount;
 		public ExtendedButton NextButton;
 		public ExtendedButton PreviousButton;
 		#endregion
@@ -31,6 +34,13 @@ namespace gametheory.UI
 		{
 			base.OnActivate ();
 			AdjustButtons();
+		}
+		protected override void OnInit ()
+		{
+			base.OnInit ();
+
+			_isVertical = Scroll.vertical;
+			_isHorizontal = Scroll.horizontal;
 		}
 		#endregion
 
@@ -54,9 +64,6 @@ namespace gametheory.UI
 			_itemPrefab = prefab;
 			SetContext(data);
 
-			_isVertical = Scroll.vertical;
-			_isHorizontal = Scroll.horizontal;
-
 			int dif = ItemsPerPage - ListItems.Count;
 			if(dif > 0)
 			{
@@ -77,9 +84,16 @@ namespace gametheory.UI
 			
 			_lastPage = Mathf.CeilToInt((float)_dataCount / (float)ItemsPerPage) - 1;
 
+			if(PageCount != null)
+			{
+				if(_lastPage > _pageIndex)
+					PageCount.Activate();
+				else
+					PageCount.Deactivate();
+			}
+
 			AdjustPage();
 			AdjustButtons();
-			AdjustBars();
 		}
 
 		public void AddItem(object obj)
@@ -155,9 +169,9 @@ namespace gametheory.UI
 			}
 
 			if(Scroll.vertical)
-				Scroll.verticalNormalizedPosition = 1f;
+				Scroll.verticalNormalizedPosition = 0f;
 			if(Scroll.horizontal)
-				Scroll.horizontalNormalizedPosition = 1f;
+				Scroll.horizontalNormalizedPosition = 0f;
 
 			AdjustButtons();
 			AdjustBars();
@@ -165,6 +179,9 @@ namespace gametheory.UI
 
 		void AdjustButtons()
 		{
+			if(!_active)
+				return;
+
 			//Debug.Log(_dataCount + " " + ItemsPerPage);
 			if(_dataCount < ItemsPerPage)
 			{
@@ -203,17 +220,20 @@ namespace gametheory.UI
 				if(NextButton)
 					NextButton.Disable();
 			}
+
+			if(PageCount != null &&  PageCount.Active)
+				PageCount.Text = (_pageIndex + 1) + "/" + (_lastPage + 1);
 		}
 
 		void AdjustBars()
 		{
 			if(_itemsOnPage < ItemsBeforeScroll)
 			{
-				if(Scroll.verticalScrollbar && Scroll.verticalScrollbar.gameObject.activeSelf)
+				/*if(Scroll.verticalScrollbar && Scroll.verticalScrollbar.gameObject.activeSelf)
 					Scroll.verticalScrollbar.gameObject.SetActive(false);
 
 				if(Scroll.horizontalScrollbar && !Scroll.horizontalScrollbar.gameObject.activeSelf)
-					Scroll.horizontalScrollbar.gameObject.SetActive(false);
+					Scroll.horizontalScrollbar.gameObject.SetActive(false);*/
 
 				if(_isVertical && Scroll.vertical)
 					Scroll.vertical = false;
@@ -223,11 +243,11 @@ namespace gametheory.UI
 			}
 			else
 			{
-				if(Scroll.verticalScrollbar && !Scroll.verticalScrollbar.gameObject.activeSelf)
+				/*if(Scroll.verticalScrollbar && !Scroll.verticalScrollbar.gameObject.activeSelf)
 					Scroll.verticalScrollbar.gameObject.SetActive(true);
 
 				if(Scroll.horizontalScrollbar && !Scroll.horizontalScrollbar.gameObject.activeSelf)
-					Scroll.horizontalScrollbar.gameObject.SetActive(true);
+					Scroll.horizontalScrollbar.gameObject.SetActive(true);*/
 
 				if(_isVertical && !Scroll.vertical)
 					Scroll.vertical = true;
