@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 
+using gametheory.Utilities;
+
 namespace gametheory.UI
 {
 	[RequireComponent(typeof(Dropdown))]
@@ -59,6 +61,44 @@ namespace gametheory.UI
 			Dropdown.captionText.text = items[selection];
 
 			//Dropdown.options[selection].
+        }
+
+        public void InitializeWithEnums<T>(int selection,params string[] ignoreValues)
+        {
+            System.Array arr = EnumUtility.GetValues<T>();
+            //some stuff here
+            Dropdown.options.Clear();
+
+            int sub = 0, select=0;
+            bool keep = true;
+            string str = "";
+            
+            for (int index = 0; index < arr.Length; index++)
+            {
+                str = arr.GetValue(index).ToString();
+                keep = true;
+
+                for(sub =0; sub <ignoreValues.Length; sub++)
+                {
+                    if(ignoreValues[sub] == str)
+                    {
+                        keep = false;
+                        break;
+                    }
+                }
+                
+                if (keep)
+                {
+                    Dropdown.options.Add(new Dropdown.OptionData(str));
+                    select = Dropdown.options.Count - 1;
+                    if (select == selection)
+                        Dropdown.captionText.text = Dropdown.options[select].text;
+                }
+            }
+
+            Dropdown.value = selection;
+
+            //Dropdown.options[selection].
         }
         #endregion
     }
