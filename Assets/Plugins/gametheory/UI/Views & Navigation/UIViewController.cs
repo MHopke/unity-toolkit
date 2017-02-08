@@ -70,6 +70,7 @@ namespace gametheory.UI
         public static void ActivateUIView(UIView view,string animation="")
     	{
             view.Activate(animation);
+			//view.Activated();
 
             Instance.OnPresent(view);
 
@@ -197,11 +198,25 @@ namespace gametheory.UI
             {
 				view = Views[i];
 				if (view != null && !view.HiddenByDefault)
+				{
 					view.Activate();
+					//view.Activated();
+				}
             }
         }
         protected virtual void OnDeactivate(){}
-        protected virtual void OnCleanUp(){}
+        protected virtual void OnCleanUp()
+        {
+            UIView view = null;
+            for (int i = 0; i < Views.Count; i++)
+            {
+                view = Views[i];
+                if (view != null && !view.gameObject.activeSelf)
+                {
+                    view.CleanUp();
+                }
+            }
+        }
 
         
         protected virtual void OnPresent(UIView view){}
