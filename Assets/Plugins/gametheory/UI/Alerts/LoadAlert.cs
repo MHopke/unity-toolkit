@@ -15,6 +15,10 @@ public class LoadAlert : UIAlert
     public Loader Loader;
     #endregion
 
+	#region Private Vars
+	static LoadAlert _instance = null;
+	#endregion
+
     #region Overriden Methods
     protected override void OnShow()
     {
@@ -28,7 +32,7 @@ public class LoadAlert : UIAlert
 
     #region Methods
     public void StartLoad(string text, System.Action timeOutCallback=null, 
-                          float timeOut=10.0f, float fillTime=1.0f, float pauseTime=0.15f)
+                          float timeOut=-1f, float fillTime=1.0f, float pauseTime=0.15f)
     {
         UIAlertController.Instance.PresentAlert(this);//base.Open();
 
@@ -43,23 +47,29 @@ public class LoadAlert : UIAlert
         Loader.StartLoading(TimedOut);
         Loader.extraneousTime += ExtranesouTime;
     }
-    public void SetText(string text)
+    public static void SetText(string text)
     {
-        LoadingText.text = text;
+		if(_instance == null)
+			return;
+		
+        _instance.LoadingText.text = text;
     }
-    public void Done()
+	public static void Done()
     {
-        if (!Loader.enabled)
+		if(_instance == null)
+			return;
+
+        if (!_instance.Loader.enabled)
             return;
 
-        ExtraneousInfo ="";
-        Loader.Done();
+        _instance.ExtraneousInfo ="";
+        _instance.Loader.Done();
 
-        timedOut = null;
+        _instance.timedOut = null;
 
-        Loader.extraneousTime -= ExtranesouTime;
+        _instance.Loader.extraneousTime -= _instance.ExtranesouTime;
 
-        Deactivate();//Close();
+        _instance.Deactivate();//Close();
     }
 
     void TimedOut()
@@ -78,7 +88,13 @@ public class LoadAlert : UIAlert
 	#region Properties
 	public static LoadAlert Instance
 	{
-		get { return UIView.Load("Alerts/LoadAlert") as LoadAlert; }
+		get 
+		{ 
+			if(_instance == null)
+				_instance = UIView.Load("Alerts/LoadAlert") as LoadAlert; 
+
+			return _instance;
+		}
 	}
 	#endregion
 }

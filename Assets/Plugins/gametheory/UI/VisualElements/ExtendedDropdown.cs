@@ -10,6 +10,7 @@ namespace gametheory.UI
     public class ExtendedDropdown : VisualElement
     {
         #region Public Vars
+        public Image Arrow;
 		public Dropdown Dropdown;
         #endregion
         
@@ -30,6 +31,8 @@ namespace gametheory.UI
 
 				if(Dropdown.captionImage)
 					Dropdown.captionImage.enabled = display;
+
+                PresentComponent(Arrow, display);
 			}
 		}
 		protected override void Disabled ()

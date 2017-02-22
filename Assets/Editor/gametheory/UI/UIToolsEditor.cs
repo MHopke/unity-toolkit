@@ -9,7 +9,6 @@ namespace gametheory.UI
 		#region Constants
 		const string BASE_PATH = "gametheory/UI";
 		const string ATTACH_PATH = BASE_PATH + "/Attach";
-		const string CONTROL_PATH = BASE_PATH + "/Controls";
 		#endregion
 
 		#region Methods
@@ -95,70 +94,85 @@ namespace gametheory.UI
 		}
 		#endregion
 
-		#region Control Methods
-		[MenuItem(CONTROL_PATH + "/Image", false)]
-		public static void CreateImage()
-		{
-			GameObject obj = new GameObject("Image",typeof(Image));
+        #region Attach Methods
+        [MenuItem(ATTACH_PATH + "/Image", false)]
+        public static void AttachImage()
+        {
+            if (Selection.gameObjects.Length > 0)
+            {
+                GameObject obj = null;
+                ExtendedImage img = null;
+                for (int index = 0; index < Selection.gameObjects.Length; index++)
+                {
+                    obj = Selection.gameObjects[index];
+                    img = obj.AddComponent<ExtendedImage>();
 
-			if(Selection.activeTransform != null)
-				obj.transform.parent = Selection.activeTransform;
+                    img.Image = obj.GetComponent<Image>();
+                }
+            }
+            else
+                Debug.LogWarning("No objects selected");
+        }
 
-			ExtendedImage img = obj.AddComponent<ExtendedImage>();
-			img.Image = obj.GetComponent<Image>();
-		}
+        [MenuItem(ATTACH_PATH + "/RawImage", false)]
+        public static void AttachRawImage()
+        {
+            if (Selection.gameObjects.Length > 0)
+            {
+                GameObject obj = null;
+                ExtendedRawImage img = null;
+                for (int index = 0; index < Selection.gameObjects.Length; index++)
+                {
+                    obj = Selection.gameObjects[index];
+                    img = obj.AddComponent<ExtendedRawImage>();
 
-		[MenuItem(CONTROL_PATH + "/RawImage", false)]
-		public static void CreateRawImage()
-		{
-			GameObject obj = new GameObject("RawImage",typeof(RawImage));
+                    img.Image = obj.GetComponent<RawImage>();
+                }
+            }
+            else
+                Debug.LogWarning("No objects selected");
+        }
 
-			if(Selection.activeTransform != null)
-				obj.transform.parent = Selection.activeTransform;
+        [MenuItem(ATTACH_PATH + "/Text", false)]
+        public static void AttachText()
+        {
+            if (Selection.gameObjects.Length > 0)
+            {
+                GameObject obj = null;
+                ExtendedText graphic = null;
+                for (int index = 0; index < Selection.gameObjects.Length; index++)
+                {
+                    obj = Selection.gameObjects[index];
+                    graphic = obj.AddComponent<ExtendedText>();
 
-			ExtendedRawImage img = obj.AddComponent<ExtendedRawImage>();
-			img.Image = obj.GetComponent<RawImage>();
-		}
+                    graphic.Label = obj.GetComponent<Text>();
+                }
+            }
+            else
+                Debug.LogWarning("No objects selected");
+        }
 
-		[MenuItem(CONTROL_PATH + "/Text", false)]
-		public static void CreateText()
-		{
-			GameObject obj = new GameObject("Text",typeof(Text));
+        [MenuItem(ATTACH_PATH + "/Button", false)]
+        public static void AttachButton()
+        {
+            if (Selection.gameObjects.Length > 0)
+            {
+                GameObject obj = null;
+                ExtendedButton graphic = null;
+                for (int index = 0; index < Selection.gameObjects.Length; index++)
+                {
+                    obj = Selection.gameObjects[index];
+                    graphic = obj.AddComponent<ExtendedButton>();
 
-			if(Selection.activeTransform != null)
-				obj.transform.parent = Selection.activeTransform;
+                    graphic.Button = obj.GetComponent<Button>();
+                    graphic.Label = obj.GetComponentInChildren<Text>();
+                }
+            }
+            else
+                Debug.LogWarning("No objects selected");
+        }
 
-			ExtendedText text = obj.AddComponent<ExtendedText>();
-			text.Label = obj.GetComponent<Text>();
-		}
-
-		[MenuItem(CONTROL_PATH +"/Button/Image", false)]
-		public static void CreateImageButton()
-		{
-			GameObject obj = new GameObject("Button",typeof(Image),typeof(Button));
-
-			if(Selection.activeTransform != null)
-				obj.transform.parent = Selection.activeTransform;
-
-			ExtendedButton btn = obj.AddComponent<ExtendedButton>();
-			btn.Button = obj.GetComponent<Button>();
-		}
-
-		[MenuItem(CONTROL_PATH + "/Button/Text", false)]
-		public static void CreateTextButton()
-		{
-			GameObject obj = new GameObject("Button",typeof(Text),typeof(Button));
-
-			if(Selection.activeTransform != null)
-				obj.transform.parent = Selection.activeTransform;
-
-			ExtendedButton btn = obj.AddComponent<ExtendedButton>();
-			btn.Button = obj.GetComponent<Button>();
-		}
-		#endregion
-
-		#region Attach Methods
-		[MenuItem(ATTACH_PATH + "/Toggle", false)]
+        [MenuItem(ATTACH_PATH + "/Toggle", false)]
 		public static void AttachToggle()
 		{
 			if(Selection.gameObjects.Length > 0)
@@ -177,6 +191,7 @@ namespace gametheory.UI
 			else
 				Debug.LogWarning("No objects selected");
 		}
+
 		[MenuItem(ATTACH_PATH + "/Dropdown", false)]
 		public static void AttachDropdown()
 		{
