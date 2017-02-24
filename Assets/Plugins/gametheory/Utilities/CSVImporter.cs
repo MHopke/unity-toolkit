@@ -196,12 +196,20 @@ namespace gametheory.Utilities
 					{
 						if(entryIndex != INVALID_INDEX)
 						{
-							if(converter != null)
-								fInfo.SetValue(obj,(converter as IColumnConverter)
-									.Convert(row[entryIndex]));
-							else
-								fInfo.SetValue(obj,Convert.ChangeType(row[entryIndex],
-									fInfo.FieldType));
+                            try
+                            {
+                                if (converter != null)
+                                    fInfo.SetValue(obj, (converter as IColumnConverter)
+                                        .Convert(row[entryIndex]));
+                                else
+                                    fInfo.SetValue(obj, Convert.ChangeType(row[entryIndex],
+                                        fInfo.FieldType));
+                            }
+                            catch(Exception ex)
+                            {
+                                if(LogInfo)
+                                    Debug.LogWarning("out of range... " + row.Count + " " + entryIndex);
+                            }
 
 							hasInfo = true;
 						}
