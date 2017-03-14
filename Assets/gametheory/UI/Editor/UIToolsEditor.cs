@@ -326,11 +326,11 @@ namespace gametheory.UI
 			if(Selection.gameObjects.Length > 0)
 			{
 				GameObject obj = null;
-				PaginingList rect = null;
+				PagingList rect = null;
 				for(int index =0; index < Selection.gameObjects.Length; index++)
 				{
 					obj = Selection.gameObjects[index];
-					rect = obj.AddComponent<PaginingList>();
+					rect = obj.AddComponent<PagingList>();
 
 					rect.Scroll = obj.GetComponent<ScrollRect>();
 				}

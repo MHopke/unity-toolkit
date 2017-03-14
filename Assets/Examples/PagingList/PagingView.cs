@@ -9,7 +9,7 @@ public class PagingView : UIView
 	#region Public Vars
 	public int NumberOfItems;
 	public SamplePageItem ItemPrefab;
-	public PaginingList PageList;
+	public PagingList PageList;
 	#endregion
 
 	#region Overridden Methods

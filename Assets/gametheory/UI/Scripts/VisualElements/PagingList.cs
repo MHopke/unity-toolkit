@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace gametheory.UI
 {
-	public class PaginingList : UIList 
+	public class PagingList : UIList 
 	{
 		#region Public Vars
 		public bool PageButtonsInList;
