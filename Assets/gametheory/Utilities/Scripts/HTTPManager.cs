@@ -10,7 +10,10 @@ using MiniJSON;
 
 namespace gametheory.Utilities
 {
-    public class BestHTTPHelper : MonoBehaviour
+    /// <summary>
+    /// Base class for anything that needs to communicate with HTTP endpoints.
+    /// </summary>
+    public class HTTPManager : MonoBehaviour
 	{
 	    #region Constants
 	    //http keys
@@ -19,49 +22,62 @@ namespace gametheory.Utilities
         #endregion
 
         #region Public Vars
-        public static BestHTTPHelper Instance;
+        public string LogName;
+        public static HTTPRequest ErrorRequest;//used to hold any errors
+        #endregion
+
+        #region Private Vars
+        bool _logRequest;
+        string _logPath;
         #endregion
 
         #region Unity Methods
-        void Start()
+        void Awake()
         {
-            enabled = false;
+            OnAwake();
+        }
+        void OnDestroy()
+        {
+            OnCleanUp();
+        }
+        #endregion
 
-            if (Instance == null)
-            {
-                Instance = this;
-            }
-            else
-            {
-                Destroy(gameObject);
-            }
+        #region Virtual Methods
+        protected virtual void OnAwake()
+        {
+            _logPath = System.IO.Path.Combine(Application.persistentDataPath, LogName + "_" + DateTime.Now);
+        }
+        protected virtual void OnCleanUp()
+        {
+
         }
         #endregion
 
         #region Methods
-        public static void AppendAuthenticationHeaders(ref HTTPRequest request, string token)
+        void AppendAuthenticationHeaders(ref HTTPRequest request, string token)
 	    {
 	        request.AddHeader("Authorization", "Bearer " + token);
 	        AppendContentHeader(ref request);
 	    }
-	    public static void AppendContentHeader(ref HTTPRequest request)
+	    void AppendContentHeader(ref HTTPRequest request)
 	    {
 	        request.AddHeader("Content-Type", CONTENT_TYPE);
 	    }
-	    public static void AppendBody(ref HTTPRequest request, string body)
+	    void AppendBody(ref HTTPRequest request, string body)
 	    {
 	        byte[] data = System.Text.Encoding.UTF8.GetBytes(body);
 	        request.AddHeader(CONTENT_LENGTH,data.Length.ToString());
 	        request.RawData = data;
 	    }
-	    public static string AppendQueryParameter(string url, string paramName, object param,bool first=false)
+	    string AppendQueryParameter(string url, string paramName, object param,bool first=false)
 	    {
 	        if (first)
 	            return url += "?" + paramName + "=" + param;
 	        else
 	            return url += "&" + paramName + "=" + param;
 	    }
-	    public static List<object> ParseGETList(string json, string key)
+
+	    List<object> ParseGETList(string json, string key)
 	    {
 	        Dictionary<string,object> dict = Json.Deserialize(json) as Dictionary<string,object>;
 
@@ -70,14 +86,50 @@ namespace gametheory.Utilities
 	        else
 	            return null;
 	    }
-	    public static JsonObject ParseResponse(string json)
+
+        HTTPRequest CreateRequest(string uri, HTTPMethods method)
+        {
+            //nullfiy request. It should only hold information if there's a failure
+            ErrorRequest = null;
+
+            return new HTTPRequest(new System.Uri(uri), method);
+        }
+
+        IEnumerator SendRequest(HTTPRequest request)
+        {
+            if (_logRequest)
+                System.IO.File.AppendAllText(_logPath, "");
+
+            request.Send();
+            yield return StartCoroutine(request);
+
+            if (_logRequest)
+                System.IO.File.AppendAllText(_logPath, "");
+        }
+
+        void HandleError(HTTPRequest request)
+        {
+            LoadAlert.Done();
+
+            string error = request.State.ToString() + " " + request.Exception;
+
+            if (request.Response != null)
+                error += " " + request.Response.StatusCode + " with data:\n" + request.Response.DataAsText;
+
+            Debug.Log(error);
+
+            ErrorRequest = request;
+        }
+
+        static JsonObject ParseResponse(string json)
 	    {
 	        if (!string.IsNullOrEmpty(json))
 	            return new JsonObject(json);
 	        else
 	            return null;
 	    }
-        public IEnumerator CallToServer(string url, HTTPMethods method, Dictionary<string, string> dictParameters, WWWForm formParameters, List<HTTPTuple> tupleParameters, Action<Dictionary<string, object>> successCallback = null, Action<string> requestNotOKCallback = null, Action<string> failureCallback = null, Action requestFailureCallback = null)
+
+        IEnumerator CallToServer(string url, HTTPMethods method, Dictionary<string, string> dictParameters, WWWForm formParameters, List<HTTPTuple> tupleParameters, Action<Dictionary<string, object>> successCallback = null, Action<string> requestNotOKCallback = null, Action<string> failureCallback = null, Action requestFailureCallback = null)
         {
             HTTPRequest request = new HTTPRequest(new Uri(url), method);
             request.SetHeader("Accept", "application/json");
@@ -133,14 +185,18 @@ namespace gametheory.Utilities
 
     public class HTTPTuple
     {
+        #region Public Vars
         public string Key;
         public string Value;
+        #endregion
 
+        #region Constructors
         public HTTPTuple(string key, string value)
         {
             Key = key;
             Value = value;
         }
+        #endregion
     }
 }
 #endif
