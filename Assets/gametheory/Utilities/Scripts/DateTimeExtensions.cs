@@ -25,7 +25,11 @@ namespace gametheory.Utilities
 	    public static DateTime EndOfMonth(this DateTime date)
 	    {
 	        return new DateTime(date.Year,date.Month,DateTime.DaysInMonth(date.Year,date.Month));
-	    }
+		}
+		public static DateTime StartOfNextMonth(this DateTime date)
+		{
+			return date.EndOfMonth().AddDays(1);
+		}
 	    public static DateTime StartOfWeek(this DateTime date)
 	    {
 	        return date.AddDays(-(int)date.DayOfWeek).Date;
@@ -34,6 +38,10 @@ namespace gametheory.Utilities
 	    {
 	        return (date.AddDays(DayOfWeek.Saturday - date.DayOfWeek)).Date;
 	    }
+		public static DateTime StartOfNextWeek(this DateTime date)
+		{
+			return date.EndOfWeek().AddDays(1);
+		}
 		public static string AbbreviatedMonth(this DateTime date)
 		{
 			switch (date.Month)
