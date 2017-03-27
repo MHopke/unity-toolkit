@@ -62,6 +62,7 @@ namespace gametheory.UI
         #region Unity Methods
         void OnDestroy()
         {
+            Deactivate();
             CleanUp();
         }
         #endregion

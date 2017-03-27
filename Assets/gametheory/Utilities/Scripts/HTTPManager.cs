@@ -5,8 +5,10 @@ using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+
 using BestHTTP;
-using MiniJSON;
+
+using Newtonsoft.Json;
 
 namespace gametheory.Utilities
 {
@@ -19,16 +21,18 @@ namespace gametheory.Utilities
 	    //http keys
 	    const string CONTENT_TYPE = "application/json";
 	    const string CONTENT_LENGTH = "Content-Length";
+        const string REQUEST_DIVIDER = "\n---";
         #endregion
 
         #region Public Vars
-        public string LogName;
+        public bool LogRequest;
+        public string LogFileName;
         public static HTTPRequest ErrorRequest;//used to hold any errors
         #endregion
 
         #region Private Vars
-        bool _logRequest;
         string _logPath;
+        string _body;
         #endregion
 
         #region Unity Methods
@@ -45,7 +49,7 @@ namespace gametheory.Utilities
         #region Virtual Methods
         protected virtual void OnAwake()
         {
-            _logPath = System.IO.Path.Combine(Application.persistentDataPath, LogName + "_" + DateTime.Now);
+            _logPath = System.IO.Path.Combine(Application.persistentDataPath, LogFileName + "_" + DateTime.Now);
         }
         protected virtual void OnCleanUp()
         {
@@ -65,6 +69,7 @@ namespace gametheory.Utilities
 	    }
 	    void AppendBody(ref HTTPRequest request, string body)
 	    {
+            _body = body;
 	        byte[] data = System.Text.Encoding.UTF8.GetBytes(body);
 	        request.AddHeader(CONTENT_LENGTH,data.Length.ToString());
 	        request.RawData = data;
@@ -77,16 +82,6 @@ namespace gametheory.Utilities
 	            return url += "&" + paramName + "=" + param;
 	    }
 
-	    List<object> ParseGETList(string json, string key)
-	    {
-	        Dictionary<string,object> dict = Json.Deserialize(json) as Dictionary<string,object>;
-
-	        if (dict.ContainsKey(key))
-	            return dict[key] as List<object>;
-	        else
-	            return null;
-	    }
-
         HTTPRequest CreateRequest(string uri, HTTPMethods method)
         {
             //nullfiy request. It should only hold information if there's a failure
@@ -97,14 +92,16 @@ namespace gametheory.Utilities
 
         IEnumerator SendRequest(HTTPRequest request)
         {
-            if (_logRequest)
-                System.IO.File.AppendAllText(_logPath, "");
-
             request.Send();
             yield return StartCoroutine(request);
 
-            if (_logRequest)
-                System.IO.File.AppendAllText(_logPath, "");
+            if (LogRequest)
+            {
+                Dictionary<string, object> dict = new Dictionary<string, object>();
+                dict.Add("sentBody", _body);
+                dict.Add("request", request);
+                System.IO.File.AppendAllText(_logPath, JsonConvert.SerializeObject(dict) + REQUEST_DIVIDER);
+            }
         }
 
         void HandleError(HTTPRequest request)
@@ -129,7 +126,8 @@ namespace gametheory.Utilities
 	            return null;
 	    }
 
-        IEnumerator CallToServer(string url, HTTPMethods method, Dictionary<string, string> dictParameters, WWWForm formParameters, List<HTTPTuple> tupleParameters, Action<Dictionary<string, object>> successCallback = null, Action<string> requestNotOKCallback = null, Action<string> failureCallback = null, Action requestFailureCallback = null)
+        //legacy method from CampConquer specific functionality
+        /*IEnumerator CallToServer(string url, HTTPMethods method, Dictionary<string, string> dictParameters, WWWForm formParameters, List<HTTPTuple> tupleParameters, Action<Dictionary<string, object>> successCallback = null, Action<string> requestNotOKCallback = null, Action<string> failureCallback = null, Action requestFailureCallback = null)
         {
             HTTPRequest request = new HTTPRequest(new Uri(url), method);
             request.SetHeader("Accept", "application/json");
@@ -179,7 +177,7 @@ namespace gametheory.Utilities
                 if (requestFailureCallback != null)
                     requestFailureCallback();
             }
-        }
+        }*/
         #endregion
     }
 
