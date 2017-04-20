@@ -204,5 +204,47 @@ public static class UnityExtensions
 		rect.width *= scale.x;
 		rect.height *= scale.y;
 	}
-	#endregion
+    #endregion
+
+    #region Sprite Extensions
+    /// <summary>
+    /// Will "merge" two sprites into one. The right sprite overwrites the left. Also the images MUST be the same size.
+    /// </summary>
+    /// <param name="left"></param>
+    /// <param name="right"></param>
+    /// <returns></returns>
+    public static Sprite DiagonalMerge(Sprite left, Sprite right)
+    {
+        Texture2D temp = new Texture2D(left.texture.width, left.texture.height);
+        Color[] botPixels = right.texture.GetPixels();
+        Color[] topPixels = left.texture.GetPixels();
+
+        int rowLength = temp.width;
+        int rowDif = Mathf.RoundToInt((float)temp.width / (float)temp.height);
+        int sub = 0;
+        int arrayIndex = 0;
+        int pixelsToFill = 0;
+        for (int index = 0; index < temp.height; index++)
+        {
+            pixelsToFill = temp.width - rowLength;
+            arrayIndex = (index * temp.width) + rowLength;
+            //Debug.Log(index + " pixels to fill: " + pixelsToFill + " arrayIndex: " + arrayIndex);
+            for (sub = 0; sub < pixelsToFill; sub++)
+            {
+                topPixels[arrayIndex] = botPixels[arrayIndex];
+                arrayIndex++;
+                //Debug.Log("sub: " + sub + " arrayIndex: " + arrayIndex);
+            }
+
+            rowLength -= rowDif;
+            if (rowLength < 0)
+                rowLength = 0;
+        }
+        temp.SetPixels(topPixels);
+        temp.Apply();
+
+        return Sprite.Create(temp, left.rect, new Vector2(0.5f, 0.5f));
+    }
+    #endregion
+
 }
