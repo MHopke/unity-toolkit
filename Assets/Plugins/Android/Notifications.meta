@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 72c02a9c6954c7a4f9087e280fbf6a94
+folderAsset: yes
+timeCreated: 1460290486
+licenseType: Store
+PluginImporter:
+  serializedVersion: 1
+  iconMap: {}
+  executionOrder: {}
+  isPreloaded: 0
+  platformData:
+    Any:
+      enabled: 1
+      settings: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
