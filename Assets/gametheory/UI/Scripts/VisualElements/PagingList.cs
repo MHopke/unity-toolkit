@@ -9,268 +9,270 @@ namespace gametheory.UI
 {
 	public class PagingList : UIList 
 	{
-		#region Public Vars
-		public bool PageButtonsInList;
+        #region Public Vars
+        public bool PageButtonsInList;
 
-		public int ItemsPerPage;
-		[Tooltip("Used to determine if the scrollbars should hide or not")]
-		public int ItemsBeforeScroll;
+        public int ItemsPerPage;
+        [Tooltip("Used to determine if the scrollbars should hide or not")]
+        public int ItemsBeforeScroll;
 
-		//public string PageCount
+        public Vector2 ResetPos;
 
-		public ExtendedText PageCount;
-		public ExtendedButton NextButton;
-		public ExtendedButton PreviousButton;
-		#endregion
+        //public string PageCount
 
-		#region Private Vars
-		bool _isVertical, _isHorizontal;
+        public ExtendedText PageCount;
+        public ExtendedButton NextButton;
+        public ExtendedButton PreviousButton;
+        #endregion
 
-		int _pageIndex, _lastPage, _itemsOnPage, _dataCount;
-		#endregion
+        #region Private Vars
+        bool _isVertical, _isHorizontal;
 
-		#region Overridden Methods
-		protected override void OnActivate ()
-		{
-			base.OnActivate ();
-			AdjustButtons();
-		}
-		protected override void OnInit ()
-		{
-			base.OnInit ();
+        int _pageIndex, _lastPage, _itemsOnPage, _dataCount;
+        #endregion
 
-			_isVertical = Scroll.vertical;
-			_isHorizontal = Scroll.horizontal;
-		}
-		#endregion
+        #region Overridden Methods
+        protected override void OnActivate()
+        {
+            base.OnActivate();
+            AdjustButtons();
+        }
+        protected override void OnInit()
+        {
+            base.OnInit();
 
-		#region UI Methods
-		public void NextPage()
-		{
-			_pageIndex++;
-			AdjustPage();
-		}
+            _isVertical = Scroll.vertical;
+            _isHorizontal = Scroll.horizontal;
+        }
+        #endregion
 
-		public void PreviousPage()
-		{
-			_pageIndex--;
-			AdjustPage();
-		}
-		#endregion
+        #region UI Methods
+        public void NextPage()
+        {
+            _pageIndex++;
+            AdjustPage();
+        }
 
-		#region Methods
-		public void SetupList(VisualElement prefab, IEnumerable data)
-		{
-			_itemPrefab = prefab;
-			SetContext(data);
+        public void PreviousPage()
+        {
+            _pageIndex--;
+            AdjustPage();
+        }
+        #endregion
 
-			int dif = ItemsPerPage - ListItems.Count;
-			if(dif > 0)
-			{
-				for(int index=0; index < dif; index++)
-				{
-					AddItem(null);
-				}
-			}
+        #region Methods
+        public void SetupList(VisualElement prefab, IEnumerable data)
+        {
+            _itemPrefab = prefab;
+            SetContext(data);
 
-			_pageIndex = 0;
+            int dif = ItemsPerPage - ListItems.Count;
+            if (dif > 0)
+            {
+                for (int index = 0; index < dif; index++)
+                {
+                    AddItem(null);
+                }
+            }
 
-			//calculate the last page
+            _pageIndex = 0;
 
-			if(data != null)
-				_dataCount = data.Count();
-			else
-				_dataCount = 0;
-			
-			_lastPage = Mathf.CeilToInt((float)_dataCount / (float)ItemsPerPage) - 1;
+            //calculate the last page
 
-			if(PageCount != null)
-			{
-				if(_lastPage > _pageIndex)
-					PageCount.Activate();
-				else
-					PageCount.Deactivate();
-			}
+            if (data != null)
+                _dataCount = data.Count();
+            else
+                _dataCount = 0;
 
-			AdjustPage();
-			AdjustButtons();
-		}
+            _lastPage = Mathf.CeilToInt((float)_dataCount / (float)ItemsPerPage) - 1;
 
-		public void AddItem(object obj)
-		{
-			DeactivateEmptyItem();
+            if (PageCount != null)
+            {
+                if (_lastPage > _pageIndex)
+                    PageCount.Activate();
+                else
+                    PageCount.Deactivate();
+            }
 
-			VisualElement element = (VisualElement)GameObject.Instantiate(_itemPrefab,Vector3.zero,Quaternion.identity);
+            AdjustPage();
+            AdjustButtons();
+        }
 
-			(element.transform as RectTransform).SetParent(ContentTransform,false);
-			ListItems.Add(element);
+        public void AddItem(object obj)
+        {
+            DeactivateEmptyItem();
 
-			if(PageButtonsInList)
-				element.transform.SetSiblingIndex(ListItems.Count - 1);
+            VisualElement element = (VisualElement)GameObject.Instantiate(_itemPrefab, Vector3.zero, Quaternion.identity);
 
-			element.Init();
+            (element.transform as RectTransform).SetParent(ContentTransform, false);
+            ListItems.Add(element);
 
-			AddListeners(element as ListElement,obj);
+            if (PageButtonsInList)
+                element.transform.SetSiblingIndex(ListItems.Count - 1);
 
-			if(_active)
-				element.Activate();
-			else
-				element.PresentVisuals(false);
-		}
+            element.Init();
 
-		void AdjustPage()
-		{
-			//set to the next dataIndex
-			int dataIndex = _pageIndex * ItemsPerPage;
-			int index = 0, elementIndex=0;
+            AddListeners(element as ListElement, obj);
 
-			_itemsOnPage =0;
+            if (_active)
+                element.Activate();
+            else
+                element.PresentVisuals(false);
+        }
 
-			VisualElement element = null;
-			if(_listContext != null)
-			{
-				//loop through the entire list of elements
-				foreach (var item in _listContext)
-				{
-					index++;
-					if(index > dataIndex)
-					{
-						if(dataIndex < _dataCount)
-						{
-							element = ListItems[elementIndex];
+        void AdjustPage()
+        {
+            //set to the next dataIndex
+            int dataIndex = _pageIndex * ItemsPerPage;
+            int index = 0, elementIndex = 0;
 
-							if(!element.gameObject.activeSelf)
-								element.gameObject.SetActive(true);
-							
-							element.SetContext(item);
+            _itemsOnPage = 0;
 
-							if(_active)
-								element.Activate();
+            VisualElement element = null;
+            if (_listContext != null)
+            {
+                //loop through the entire list of elements
+                foreach (var item in _listContext)
+                {
+                    index++;
+                    if (index > dataIndex)
+                    {
+                        if (dataIndex < _dataCount)
+                        {
+                            element = ListItems[elementIndex];
 
-							dataIndex++;
-							_itemsOnPage++;
-							elementIndex++;
+                            if (!element.gameObject.activeSelf)
+                                element.gameObject.SetActive(true);
 
-							//cut out if we've reached the max page items
-							if(_itemsOnPage >= ItemsPerPage)
-								break;
-						}
-					}
-				}
-			}
+                            element.SetContext(item);
 
-			for(index =elementIndex; index < ListItems.Count; index++)
-			{
-				element = ListItems[index];
-					element.Deactivate();
+                            if (_active)
+                                element.Activate();
 
-				if(element.gameObject.activeSelf)
-					element.gameObject.SetActive(false);
-			}
+                            dataIndex++;
+                            _itemsOnPage++;
+                            elementIndex++;
 
-			if(Scroll.vertical)
-				Scroll.verticalNormalizedPosition = 0f;
-			if(Scroll.horizontal)
-				Scroll.horizontalNormalizedPosition = 0f;
+                            //cut out if we've reached the max page items
+                            if (_itemsOnPage >= ItemsPerPage)
+                                break;
+                        }
+                    }
+                }
+            }
 
-			AdjustButtons();
-			AdjustBars();
-		}
+            for (index = elementIndex; index < ListItems.Count; index++)
+            {
+                element = ListItems[index];
+                element.Deactivate();
 
-		void AdjustButtons()
-		{
-			if(!_active)
-				return;
+                if (element.gameObject.activeSelf)
+                    element.gameObject.SetActive(false);
+            }
 
-			//Debug.Log(_dataCount + " " + ItemsPerPage);
-			if(_dataCount < ItemsPerPage)
-			{
-				if(NextButton)
-					NextButton.Deactivate();
+            if (Scroll.vertical)
+                Scroll.verticalNormalizedPosition = ResetPos.y;
+            if (Scroll.horizontal)
+                Scroll.horizontalNormalizedPosition = ResetPos.x;
 
-				if(PreviousButton)
-					PreviousButton.Deactivate();
-			}
-			else
-			{
-				if(NextButton)
-					NextButton.Activate();
-				if(PreviousButton)
-					PreviousButton.Activate();
-			}
+            AdjustButtons();
+            AdjustBars();
+        }
 
-			//somewhere in the middle so both should be active
-			if(_pageIndex >= 0 && _pageIndex <= _lastPage)
-			{
-				if(PreviousButton)
-					PreviousButton.Enable();
+        void AdjustButtons()
+        {
+            if (!_active)
+                return;
 
-				if(NextButton)
-					NextButton.Enable();
-			}
+            //Debug.Log(_dataCount + " " + ItemsPerPage);
+            if (_dataCount < ItemsPerPage)
+            {
+                if (NextButton)
+                    NextButton.Deactivate();
 
-			if(_pageIndex == 0)
-			{
-				if(PreviousButton)
-					PreviousButton.Disable();
-			}
+                if (PreviousButton)
+                    PreviousButton.Deactivate();
+            }
+            else
+            {
+                if (NextButton)
+                    NextButton.Activate();
+                if (PreviousButton)
+                    PreviousButton.Activate();
+            }
 
-			if(_pageIndex == _lastPage)
-			{
-				if(NextButton)
-					NextButton.Disable();
-			}
+            //somewhere in the middle so both should be active
+            if (_pageIndex >= 0 && _pageIndex <= _lastPage)
+            {
+                if (PreviousButton)
+                    PreviousButton.Enable();
 
-			if(PageCount != null &&  PageCount.Active)
-				PageCount.Text = (_pageIndex + 1) + "/" + (_lastPage + 1);
-		}
+                if (NextButton)
+                    NextButton.Enable();
+            }
 
-		void AdjustBars()
-		{
-			if(_itemsOnPage < ItemsBeforeScroll)
-			{
-				/*if(Scroll.verticalScrollbar && Scroll.verticalScrollbar.gameObject.activeSelf)
+            if (_pageIndex == 0)
+            {
+                if (PreviousButton)
+                    PreviousButton.Disable();
+            }
+
+            if (_pageIndex == _lastPage)
+            {
+                if (NextButton)
+                    NextButton.Disable();
+            }
+
+            if (PageCount != null && PageCount.Active)
+                PageCount.Text = (_pageIndex + 1) + "/" + (_lastPage + 1);
+        }
+
+        void AdjustBars()
+        {
+            if (_itemsOnPage < ItemsBeforeScroll)
+            {
+                /*if(Scroll.verticalScrollbar && Scroll.verticalScrollbar.gameObject.activeSelf)
 					Scroll.verticalScrollbar.gameObject.SetActive(false);
 
 				if(Scroll.horizontalScrollbar && !Scroll.horizontalScrollbar.gameObject.activeSelf)
 					Scroll.horizontalScrollbar.gameObject.SetActive(false);*/
 
-				if(_isVertical && Scroll.vertical)
-					Scroll.vertical = false;
+                if (_isVertical && Scroll.vertical)
+                    Scroll.vertical = false;
 
-				if(_isHorizontal && Scroll.horizontal)
-					Scroll.horizontal = false;
-			}
-			else
-			{
-				/*if(Scroll.verticalScrollbar && !Scroll.verticalScrollbar.gameObject.activeSelf)
+                if (_isHorizontal && Scroll.horizontal)
+                    Scroll.horizontal = false;
+            }
+            else
+            {
+                /*if(Scroll.verticalScrollbar && !Scroll.verticalScrollbar.gameObject.activeSelf)
 					Scroll.verticalScrollbar.gameObject.SetActive(true);
 
 				if(Scroll.horizontalScrollbar && !Scroll.horizontalScrollbar.gameObject.activeSelf)
 					Scroll.horizontalScrollbar.gameObject.SetActive(true);*/
 
-				if(_isVertical && !Scroll.vertical)
-					Scroll.vertical = true;
+                if (_isVertical && !Scroll.vertical)
+                    Scroll.vertical = true;
 
-				if(_isHorizontal && !Scroll.horizontal)
-					Scroll.horizontal = true;
-			}
-		}
-		#endregion
-	}
+                if (_isHorizontal && !Scroll.horizontal)
+                    Scroll.horizontal = true;
+            }
+        }
+        #endregion
+    }
 
-	#region IEnumerable Extenstions
-	public static class IEnumerableExtensions
-	{
-		public static int Count(this IEnumerable source)
-		{
-			int res = 0;
+    #region IEnumerable Extenstions
+    public static class IEnumerableExtensions
+    {
+        public static int Count(this IEnumerable source)
+        {
+            int res = 0;
 
-			foreach (var item in source)
-				res++;
+            foreach (var item in source)
+                res++;
 
-			return res;
-		}
-	}
-	#endregion
+            return res;
+        }
+    }
+    #endregion
 }
