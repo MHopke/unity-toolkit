@@ -442,15 +442,23 @@ namespace gametheory.Utilities
 
 		void ReadLine(int line_index, List<string> line)
 		{
-			if(line_index == HeaderRow)
-			{
-				Headers =  new List<string>(line);
+            if (line_index == HeaderRow)
+            {
+                Headers = new List<string>();
+                for (int index = 0; index < line.Count; index++)
+                    Headers.Add(line[index].Trim());
 
-				/*for(int index =0; index < line.Count; index++)
+                /*for(int index =0; index < line.Count; index++)
 					Debug.Log("header: " +line[index]+"[]");*/
-			}
-			else
-				Rows.Add(new List<string>(line));
+            }
+            else
+            {
+                //trim out empty spaces
+                for (int index = 0; index < line.Count; index++)
+                    line[index] = line[index].Trim();
+
+                Rows.Add(new List<string>(line));
+            }
 		}
 		#endregion
 	}
