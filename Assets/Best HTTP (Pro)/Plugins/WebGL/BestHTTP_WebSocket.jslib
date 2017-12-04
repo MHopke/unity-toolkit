@@ -44,7 +44,9 @@ var Lib_BEST_HTTP_WebGL_WS_Bridge =
 
 	WS_Create: function(url, protocol, onOpen, onText, onBinary, onError, onClose)
 	{
-		var urlStr = encodeURI(Pointer_stringify(url)).toLowerCase().replace(/\+/g, '%2B').replace('%252f', '%2f');
+		var urlStr = /*encodeURI*/(Pointer_stringify(url))
+					.replace(/\+/g, '%2B')
+					.replace(/%252[fF]/ig, '%2F');
 		var proto = Pointer_stringify(protocol);
 
 		console.log('WS_Create(' + urlStr + ', "' + proto + '")');
@@ -84,9 +86,9 @@ var Lib_BEST_HTTP_WebGL_WS_Bridge =
 			else // Text
 			{
 				var length = lengthBytesUTF8(e.data) + 1;
-  				var buffer = _malloc(length);
+				var buffer = _malloc(length);
 
-  				stringToUTF8Array(e.data, HEAPU8, buffer, length);
+				stringToUTF8Array(e.data, HEAPU8, buffer, length);
 
 				Runtime.dynCall('vii', onText, [id, buffer]);
 
@@ -147,6 +149,12 @@ var Lib_BEST_HTTP_WebGL_WS_Bridge =
 			return 3; // closed
 
 		return socket.socketImpl.readyState;
+	},
+
+  WS_GetBufferedAmount: function (id)
+	{
+		var socket = ws.Get(id);
+		return socket.socketImpl.bufferedAmount;
 	},
 
 	WS_Send_String: function (id, str)

@@ -194,7 +194,7 @@ namespace BestHTTP.Authentication
 
                         if (qop == null)
                         {
-                            string HA2 = string.Concat(request.MethodType.ToString().ToUpper(), ":", request.CurrentUri.GetComponents(UriComponents.PathAndQuery, UriFormat.UriEscaped)).CalculateMD5Hash();
+                            string HA2 = string.Concat(request.MethodType.ToString().ToUpper(), ":", request.CurrentUri.GetRequestPathAndQueryURL()).CalculateMD5Hash();
                             response = string.Format("{0}:{1}:{2}", HA1, Nonce, HA2).CalculateMD5Hash();
                         }
                         else if (qop.Contains("auth-int"))
@@ -206,14 +206,14 @@ namespace BestHTTP.Authentication
                             if (entityBody == null)
                                 entityBody = string.Empty.GetASCIIBytes();
 
-                            string HA2 = string.Format("{0}:{1}:{2}", request.MethodType.ToString().ToUpper(), request.CurrentUri.GetComponents(UriComponents.PathAndQuery, UriFormat.UriEscaped), entityBody.CalculateMD5Hash()).CalculateMD5Hash();
+                            string HA2 = string.Format("{0}:{1}:{2}", request.MethodType.ToString().ToUpper(), request.CurrentUri.GetRequestPathAndQueryURL(), entityBody.CalculateMD5Hash()).CalculateMD5Hash();
 
                             response = string.Format("{0}:{1}:{2}:{3}:{4}:{5}", HA1, Nonce, ncvalue, cnonce, qop, HA2).CalculateMD5Hash();
                         }
                         else if (qop.Contains("auth"))
                         {
                             qop = "auth";
-                            string HA2 = string.Concat(request.MethodType.ToString().ToUpper(), ":", request.CurrentUri.GetComponents(UriComponents.PathAndQuery, UriFormat.UriEscaped)).CalculateMD5Hash();
+                            string HA2 = string.Concat(request.MethodType.ToString().ToUpper(), ":", request.CurrentUri.GetRequestPathAndQueryURL()).CalculateMD5Hash();
 
                             response = string.Format("{0}:{1}:{2}:{3}:{4}:{5}", HA1, Nonce, ncvalue, cnonce, qop, HA2).CalculateMD5Hash();
                         }
@@ -221,7 +221,7 @@ namespace BestHTTP.Authentication
                             return string.Empty;
 
                         string result = string.Format("Digest username=\"{0}\", realm=\"{1}\", nonce=\"{2}\", uri=\"{3}\", cnonce=\"{4}\", response=\"{5}\"",
-                                                                credentials.UserName, Realm, Nonce, request.Uri.GetComponents(UriComponents.PathAndQuery, UriFormat.UriEscaped), cnonce, response);
+                                                                credentials.UserName, Realm, Nonce, request.Uri.GetRequestPathAndQueryURL(), cnonce, response);
 
                         if (qop != null)
                             result += String.Concat(", qop=\"", qop, "\", nc=", ncvalue);

@@ -25,7 +25,7 @@ namespace BestHTTP
         public static bool IsCreated { get; private set; }
 
         /// <summary>
-        /// Set it true before any CheckInstance() call, or before any request send to dispatch callbacks on another thread.
+        /// Set it true before any CheckInstance() call, or before any request sent to dispatch callbacks on another thread.
         /// </summary>
         public static bool IsThreaded { get; set; }
 
@@ -71,13 +71,8 @@ namespace BestHTTP
                     if (Instance == null)
                     {
                         go = new GameObject("HTTP Update Delegator");
-                        go.hideFlags = HideFlags.HideAndDontSave;
-
-#if UNITY_EDITOR
-                        if (UnityEditor.EditorApplication.isPlaying)
-                            GameObject.DontDestroyOnLoad(go);
-#endif
-
+                        go.hideFlags = HideFlags.DontSave;
+                        
                         Instance = go.AddComponent<HTTPUpdateDelegator>();
                     }
                     IsCreated = true;
@@ -93,6 +88,7 @@ namespace BestHTTP
                     UnityEditor.EditorApplication.playmodeStateChanged += Instance.OnPlayModeStateChanged;
 #endif
                 }
+                HTTPManager.Logger.Information("HTTPUpdateDelegator", "Instance Created!");
             }
             catch
             {
@@ -111,7 +107,7 @@ namespace BestHTTP
             Cookies.CookieJar.Load();
 #endif
 
-#if UNITY_WEBGL
+#if UNITY_WEBGL && !UNITY_EDITOR
             // Threads are not implemented in WEBGL builds, disable it for now.
             IsThreaded = false;
 #endif
@@ -120,12 +116,20 @@ namespace BestHTTP
 #if NETFX_CORE
                 Windows.System.Threading.ThreadPool.RunAsync(ThreadFunc);
 #else
-                new System.Threading.Thread(ThreadFunc)
-                    .Start();
+                System.Threading.ThreadPool.QueueUserWorkItem(new System.Threading.WaitCallback(ThreadFunc));
 #endif
             }
 
             IsSetupCalled = true;
+
+            // Unity doesn't tolerate well if the DontDestroyOnLoad called when purely in editor mode. So, we will set the flag
+            //  only when we are playing, or not in the editor.
+#if UNITY_EDITOR
+            if (UnityEditor.EditorApplication.isPlaying)
+#endif
+                GameObject.DontDestroyOnLoad(this.gameObject);
+
+            HTTPManager.Logger.Information("HTTPUpdateDelegator", "Setup done!");
         }
 
 #if NETFX_CORE
@@ -179,6 +183,8 @@ namespace BestHTTP
 
         void OnDisable()
         {
+            HTTPManager.Logger.Information("HTTPUpdateDelegator", "OnDisable Called!");
+
 #if UNITY_EDITOR
             if (UnityEditor.EditorApplication.isPlaying)
 #endif
@@ -187,6 +193,8 @@ namespace BestHTTP
 
         void OnApplicationQuit()
         {
+            HTTPManager.Logger.Information("HTTPUpdateDelegator", "OnApplicationQuit Called!");
+
             if (OnBeforeApplicationQuit != null)
             {
                 try

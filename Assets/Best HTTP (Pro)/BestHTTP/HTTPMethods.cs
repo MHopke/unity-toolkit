@@ -63,6 +63,12 @@
         /// The set of changes is represented in a format called a "patchdocument" identified by a media type. If the Request-URI does not point to an existing resource,
         /// the server MAY create a new resource, depending on the patch document type (whether it can logically modify a null resource) and permissions, etc.
         /// </summary>
-        Patch
+        Patch,
+
+        /// <summary>
+        /// The HTTP methods PATCH can be used to update partial resources. For instance, when you only need to update one field of the resource, PUTting a complete resource representation might be cumbersome and utilizes more bandwidth.
+        /// <seealso href="http://restcookbook.com/HTTP%20Methods/patch/"/>
+        /// </summary>
+        Merge
     }
 }

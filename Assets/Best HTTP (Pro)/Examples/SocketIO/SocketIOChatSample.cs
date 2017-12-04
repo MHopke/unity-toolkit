@@ -78,7 +78,7 @@ public sealed class SocketIOChatSample : MonoBehaviour
         options.AutoConnect = false;
 
         // Create the Socket.IO manager
-        Manager = new SocketManager(new Uri("http://chat.socket.io/socket.io/"), options);
+        Manager = new SocketManager(new Uri("http://localhost:3000/socket.io/"), options);
 
         // Set up custom chat events
         Manager.Socket.On("login", OnLogin);
@@ -90,6 +90,16 @@ public sealed class SocketIOChatSample : MonoBehaviour
 
         // The argument will be an Error object.
         Manager.Socket.On(SocketIOEventTypes.Error, (socket, packet, args) => Debug.LogError(string.Format("Error: {0}", args[0].ToString())));
+
+        Manager.GetSocket("/nsp").On(SocketIOEventTypes.Connect, (socket, packet, arg) => {
+            Debug.LogWarning("Connected to /nsp");
+
+            socket.Emit("testmsg", "Message from /nsp 'on connect'");
+        });
+
+        Manager.GetSocket("/nsp").On("nsp_message", (socket, packet, arg) => {
+            Debug.LogWarning("nsp_message: " + arg[0]);
+        });
 
         // We set SocketOptions' AutoConnect to false, so we have to call it manually.
         Manager.Open();

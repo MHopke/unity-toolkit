@@ -39,7 +39,7 @@ class DemoHubSample : MonoBehaviour
     /// </summary>
     string vbReadStateResult = string.Empty;
 
-    Vector2 scrollPos;    
+    Vector2 scrollPos;
 
     void Start()
     {

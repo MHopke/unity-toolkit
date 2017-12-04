@@ -20,12 +20,19 @@ public class DefaultAlert : UIAlert
     public ExtendedButton CloseButton;
 
 	public static bool IsOpen;
+    public static DefaultAlert Instance = null;
     #endregion
 
     #region Private Vars
     string CONFIRM_TEXT = "CONFIRM";
     static Queue<AlertContent> _alertQueue;
-	static DefaultAlert _instance = null;
+    #endregion
+
+    #region Unity Methods
+    void Awake()
+    {
+        Initialize();
+    }
     #endregion
 
     #region Overriden Methods
@@ -36,16 +43,18 @@ public class DefaultAlert : UIAlert
 		IsOpen = false;
 
         _alertQueue = new Queue<AlertContent>();
+
+        Instance = this;
     }
-    protected override void OnDeactivate()
+    protected override void OnCleanUp()
     {
-		base.OnDeactivate();
-		_instance = null;
+        Instance = null;
+        base.OnCleanUp();
     }
     #endregion
 
-	#region UI Methods
-	public void Confirm()
+    #region UI Methods
+    public void Confirm()
 	{
 		if(IsQueueEmpty())
 		{
@@ -58,7 +67,7 @@ public class DefaultAlert : UIAlert
 
 		confirm = null;
 		cancel = null;
-	}
+    }
 	public void Cancel()
 	{
 		if(IsQueueEmpty())
@@ -72,30 +81,28 @@ public class DefaultAlert : UIAlert
 
 		confirm = null;
 		cancel = null;
-	}
+    }
 	#endregion
 
     #region Methods
     public static void Present(string title, string message, Action confirmCallback=null, Action cancelCallback=null, bool showClose = false, string confirmText="")
     {
-		GetInstance();
-
         if (confirmText == "")
-            confirmText = _instance.CONFIRM_TEXT;
+            confirmText = Instance.CONFIRM_TEXT;
 
         if (_alertQueue.Count == 0)
         {
             confirm = confirmCallback;
             cancel = cancelCallback;
         
-            _instance.TitleText.text = title;
-            _instance.MessageText.text = message;
-            _instance.ConfirmText.text = confirmText;
+            Instance.TitleText.text = title;
+            Instance.MessageText.text = message;
+            Instance.ConfirmText.text = confirmText;
 
-			UIAlertController.Instance.PresentAlert(_instance);
+			UIAlertController.Instance.PresentAlert(Instance);
 
 			if (showClose)
-				_instance.CloseButton.Activate();
+				Instance.CloseButton.Activate();
 
             IsOpen = true;
         }
@@ -136,15 +143,6 @@ public class DefaultAlert : UIAlert
 		}
 		else
 			return true;
-	}
-
-	static void GetInstance()
-	{
-		if(_instance == null)
-		{
-			_instance = Load("Alerts/DefaultAlert",
-				UIAlertController.Instance.CanvasRect) as DefaultAlert;
-		}
 	}
     #endregion
 

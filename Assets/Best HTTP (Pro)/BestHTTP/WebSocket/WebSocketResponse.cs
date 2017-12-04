@@ -55,6 +55,12 @@ namespace BestHTTP.WebSocket
         /// </summary>
         public UInt16 MaxFragmentSize { get; private set; }
 
+        /// <summary>
+        /// Length of unsent, buffered up data in bytes.
+        /// </summary>
+        public int BufferedAmount { get { return this._bufferedAmount; } }
+        private int _bufferedAmount;
+
         #endregion
 
         #region Private Fields
@@ -66,15 +72,19 @@ namespace BestHTTP.WebSocket
         private object FrameLock = new object();
         private object SendLock = new object();
 
+        private List<WebSocketFrame> unsentFrames = new List<WebSocketFrame>();
+        private AutoResetEvent newFrameSignal = new AutoResetEvent(false);
+        private volatile bool sendThreadCreated = false;
+
         /// <summary>
         /// True if we sent out a Close message to the server
         /// </summary>
-        private bool closeSent;
+        private volatile bool closeSent;
 
         /// <summary>
         /// True if this WebSocket connection is closed
         /// </summary>
-        private bool closed;
+        private volatile bool closed;
 
         private DateTime lastPing = DateTime.MinValue;
 
@@ -99,10 +109,15 @@ namespace BestHTTP.WebSocket
                 #pragma warning restore 4014
 #else
                 ThreadPool.QueueUserWorkItem(ReceiveThreadFunc);
-                //new Thread(ReceiveThreadFunc)
-                //    .Start();
 #endif
             }
+        }
+
+        internal void CloseStream()
+        {
+            var conn = HTTPManager.GetConnectionWith(this.baseRequest);
+            if (conn != null)
+                conn.Abort(HTTPConnectionStates.Closed);
         }
 
         #region Public interface for interacting with the server
@@ -186,15 +201,27 @@ namespace BestHTTP.WebSocket
             if (closed)
                 return;
 
-            byte[] rawData = frame.Get();
             lock (SendLock)
             {
-                Stream.Write(rawData, 0, rawData.Length);
-                Stream.Flush();
+                this.unsentFrames.Add(frame);
+                Interlocked.Add(ref this._bufferedAmount, frame.Data != null ? frame.Data.Length : 0);
 
-                if (frame.Type == WebSocketFrameTypes.ConnectionClose)
-                    closeSent = true;
+                if (!sendThreadCreated)
+                {
+#if NETFX_CORE
+#pragma warning disable 4014
+                    Windows.System.Threading.ThreadPool.RunAsync(SendThreadFunc);
+#pragma warning restore 4014
+#else
+                    ThreadPool.QueueUserWorkItem(SendThreadFunc);
+#endif
+                    sendThreadCreated = true;
+                }
             }
+
+            HTTPManager.Logger.Information("WebSocketResponse", "Signaling SendThread!");
+
+            newFrameSignal.Set();
         }
 
         /// <summary>
@@ -219,7 +246,7 @@ namespace BestHTTP.WebSocket
         public void StartPinging(int frequency)
         {
             if (frequency < 100)
-                throw new ArgumentException("frequency must be at least 100 millisec!");
+                throw new ArgumentException("frequency must be at least 100 milliseconds!");
 
             PingFrequnecy = TimeSpan.FromMilliseconds(frequency);
 
@@ -229,6 +256,71 @@ namespace BestHTTP.WebSocket
         #endregion
 
         #region Private Threading Functions
+
+        private void SendThreadFunc(object param)
+        {
+            List<WebSocketFrame> localFrames = new List<WebSocketFrame>();
+            try
+            {
+                while (!closed && !closeSent)
+                {
+                    if (HTTPManager.Logger.Level <= Logger.Loglevels.Information)
+                        HTTPManager.Logger.Information("WebSocketResponse", "SendThread - Waiting...");
+                    newFrameSignal.WaitOne();
+
+                    try
+                    {
+                        lock (SendLock)
+                        {
+                            // add frames reversed in order
+                            for (int i = this.unsentFrames.Count - 1; i >= 0; --i)
+                                localFrames.Add(this.unsentFrames[i]);
+
+                            this.unsentFrames.Clear();
+                        }
+
+                        if (HTTPManager.Logger.Level <= Logger.Loglevels.Information)
+                            HTTPManager.Logger.Information("WebSocketResponse", "SendThread - Wait is over, " + localFrames.Count.ToString() + " new frames!");
+
+                        while (localFrames.Count > 0)
+                        {
+                            WebSocketFrame frame = localFrames[localFrames.Count - 1];
+                            localFrames.RemoveAt(localFrames.Count - 1);
+
+                            if (!closeSent)
+                            {
+                                byte[] rawData = frame.Get();
+                                Stream.Write(rawData, 0, rawData.Length);
+                                Stream.Flush();
+
+                                if (frame.Type == WebSocketFrameTypes.ConnectionClose)
+                                    closeSent = true;
+                            }
+
+                            Interlocked.Add(ref this._bufferedAmount, -frame.Data.Length);
+                        }
+                    }
+                    catch(Exception ex)
+                    {
+                        if (HTTPUpdateDelegator.IsCreated)
+                        {
+                            this.baseRequest.Exception = ex;
+                            this.baseRequest.State = HTTPRequestStates.Error;
+                        }
+                        else
+                            this.baseRequest.State = HTTPRequestStates.Aborted;
+
+                        closed = true;
+                    }
+                }
+            }
+            finally
+            {
+                sendThreadCreated = false;
+
+                HTTPManager.Logger.Information("WebSocketResponse", "SendThread - Closed!");
+            }
+        }
 
         private void ReceiveThreadFunc(object param)
         {
@@ -294,9 +386,9 @@ namespace BestHTTP.WebSocket
                             // If an endpoint receives a Close frame and did not previously send a Close frame, the endpoint MUST send a Close frame in response.
                             case WebSocketFrameTypes.ConnectionClose:
                                 CloseFrame = frame;
-                                if (!closeSent)
-                                    Send(new WebSocketFrame(this.WebSocket, WebSocketFrameTypes.ConnectionClose, null));
-                                closed = closeSent;
+								if (!closeSent)
+									Send(new WebSocketFrame(this.WebSocket, WebSocketFrameTypes.ConnectionClose, null));
+                                closed = true;
                                 break;
                         }
                     }
@@ -307,6 +399,8 @@ namespace BestHTTP.WebSocket
                         this.baseRequest.State = HTTPRequestStates.Aborted;
 
                         closed = true;
+
+                        newFrameSignal.Set();
                     }
 #endif
                     catch (Exception e)
@@ -320,6 +414,7 @@ namespace BestHTTP.WebSocket
                             this.baseRequest.State = HTTPRequestStates.Aborted;
 
                         closed = true;
+                        newFrameSignal.Set();
                     }
                 }
             }

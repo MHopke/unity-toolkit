@@ -63,9 +63,11 @@ namespace BestHTTP.ServerSentEvents
         {
             bool received = base.Receive(forceReadRawContentLength, false);
 
+            string contentType = this.GetFirstHeaderValue("content-type");
             base.IsUpgraded = received &&
                               this.StatusCode == 200 &&
-                              this.HasHeaderWithValue("content-type", "text/event-stream");
+                              !string.IsNullOrEmpty(contentType) &&
+                              contentType.ToLower().StartsWith("text/event-stream");
 
             // If we didn't upgraded to the protocol we have to read all the sent payload because
             // next requests may read these datas as HTTP headers and will fail
@@ -165,7 +167,7 @@ namespace BestHTTP.ServerSentEvents
             ReadHeaders(stream);
         }
 
-        private new void ReadRaw(Stream stream, int contentLength)
+        private new void ReadRaw(Stream stream, long contentLength)
         {
             byte[] buffer = new byte[1024];
             int bytes;

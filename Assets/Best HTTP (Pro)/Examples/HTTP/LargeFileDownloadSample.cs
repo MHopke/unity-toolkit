@@ -11,7 +11,7 @@ namespace BestHTTP.Examples
         /// <summary>
         /// The url of the resource to download
         /// </summary>
-        const string URL = "http://ipv4.download.thinkbroadband.com/100MB.zip";
+        const string URL = "http://uk3.testmy.net/dl-102400";
 
         #region Private Fields
 
@@ -61,21 +61,21 @@ namespace BestHTTP.Examples
         {
             GUIHelper.DrawArea(GUIHelper.ClientArea, true, () =>
                 {
-                // Draw the current status
-                GUILayout.Label("Request status: " + status);
+                    // Draw the current status
+                    GUILayout.Label("Request status: " + status);
 
                     GUILayout.Space(5);
 
-                // Draw the current progress
-                GUILayout.Label(string.Format("Progress: {0:P2} of {1:N0}Mb", progress, PlayerPrefs.GetInt("DownloadLength") / 1048576 /*1 Mb*/));
+                    // Draw the current progress
+                    GUILayout.Label(string.Format("Progress: {0:P2} of {1:N0}Mb", progress, PlayerPrefs.GetInt("DownloadLength") / 1048576 /*1 Mb*/));
                     GUILayout.HorizontalSlider(progress, 0, 1);
 
                     GUILayout.Space(50);
 
                     if (request == null)
                     {
-                    // Draw a slider to be able to change the fragment size
-                    GUILayout.Label(string.Format("Desired Fragment Size: {0:N} KBytes", fragmentSize / 1024f));
+                        // Draw a slider to be able to change the fragment size
+                        GUILayout.Label(string.Format("Desired Fragment Size: {0:N} KBytes", fragmentSize / 1024f));
                         fragmentSize = (int)GUILayout.HorizontalSlider(fragmentSize, HTTPResponse.MinBufferSize, 10 * 1024 * 1024);
 
                         GUILayout.Space(5);
@@ -86,8 +86,8 @@ namespace BestHTTP.Examples
                     }
                     else if (request.State == HTTPRequestStates.Processing && GUILayout.Button("Abort Download"))
                     {
-                    // Simulate a connection lost
-                    request.Abort();
+                        // Simulate a connection lost
+                        request.Abort();
                     }
                 });
         }
@@ -104,37 +104,37 @@ namespace BestHTTP.Examples
             {
                 switch (req.State)
                 {
-                // The request is currently processed. With UseStreaming == true, we can get the streamed fragments here
-                case HTTPRequestStates.Processing:
+                    // The request is currently processed. With UseStreaming == true, we can get the streamed fragments here
+                    case HTTPRequestStates.Processing:
 
-                    // Set the DownloadLength, so we can display the progress
-                    if (!PlayerPrefs.HasKey("DownloadLength"))
+                        // Set the DownloadLength, so we can display the progress
+                        if (!PlayerPrefs.HasKey("DownloadLength"))
                         {
                             string value = resp.GetFirstHeaderValue("content-length");
                             if (!string.IsNullOrEmpty(value))
                                 PlayerPrefs.SetInt("DownloadLength", int.Parse(value));
                         }
 
-                    // Get the fragments, and save them
-                    ProcessFragments(resp.GetStreamedFragments());
+                        // Get the fragments, and save them
+                        ProcessFragments(resp.GetStreamedFragments());
 
                         status = "Processing";
                         break;
 
-                // The request finished without any problem.
-                case HTTPRequestStates.Finished:
+                    // The request finished without any problem.
+                    case HTTPRequestStates.Finished:
                         if (resp.IsSuccess)
                         {
-                        // Save any remaining fragments
-                        ProcessFragments(resp.GetStreamedFragments());
+                            // Save any remaining fragments
+                            ProcessFragments(resp.GetStreamedFragments());
 
-                        // Completly finished
-                        if (resp.IsStreamingFinished)
+                            // Completely finished
+                            if (resp.IsStreamingFinished)
                             {
                                 status = "Streaming finished!";
 
-                            // We are done, delete the progress key
-                            PlayerPrefs.DeleteKey("DownloadProgress");
+                                // We are done, delete the progress key
+                                PlayerPrefs.DeleteKey("DownloadProgress");
                                 PlayerPrefs.Save();
 
                                 request = null;
@@ -154,32 +154,32 @@ namespace BestHTTP.Examples
                         }
                         break;
 
-                // The request finished with an unexpected error. The request's Exception property may contain more info about the error.
-                case HTTPRequestStates.Error:
+                    // The request finished with an unexpected error. The request's Exception property may contain more info about the error.
+                    case HTTPRequestStates.Error:
                         status = "Request Finished with Error! " + (req.Exception != null ? (req.Exception.Message + "\n" + req.Exception.StackTrace) : "No Exception");
                         Debug.LogError(status);
 
                         request = null;
                         break;
 
-                // The request aborted, initiated by the user.
-                case HTTPRequestStates.Aborted:
+                    // The request aborted, initiated by the user.
+                    case HTTPRequestStates.Aborted:
                         status = "Request Aborted!";
                         Debug.LogWarning(status);
 
                         request = null;
                         break;
 
-                // Ceonnecting to the server is timed out.
-                case HTTPRequestStates.ConnectionTimedOut:
+                    // Connecting to the server is timed out.
+                    case HTTPRequestStates.ConnectionTimedOut:
                         status = "Connection Timed Out!";
                         Debug.LogError(status);
 
                         request = null;
                         break;
 
-                // The request didn't finished in the given time.
-                case HTTPRequestStates.TimedOut:
+                    // The request didn't finished in the given time.
+                    case HTTPRequestStates.TimedOut:
                         status = "Processing the request Timed Out!";
                         Debug.LogError(status);
 
@@ -197,7 +197,7 @@ namespace BestHTTP.Examples
                 PlayerPrefs.SetInt("DownloadProgress", 0);
 
 #if !BESTHTTP_DISABLE_CACHING && (!UNITY_WEBGL || UNITY_EDITOR)
-            // If we are writing our own file set it true(disable), so don't duplicate it on the filesystem
+            // If we are writing our own file set it true(disable), so don't duplicate it on the file-system
             request.DisableCache = true;
 #endif
 

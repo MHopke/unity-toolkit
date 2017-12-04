@@ -7,6 +7,7 @@ using System.Collections.Generic;
 namespace BestHTTP.SocketIO.Transports
 {
     using BestHTTP.WebSocket;
+    using Extensions;
 
     /// <summary>
     /// A transport implementation that can communicate with a SocketIO server.
@@ -40,7 +41,7 @@ namespace BestHTTP.SocketIO.Transports
             string baseUrl = new UriBuilder(HTTPProtocolFactory.IsSecureProtocol(Manager.Uri) ? "wss" : "ws",
                                                             Manager.Uri.Host,
                                                             Manager.Uri.Port,
-                                                            Manager.Uri.GetComponents(UriComponents.PathAndQuery, UriFormat.UriEscaped)).Uri.ToString();
+                                                            Manager.Uri.GetRequestPathAndQueryURL()).Uri.ToString();
             string format = "{0}?EIO={1}&transport=websocket{3}";
             if (Manager.Handshake != null)
                 format += "&sid={2}";

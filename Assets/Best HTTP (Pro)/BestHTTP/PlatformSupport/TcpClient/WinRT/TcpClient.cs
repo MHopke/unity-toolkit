@@ -55,12 +55,22 @@ namespace BestHTTP.PlatformSupport.TcpClient.WinRT
             try
             {
                 var result = Socket.ConnectAsync(host, UseHTTPSProtocol ? "https" : port.ToString(), spl);
-                Connected = result.AsTask().Wait(ConnectTimeout);
+
+                if (ConnectTimeout > TimeSpan.Zero)
+                    Connected = result.AsTask().Wait(ConnectTimeout);
+                else
+                    Connected = result.AsTask().Wait(TimeSpan.FromMilliseconds(-1));
             }
             catch(AggregateException ex)
             {
                 if (ex.InnerException != null)
-                    throw ex.InnerException;
+                    //throw ex.InnerException;
+                {
+                    if ( ex.Message.Contains("No such host is known") || ex.Message.Contains("unreachable host") )
+                        throw new Exception("Socket Exception");
+                    else
+                        throw ex.InnerException;
+                }
                 else
                     throw ex;
             }

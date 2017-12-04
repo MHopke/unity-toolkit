@@ -61,7 +61,7 @@ namespace BestHTTP
     }
 
     public delegate void OnRequestFinishedDelegate(HTTPRequest originalRequest, HTTPResponse response);
-    public delegate void OnDownloadProgressDelegate(HTTPRequest originalRequest, int downloaded, int downloadLength);
+    public delegate void OnDownloadProgressDelegate(HTTPRequest originalRequest, long downloaded, long downloadLength);
     public delegate void OnUploadProgressDelegate(HTTPRequest originalRequest, long uploaded, long uploadLength);
     public delegate bool OnBeforeRedirectionDelegate(HTTPRequest originalRequest, HTTPResponse response, Uri redirectUri);
     public delegate void OnHeaderEnumerationDelegate(string header, List<string> values);
@@ -85,7 +85,8 @@ namespace BestHTTP
                                                           HTTPMethods.Post.ToString().ToUpper(),
                                                           HTTPMethods.Put.ToString().ToUpper(),
                                                           HTTPMethods.Delete.ToString().ToUpper(),
-                                                          HTTPMethods.Patch.ToString().ToUpper()
+                                                          HTTPMethods.Patch.ToString().ToUpper(),
+                                                          HTTPMethods.Merge.ToString().ToUpper()
                                                       };
 
         /// <summary>
@@ -159,6 +160,17 @@ namespace BestHTTP
                 if (State == HTTPRequestStates.Processing)
                     throw new NotSupportedException("Changing the DisableCache property while processing the request is not supported.");
                 disableCache = value;
+            }
+        }
+
+        public bool CacheOnly
+        {
+            get { return cacheOnly; }
+            set
+            {
+                if (State == HTTPRequestStates.Processing)
+                    throw new NotSupportedException("Changing the CacheOnly property while processing the request is not supported.");
+                cacheOnly = value;
             }
         }
 #endif
@@ -332,7 +344,7 @@ namespace BestHTTP
 #endif
 
         /// <summary>
-        /// Maximum time we wait to establish the connection to the target server. Default value is 20 seconds.
+        /// Maximum time we wait to establish the connection to the target server. If set to TimeSpan.Zero or lower, no connect timeout logic is executed. Default value is 20 seconds.
         /// </summary>
         public TimeSpan ConnectTimeout { get; set; }
 
@@ -395,19 +407,24 @@ namespace BestHTTP
         }
         private OnBeforeHeaderSendDelegate _onBeforeHeaderSend;
 
+        /// <summary>
+        /// Setting this option to true, the processing connection will set the TCP NoDelay option to send out data as soon as it can.
+        /// </summary>
+        public bool TryToMinimizeTCPLatency { get; set; }
+
         #region Internal Properties For Progress Report Support
 
         /// <summary>
         /// How many bytes downloaded so far.
         /// </summary>
-        internal int Downloaded { get; set; }
+        internal long Downloaded { get; set; }
 
         /// <summary>
         /// The length of the content that we are currently downloading.
         /// If chunked encoding is used, then it is the size of the sum of all previous chunks plus the current one.
         /// When no Content-Length present and no chunked encoding is used then its size is the currently downloaded size.
         /// </summary>
-        internal int DownloadLength { get; set; }
+        internal long DownloadLength { get; set; }
 
         /// <summary>
         /// Set to true when the downloaded bytes are changed, and set to false when the OnProgress event called.
@@ -461,6 +478,7 @@ namespace BestHTTP
         private bool isKeepAlive;
 #if !BESTHTTP_DISABLE_CACHING && (!UNITY_WEBGL || UNITY_EDITOR)
         private bool disableCache;
+        private bool cacheOnly;
 #endif
         private int streamFragmentSize;
         private bool useStreaming;
@@ -598,6 +616,11 @@ namespace BestHTTP
             this.CustomClientCredentialsProvider = HTTPManager.DefaultClientCredentialsProvider;
             this.UseAlternateSSL = HTTPManager.UseAlternateSSLDefaultValue;
 #endif
+
+#if !NETFX_CORE && !UNITY_WP8
+            this.CustomCertificationValidator += HTTPManager.DefaultCertificationValidator;
+#endif
+            this.TryToMinimizeTCPLatency = HTTPManager.TryToMinimizeTCPLatency;
         }
 
         #endregion
@@ -703,6 +726,7 @@ namespace BestHTTP
 
                 case HTTPFormUsage.UrlEncoded:  FormImpl = new HTTPUrlEncodedForm(); break;
                 case HTTPFormUsage.Multipart:   FormImpl = new HTTPMultiPartForm(); break;
+                case HTTPFormUsage.RawJSon: FormImpl = new RawJsonForm(); break;
 #if !BESTHTTP_DISABLE_UNITY_FORM
                 case HTTPFormUsage.Unity:       FormImpl = new UnityForm(); break;
 #endif
@@ -851,7 +875,11 @@ namespace BestHTTP
                 AddHeader("Referer", Uri.ToString());
 
             if (!HasHeader("Accept-Encoding"))
-                AddHeader("Accept-Encoding", "gzip, identity");
+#if BESTHTTP_DISABLE_GZIP
+              AddHeader("Accept-Encoding", "identity");
+#else
+              AddHeader("Accept-Encoding", "gzip, identity");
+#endif
 
             #if !BESTHTTP_DISABLE_PROXY
             if (HasProxy && !HasHeader("Proxy-Connection"))
@@ -894,7 +922,13 @@ namespace BestHTTP
 
             // Always set the Content-Length header if possible
             // http://tools.ietf.org/html/rfc2616#section-4.4 : For compatibility with HTTP/1.0 applications, HTTP/1.1 requests containing a message-body MUST include a valid Content-Length header field unless the server is known to be HTTP/1.1 compliant.
-            if (contentLength != -1 && !HasHeader("Content-Length"))
+            if (
+#if !UNITY_WEBGL || UNITY_EDITOR
+                contentLength > 0
+#else
+                contentLength != -1
+#endif
+                && !HasHeader("Content-Length"))
                 SetHeader("Content-Length", contentLength.ToString());
 
 #if !UNITY_WEBGL || UNITY_EDITOR
@@ -922,7 +956,7 @@ namespace BestHTTP
                         break;
                 }
             }
-#endif
+            #endif
 
 #endif
 
@@ -1022,7 +1056,7 @@ namespace BestHTTP
             }
 
             // Write out the headers to the stream
-            if (callback != null)
+            if (callback != null && Headers != null)
                 foreach (var kvp in Headers)
                     callback(kvp.Key, kvp.Value);
         }
@@ -1030,7 +1064,7 @@ namespace BestHTTP
         /// <summary>
         /// Writes out the Headers to the stream.
         /// </summary>
-        private void SendHeaders(BinaryWriter stream)
+        private void SendHeaders(Stream stream)
         {
             EnumerateHeaders((header, values) =>
                 {
@@ -1047,9 +1081,9 @@ namespace BestHTTP
                             continue;
                         }
 
-                        stream.Write(headerName);
-                        stream.Write(values[i].GetASCIIBytes());
-                        stream.Write(EOL);
+                        stream.WriteArray(headerName);
+                        stream.WriteArray(values[i].GetASCIIBytes());
+                        stream.WriteArray(EOL);
                     }
                 }, /*callBeforeSendCallback:*/ true);
         }
@@ -1060,9 +1094,8 @@ namespace BestHTTP
         public string DumpHeaders()
         {
             using (var ms = new MemoryStream())
-            using (var bw = new BinaryWriter(ms))
             {
-                SendHeaders(bw);
+                SendHeaders(ms);
                 return ms.ToArray().AsciiToString();
             }
         }
@@ -1090,28 +1123,27 @@ namespace BestHTTP
         {
             try
             {
-                BinaryWriter outStream = new BinaryWriter(stream);
-
 #if !UNITY_WEBGL || UNITY_EDITOR
-
-                string requestLine = string.Format("{0} {1} HTTP/1.1", MethodNames[(byte)MethodType],
+                string requestPathAndQuery =
                 #if !BESTHTTP_DISABLE_PROXY
                     HasProxy && Proxy.SendWholeUri ? CurrentUri.OriginalString :
                 #endif
-                    CurrentUri.GetComponents(UriComponents.PathAndQuery, UriFormat.UriEscaped));
+                    CurrentUri.GetRequestPathAndQueryURL();
+
+                string requestLine = string.Format("{0} {1} HTTP/1.1", MethodNames[(byte)MethodType], requestPathAndQuery);
 
                 if (HTTPManager.Logger.Level <= Logger.Loglevels.Information)
-                    HTTPManager.Logger.Information("HTTPRequest", string.Format("Sending request: {0}", requestLine));
+                    HTTPManager.Logger.Information("HTTPRequest", string.Format("Sending request: '{0}'", requestLine));
 
-                outStream.Write(requestLine.GetASCIIBytes());
-                outStream.Write(EOL);
+                stream.WriteArray(requestLine.GetASCIIBytes());
+                stream.WriteArray(EOL);
 
-                SendHeaders(outStream);
-                outStream.Write(EOL);
+                SendHeaders(stream);
+                stream.WriteArray(EOL);
 
                 // Send headers to the wire
                 if (UploadStream != null)
-                    outStream.Flush();
+                    stream.Flush();
 #endif
 
                 byte[] data = RawData;
@@ -1149,19 +1181,19 @@ namespace BestHTTP
                         // If we don't know the size, send as chunked
                         if (!UseUploadStreamLength)
                         {
-                            outStream.Write(count.ToString("X").GetASCIIBytes());
-                            outStream.Write(EOL);
+                            stream.WriteArray(count.ToString("X").GetASCIIBytes());
+                            stream.WriteArray(EOL);
                         }
 
                         // write out the buffer to the wire
-                        outStream.Write(buffer, 0, count);
+                        stream.Write(buffer, 0, count);
 
                         // chunk trailing EOL
                         if (!UseUploadStreamLength)
-                            outStream.Write(EOL);
+                            stream.WriteArray(EOL);
 
                         // Make sure that the system sends the buffer
-                        outStream.Flush();
+                        stream.Flush();
 
                         // update how many bytes are uploaded
                         Uploaded += count;
@@ -1173,20 +1205,24 @@ namespace BestHTTP
                     // All data from the stream are sent, write the 'end' chunk if necessary
                     if (!UseUploadStreamLength)
                     {
-                        outStream.Write("0".GetASCIIBytes());
-                        outStream.Write(EOL);
-                        outStream.Write(EOL);
+                        stream.WriteArray("0".GetASCIIBytes());
+                        stream.WriteArray(EOL);
+                        stream.WriteArray(EOL);
                     }
 
                     // Make sure all remaining data will be on the wire
-                    outStream.Flush();
+                    stream.Flush();
 
                     // Dispose the MemoryStream
                     if (UploadStream == null && uploadStream != null)
                         uploadStream.Dispose();
                 }
                 else
-                    outStream.Flush();
+                    stream.Flush();
+
+#if !UNITY_WEBGL || UNITY_EDITOR
+                HTTPManager.Logger.Information("HTTPRequest", "'" + requestLine + "' sent out");
+#endif
             }
             finally
             {
@@ -1258,7 +1294,7 @@ namespace BestHTTP
         }
 #endif
 
-        #endregion
+#endregion
 
         /// <summary>
         /// Starts processing the request.
@@ -1323,9 +1359,13 @@ namespace BestHTTP
         {
             ClearForm();
             RemoveHeaders();
+
+            this.IsRedirected = false;
+            this.RedirectCount = 0;
+            this.Downloaded = this.DownloadLength = 0;
         }
 
-        #region System.Collections.IEnumerator implementation
+#region System.Collections.IEnumerator implementation
 
         public object Current { get { return null; } }
 
@@ -1339,7 +1379,7 @@ namespace BestHTTP
             throw new NotImplementedException();
         }
 
-        #endregion
+#endregion
 
         HTTPRequest IEnumerator<HTTPRequest>.Current
         {

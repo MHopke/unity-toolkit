@@ -32,12 +32,49 @@ var Lib_BEST_HTTP_WebGL_ES_Bridge =
 			}
 			else
 				Runtime.dynCall('vii', errCallback, [id, 0]);
-		}
+		},
+
+        _GenericEventHandler: function(id, eventName, e, onMessage) {
+          function AllocString(str) {
+			  if (str != undefined)
+			  {
+				  var length = lengthBytesUTF8(str) + 1;
+				  var buff = _malloc(length);
+
+				  stringToUTF8Array(str, HEAPU8, buff, length);
+
+				  return buff;
+			  }
+
+			  return 0;
+		  }
+
+		  var eventBuffer = AllocString(eventName);
+		  var dataBuffer = AllocString(e.data);
+		  var idBuffer = AllocString(e.id);
+
+		  Runtime.dynCall('viiiii', onMessage, [id, eventBuffer, dataBuffer, idBuffer, e.retry]);
+
+		  if (eventBuffer != 0)
+			  _free(eventBuffer);
+
+		  if (dataBuffer != 0)
+			  _free(dataBuffer);
+
+		  if (idBuffer != 0)
+			  _free(idBuffer);
+       }
 	},
+
+    ES_IsSupported: function() {
+      return typeof(EventSource) !== "undefined";
+    },
 
 	ES_Create: function(urlPtr, withCredentials, onOpen, onMessage, onError)
 	{
-		var url = encodeURI(Pointer_stringify(urlPtr)).toLowerCase().replace(/\+/g, '%2B').replace('%252f', '%2f');
+		var url = /*encodeURI*/(Pointer_stringify(urlPtr))
+					.replace(/\+/g, '%2B')
+					.replace(/%252[fF]/ig, '%2F');
 
 		var event = {
 			onError: onError
@@ -48,6 +85,7 @@ var Lib_BEST_HTTP_WebGL_ES_Bridge =
 		console.log(id + ' ES_Create(' + url + ', ' + withCredentials + ')');
 
 		event.eventImpl = new EventSource(url, { withCredentials: withCredentials != 0 ? true : false } );
+        event.onMessage = onMessage;
 
 		event.eventImpl.onopen = function() {
 			console.log(id + ' ES_Create - onOpen');
@@ -56,35 +94,8 @@ var Lib_BEST_HTTP_WebGL_ES_Bridge =
 		};
 
 		event.eventImpl.onmessage = function(e) {
-
-			function AllocString(str) {
-				if (str != undefined)
-				{
-					var length = lengthBytesUTF8(str) + 1;
-					var buff = _malloc(length);
-
-					stringToUTF8Array(str, HEAPU8, buff, length);
-
-					return buff;
-				}
-
-				return 0;
-			}
-
-			var eventBuffer = AllocString(e.event);
-			var dataBuffer = AllocString(e.data);
-			var idBuffer = AllocString(e.id);
-
-			Runtime.dynCall('viiiii', onMessage, [id, eventBuffer, dataBuffer, idBuffer, e.retry]);
-
-			if (eventBuffer != 0)
-				_free(eventBuffer);
-
-			if (dataBuffer != 0)
-				_free(dataBuffer);
-
-			if (idBuffer != 0)
-				_free(idBuffer);
+          console.log(id + ' onMessage('+ eventName + ')');
+          es._GenericEventHandler(id, undefined, e, onMessage);
 		};
 
 		event.eventImpl.onerror = function(e) {
@@ -96,6 +107,26 @@ var Lib_BEST_HTTP_WebGL_ES_Bridge =
 		return es.Set(event);
 	},
 
+    ES_AddEventHandler: function(id, eventNamePtr) {
+        var eventName = Pointer_stringify(eventNamePtr);
+
+        console.log(id + ' ES_AddEventHandler(' + eventName + ')');
+
+		var event = es.Get(id);
+
+		try
+		{
+			event.eventImpl.addEventListener(eventName, function(e) {
+              console.log(id + ' onEvent('+ eventName + ')');
+
+              es._GenericEventHandler(id, eventName, e, event.onMessage);
+            });
+		}
+		catch(e) {
+			es._callOnError(event.eventImpl.onError, id, ' ' + e.name + ': ' + e.message);
+		}
+    },
+
 	ES_Close: function(id)
 	{
 		console.log(id + ' ES_Close');
@@ -104,10 +135,10 @@ var Lib_BEST_HTTP_WebGL_ES_Bridge =
 
 		try
 		{
-			event.close();
+			event.eventImpl.close();
 		}
 		catch(e) {
-			es._callOnError(event.onError, id, ' ' + e.name + ': ' + e.message);
+			es._callOnError(event.eventImpl.onError, id, ' ' + e.name + ': ' + e.message);
 		}
 	},
 

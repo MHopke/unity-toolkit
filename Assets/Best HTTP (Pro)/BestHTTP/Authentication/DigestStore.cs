@@ -9,7 +9,7 @@ namespace BestHTTP.Authentication
     internal static class DigestStore
     {
         private static Dictionary<string, Digest> Digests = new Dictionary<string, Digest>();
-        
+
         private static object Locker = new object();
 
         /// <summary>
@@ -17,7 +17,7 @@ namespace BestHTTP.Authentication
         /// </summary>
         private static string[] SupportedAlgorithms = new string[] { "digest", "basic" };
 
-        public static Digest Get(Uri uri)
+        internal static Digest Get(Uri uri)
         {
             lock (Locker)
             {

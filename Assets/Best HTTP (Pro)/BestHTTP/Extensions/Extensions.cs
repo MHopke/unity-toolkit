@@ -22,7 +22,7 @@ namespace BestHTTP.Extensions
 {
     public static class Extensions
     {
-        #region ASCII Encoding (These are required becouse Windows Phone doesn't supports the Encoding.ASCII class.)
+        #region ASCII Encoding (These are required because Windows Phone doesn't supports the Encoding.ASCII class.)
 
         /// <summary>
         /// On WP8 platform there are no ASCII encoding.
@@ -87,6 +87,17 @@ namespace BestHTTP.Extensions
 
         #region Other Extensions
 
+        public static string GetRequestPathAndQueryURL(this Uri uri)
+        {
+            string requestPathAndQuery = uri.GetComponents(UriComponents.PathAndQuery, UriFormat.UriEscaped);
+
+            // http://forum.unity3d.com/threads/best-http-released.200006/page-26#post-2723250
+            if (string.IsNullOrEmpty(requestPathAndQuery))
+                requestPathAndQuery = "/";
+
+            return requestPathAndQuery;
+        }
+
         public static string[] FindOption(this string str, string option)
         {
             //s-maxage=2678400, must-revalidate, max-age=0
@@ -98,6 +109,11 @@ namespace BestHTTP.Extensions
                     return options[i].Split(new char[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
 
             return null;
+        }
+
+        public static void WriteArray(this Stream stream, byte[] array)
+        {
+            stream.Write(array, 0, array.Length);
         }
 
         #endregion

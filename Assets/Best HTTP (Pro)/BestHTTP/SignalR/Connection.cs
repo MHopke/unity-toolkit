@@ -162,6 +162,11 @@ namespace BestHTTP.SignalR
         /// </summary>
         public TimeSpan PingInterval { get; set; }
 
+        /// <summary>
+        /// Wait time before the plugin should do a reconnect attempt. Its default value is 5 seconds.
+        /// </summary>
+        public TimeSpan ReconnectDelay { get; set; }
+
         #endregion
 
         #region Public Events
@@ -291,6 +296,8 @@ namespace BestHTTP.SignalR
         /// When we started to reconnect. When too much time passes without a successful reconnect, we will close the connection.
         /// </summary>
         private DateTime ReconnectStartedAt;
+
+        private DateTime ReconnectDelayStartedAt;
 
         /// <summary>
         /// True, if the reconnect process started.
@@ -424,6 +431,8 @@ namespace BestHTTP.SignalR
 
             // Expected protocol
             this.Protocol = ProtocolVersions.Protocol_2_2;
+
+            this.ReconnectDelay = TimeSpan.FromSeconds(5);
         }
 
         #endregion
@@ -508,7 +517,7 @@ namespace BestHTTP.SignalR
 
             this.Protocol = (ProtocolVersions)protocolIdx;
 
-#if !BESTHTTP_DISABLE_WEBSOCKET
+            #if !BESTHTTP_DISABLE_WEBSOCKET
             if (data.TryWebSockets)
             {
                 Transport = new WebSocketTransport(this);
@@ -520,7 +529,7 @@ namespace BestHTTP.SignalR
                 #endif
             }
             else
-#endif
+            #endif
             {
                 #if !BESTHTTP_DISABLE_SERVERSENT_EVENTS
                     Transport = new ServerSentEventsTransport(this);
@@ -856,14 +865,19 @@ namespace BestHTTP.SignalR
 
             HTTPManager.Logger.Error("SignalR Connection", reason);
 
-            //ReconnectStartedAt = null;
             ReconnectStarted = false;
 
             if (OnError != null)
                 OnError(this, reason);
 
             if (this.State == ConnectionStates.Connected || this.State == ConnectionStates.Reconnecting)
-                Reconnect();
+            {
+                this.ReconnectDelayStartedAt = DateTime.UtcNow;
+                if (this.State != ConnectionStates.Reconnecting)
+                    this.ReconnectStartedAt = DateTime.UtcNow;
+
+                //Reconnect();
+            }
             else
             {
                 // Fall back if possible
@@ -1073,6 +1087,21 @@ namespace BestHTTP.SignalR
 
                     break;
 
+                case ConnectionStates.Reconnecting:
+                    if ( DateTime.UtcNow - ReconnectStartedAt >= NegotiationResult.DisconnectTimeout)
+                    {
+                        HTTPManager.Logger.Warning("SignalR Connection", "OnHeartbeatUpdate - Failed to reconnect in the given time!");
+
+                        Close();
+                    }
+                    else if (DateTime.UtcNow - ReconnectDelayStartedAt >= ReconnectDelay)
+                    {
+                        if (HTTPManager.Logger.Level <= Logger.Loglevels.Warning)
+                          HTTPManager.Logger.Warning("SignalR Connection", this.ReconnectStarted.ToString() + " " + this.ReconnectStartedAt.ToString() + " " + NegotiationResult.DisconnectTimeout.ToString());
+                        Reconnect();
+                    }
+                    break;
+
                 default:
 
                     if (TransportConnectionStartedAt != null && DateTime.UtcNow - TransportConnectionStartedAt >= NegotiationResult.TransportConnectTimeout)
@@ -1083,12 +1112,6 @@ namespace BestHTTP.SignalR
                         (this as IConnection).Error("Transport failed to connect in the given time!");
                     }
 
-                    if (ReconnectStarted && DateTime.UtcNow - ReconnectStartedAt >= NegotiationResult.DisconnectTimeout)
-                    {
-                        HTTPManager.Logger.Warning("SignalR Connection", "OnHeartbeatUpdate - Failed to reconnect in the given time!");
-
-                        Close();
-                    }
                     break;
             }
         }
@@ -1241,7 +1264,7 @@ namespace BestHTTP.SignalR
                     reason = "Ping - Request Finished with Error! " + (req.Exception != null ? (req.Exception.Message + "\n" + req.Exception.StackTrace) : "No Exception");
                     break;
 
-                // Ceonnecting to the server is timed out.
+                // Connecting to the server is timed out.
                 case HTTPRequestStates.ConnectionTimedOut:
                     reason = "Ping - Connection Timed Out!";
                     break;

@@ -13,13 +13,27 @@ public class LoadAlert : UIAlert
     public string ExtraneousInfo;
     public Text LoadingText;
     public Loader Loader;
+    public static LoadAlert Instance = null;
     #endregion
 
-	#region Private Vars
-	static LoadAlert _instance = null;
-	#endregion
+    #region Unity Methods
+    void Awake()
+    {
+        Initialize();
+    }
+    #endregion
 
     #region Overriden Methods
+    protected override void OnInit()
+    {
+        base.OnInit();
+        Instance = this;
+    }
+    protected override void OnCleanUp()
+    {
+        Instance = null;
+        base.OnCleanUp();
+    }
     protected override void OnShow()
     {
         base.OnShow();
@@ -49,27 +63,27 @@ public class LoadAlert : UIAlert
     }
     public static void SetText(string text)
     {
-		if(_instance == null)
+		if(Instance == null)
 			return;
 		
-        _instance.LoadingText.text = text;
+        Instance.LoadingText.text = text;
     }
 	public static void Done()
     {
-		if(_instance == null)
+		if(Instance == null)
 			return;
 
-        if (!_instance.Loader.enabled)
+        if (!Instance.Loader.enabled)
             return;
 
-        _instance.ExtraneousInfo ="";
-        _instance.Loader.Done();
+        Instance.ExtraneousInfo ="";
+        Instance.Loader.Done();
 
-        _instance.timedOut = null;
+        Instance.timedOut = null;
 
-        _instance.Loader.extraneousTime -= _instance.ExtranesouTime;
+        Instance.Loader.extraneousTime -= Instance.ExtranesouTime;
 
-        _instance.Deactivate();//Close();
+        Instance.Deactivate();//Close();
     }
 
     void TimedOut()
@@ -84,17 +98,4 @@ public class LoadAlert : UIAlert
         LoadingText.text = ExtraneousInfo;
     }
     #endregion
-
-	#region Properties
-	public static LoadAlert Instance
-	{
-		get 
-		{ 
-			if(_instance == null)
-				_instance = UIView.Load("Alerts/LoadAlert") as LoadAlert; 
-
-			return _instance;
-		}
-	}
-	#endregion
 }

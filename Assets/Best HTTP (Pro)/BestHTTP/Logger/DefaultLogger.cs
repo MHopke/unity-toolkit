@@ -19,7 +19,7 @@ namespace BestHTTP.Logger
 
         public DefaultLogger()
         {
-            FormatVerbose = "I [{0}]: {1}";
+            FormatVerbose = "D [{0}]: {1}";
             FormatInfo = "I [{0}]: {1}";
             FormatWarn = "W [{0}]: {1}";
             FormatErr = "Err [{0}]: {1}";

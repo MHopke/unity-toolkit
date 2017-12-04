@@ -11,18 +11,19 @@ namespace gametheory.UI
 	{
         #region Public Vars
         public bool PageButtonsInList;
+        [Tooltip("Causes the next/previous buttons to be deactivated rather than disabled")]
+        public bool DeactivateButtons;
 
         public int ItemsPerPage;
         [Tooltip("Used to determine if the scrollbars should hide or not")]
         public int ItemsBeforeScroll;
-
-        public Vector2 ResetPos;
 
         //public string PageCount
 
         public ExtendedText PageCount;
         public ExtendedButton NextButton;
         public ExtendedButton PreviousButton;
+        //public bool Deactivate 
         #endregion
 
         #region Private Vars
@@ -41,29 +42,15 @@ namespace gametheory.UI
         {
             base.OnInit();
 
-            _isVertical = Scroll.vertical;
-            _isHorizontal = Scroll.horizontal;
+            if (Scroll)
+            {
+                _isVertical = Scroll.vertical;
+                _isHorizontal = Scroll.horizontal;
+            }
         }
-        #endregion
-
-        #region UI Methods
-        public void NextPage()
+        public override void SetupList(VisualElement prefab, IEnumerable data, bool setupContent=true)
         {
-            _pageIndex++;
-            AdjustPage();
-        }
-
-        public void PreviousPage()
-        {
-            _pageIndex--;
-            AdjustPage();
-        }
-        #endregion
-
-        #region Methods
-        public void SetupList(VisualElement prefab, IEnumerable data)
-        {
-            _itemPrefab = prefab;
+            /*_itemPrefab = prefab;
             SetContext(data);
 
             int dif = ItemsPerPage - ListItems.Count;
@@ -73,7 +60,8 @@ namespace gametheory.UI
                 {
                     AddItem(null);
                 }
-            }
+            }*/
+            base.SetupList(prefab, data,false);
 
             _pageIndex = 0;
 
@@ -94,11 +82,16 @@ namespace gametheory.UI
                     PageCount.Deactivate();
             }
 
-            AdjustPage();
             AdjustButtons();
+
+            SetupContent();
+        }
+        protected override int GetItemCount(IEnumerable data)
+        {
+            return ItemsPerPage - ListItems.Count;//base.GetItemCount(data);
         }
 
-        public void AddItem(object obj)
+        public override void AddItem(object obj)
         {
             DeactivateEmptyItem();
 
@@ -112,15 +105,14 @@ namespace gametheory.UI
 
             element.Init();
 
-            AddListeners(element as ListElement, obj);
+            AddListeners(element as ListElement);
 
             if (_active)
                 element.Activate();
             else
                 element.PresentVisuals(false);
         }
-
-        void AdjustPage()
+        protected override void SetupContent()
         {
             //set to the next dataIndex
             int dataIndex = _pageIndex * ItemsPerPage;
@@ -170,15 +162,28 @@ namespace gametheory.UI
                     element.gameObject.SetActive(false);
             }
 
-            if (Scroll.vertical)
-                Scroll.verticalNormalizedPosition = ResetPos.y;
-            if (Scroll.horizontal)
-                Scroll.horizontalNormalizedPosition = ResetPos.x;
+            ResetScrollPos();
 
             AdjustButtons();
             AdjustBars();
         }
+        #endregion
 
+        #region UI Methods
+        public void NextPage()
+        {
+            _pageIndex++;
+            SetupContent();
+        }
+
+        public void PreviousPage()
+        {
+            _pageIndex--;
+            SetupContent();
+        }
+        #endregion
+
+        #region Methods
         void AdjustButtons()
         {
             if (!_active)
@@ -205,22 +210,42 @@ namespace gametheory.UI
             if (_pageIndex >= 0 && _pageIndex <= _lastPage)
             {
                 if (PreviousButton)
-                    PreviousButton.Enable();
+                {
+                    if (DeactivateButtons)
+                        PreviousButton.Activate();
+                    else
+                        PreviousButton.Enable();
+                }
 
                 if (NextButton)
-                    NextButton.Enable();
+                {
+                    if (DeactivateButtons)
+                        NextButton.Activate();
+                    else
+                        NextButton.Enable();
+                }
             }
 
             if (_pageIndex == 0)
             {
                 if (PreviousButton)
-                    PreviousButton.Disable();
+                {
+                    if (DeactivateButtons)
+                        PreviousButton.Deactivate();
+                    else
+                        PreviousButton.Disable();
+                }
             }
 
             if (_pageIndex == _lastPage)
             {
                 if (NextButton)
-                    NextButton.Disable();
+                {
+                    if (DeactivateButtons)
+                        NextButton.Deactivate();
+                    else
+                        NextButton.Disable();
+                }
             }
 
             if (PageCount != null && PageCount.Active)
@@ -260,19 +285,4 @@ namespace gametheory.UI
         }
         #endregion
     }
-
-    #region IEnumerable Extenstions
-    public static class IEnumerableExtensions
-    {
-        public static int Count(this IEnumerable source)
-        {
-            int res = 0;
-
-            foreach (var item in source)
-                res++;
-
-            return res;
-        }
-    }
-    #endregion
 }

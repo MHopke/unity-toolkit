@@ -101,15 +101,15 @@ namespace BestHTTP.Examples
 #if !BESTHTTP_DISABLE_CACHING && (!UNITY_WEBGL || UNITY_EDITOR)
                         status = string.Format("AssetBundle downloaded! Loaded from local cache: {0}", request.Response.IsFromCache.ToString());
 #else
-                    status = "AssetBundle downloaded!";
+                        status = "AssetBundle downloaded!";
 #endif
 
                         // Start creating the downloaded asset bundle
                         AssetBundleCreateRequest async =
-#if UNITY_5_3
+#if UNITY_5_3_OR_NEWER
                             AssetBundle.LoadFromMemoryAsync(request.Response.Data);
 #else
-                            AssetBundle.LoadFromMemoryAsync(request.Response.Data);
+                            AssetBundle.CreateFromMemory(request.Response.Data);
 #endif
 
                         // wait for it
@@ -141,7 +141,7 @@ namespace BestHTTP.Examples
                     Debug.LogWarning(status);
                     break;
 
-                // Ceonnecting to the server is timed out.
+                // Connecting to the server is timed out.
                 case HTTPRequestStates.ConnectionTimedOut:
                     status = "Connection Timed Out!";
                     Debug.LogError(status);
@@ -171,10 +171,10 @@ namespace BestHTTP.Examples
 
             // Start loading the asset from the bundle
             var asyncAsset =
-#if UNITY_5
+#if UNITY_5_1 || UNITY_5_2 || UNITY_5_3_OR_NEWER
             cachedBundle.LoadAssetAsync("9443182_orig", typeof(Texture2D));
 #else
-        
+
             cachedBundle.LoadAsync("9443182_orig", typeof(Texture2D));
 #endif
 

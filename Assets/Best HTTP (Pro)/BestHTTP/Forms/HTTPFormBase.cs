@@ -92,7 +92,7 @@ namespace BestHTTP.Forms
             field.Name = fieldName;
             field.FileName = null;
             if (e != null)
-                field.MimeType = "text/plain; charset=\"" + e.WebName + "\"";
+                field.MimeType = "text/plain; charset=" + e.WebName;
             field.Text = value;
             field.Encoding = e;
 

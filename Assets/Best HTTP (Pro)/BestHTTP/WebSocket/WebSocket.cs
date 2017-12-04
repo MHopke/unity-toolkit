@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using BestHTTP.Extensions;
 
 #if UNITY_WEBGL && !UNITY_EDITOR
     using System.Runtime.InteropServices;
@@ -57,6 +58,18 @@ namespace BestHTTP.WebSocket
                 return webSocket != null && !webSocket.IsClosed;
 #else
                 return ImplementationId != 0 && WS_GetState(ImplementationId) == WebSocketStates.Open;
+#endif
+            }
+        }
+
+        public int BufferedAmount
+        {
+            get
+            {
+#if (!UNITY_WEBGL || UNITY_EDITOR)
+                return webSocket.BufferedAmount;
+#else
+                return WS_GetBufferedAmount(ImplementationId);
 #endif
             }
         }
@@ -154,7 +167,7 @@ namespace BestHTTP.WebSocket
         public WebSocket(Uri uri)
             :this(uri, string.Empty, string.Empty)
         {
-#if (!UNITY_WEBGL || UNITY_EDITOR)
+#if (!UNITY_WEBGL || UNITY_EDITOR) && !BESTHTTP_DISABLE_GZIP
             this.Extensions = new IExtension[] { new PerMessageCompression(/*compression level: */           Decompression.Zlib.CompressionLevel.Default,
                                                                            /*clientNoContextTakeover: */     false,
                                                                            /*serverNoContextTakeover: */     false,
@@ -187,7 +200,7 @@ namespace BestHTTP.WebSocket
             if (uri.Port == -1)
                 // Somehow if i use the UriBuilder it's not the same as if the uri is constructed from a string...
                 //uri = new UriBuilder(uri.Scheme, uri.Host, uri.Scheme.Equals("wss", StringComparison.OrdinalIgnoreCase) ? 443 : 80, uri.PathAndQuery).Uri;
-                uri = new Uri(uri.Scheme + "://" + uri.Host + ":" + (uri.Scheme.Equals("wss", StringComparison.OrdinalIgnoreCase) ? "443" : "80") + uri.GetComponents(UriComponents.PathAndQuery, UriFormat.UriEscaped));
+                uri = new Uri(uri.Scheme + "://" + uri.Host + ":" + (uri.Scheme.Equals("wss", StringComparison.OrdinalIgnoreCase) ? "443" : "80") + uri.GetRequestPathAndQueryURL());
 
             InternalRequest = new HTTPRequest(uri, OnInternalRequestCallback);
 
@@ -197,7 +210,10 @@ namespace BestHTTP.WebSocket
             //http://tools.ietf.org/html/rfc6455#section-4
 
             //The request MUST contain a |Host| header field whose value contains /host/ plus optionally ":" followed by /port/ (when not using the default port).
-            InternalRequest.SetHeader("Host", uri.Host + ":" + uri.Port);
+            if (uri.Port != 80)
+                InternalRequest.SetHeader("Host", uri.Host + ":" + uri.Port);
+            else
+                InternalRequest.SetHeader("Host", uri.Host);
 
             // The request MUST contain an |Upgrade| header field whose value MUST include the "websocket" keyword.
             InternalRequest.SetHeader("Upgrade", "websocket");
@@ -304,6 +320,9 @@ namespace BestHTTP.WebSocket
 
             if (OnError == null && OnErrorDesc == null)
                 HTTPManager.Logger.Error("WebSocket", reason);
+
+            if (!req.IsKeepAlive && resp != null && resp is WebSocketResponse)
+                (resp as WebSocketResponse).CloseStream();
         }
 
         private void OnInternalRequestUpgraded(HTTPRequest req, HTTPResponse resp)
@@ -730,6 +749,9 @@ namespace BestHTTP.WebSocket
 
         [DllImport("__Internal")]
         static extern WebSocketStates WS_GetState(uint id);
+        
+        [DllImport("__Internal")]
+        static extern int WS_GetBufferedAmount(uint id);
 
         [DllImport("__Internal")]
         static extern int WS_Send_String(uint id, string strData);

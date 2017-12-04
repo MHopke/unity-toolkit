@@ -18,6 +18,8 @@ namespace gametheory.UI
         public bool ZeroScrollBar;
         public bool HideScrollBar;
 
+        public Vector2 ResetPos;
+
         public VisualElement EmptyListItem;
         public Text DefaultListItemText;
 
@@ -150,6 +152,65 @@ namespace gametheory.UI
         #endregion
 
         #region Methods
+        public virtual void SetupList(VisualElement prefab, IEnumerable data,bool setupContent=true)
+        {
+            _itemPrefab = prefab;
+            SetContext(data);
+
+            int dif = GetItemCount(data);
+            //setup extra items
+            while (dif > 0)
+            {
+                AddItem(null);
+                dif--;
+            }
+            // remove extra items
+            while(dif < 0)
+            {
+                RemoveListElement(ListItems[ListItems.Count - 1]);
+                dif++;
+            }
+
+            if(setupContent)
+                SetupContent();
+        }
+
+        protected virtual void SetupContent()
+        {
+            if (_listContext == null)
+                return;
+
+            IEnumerator iter = _listContext.GetEnumerator();
+            iter.Reset();
+            int index = 0;
+            while(iter.MoveNext())
+            {
+                ListItems[index].SetContext(iter.Current);
+                index++;
+            }
+
+            ResetScrollPos();
+        }
+
+        protected virtual int GetItemCount(IEnumerable data)
+        {
+            if (data == null)
+                return 0;
+            else
+                return data.Count() - ListItems.Count;
+        }
+
+        protected void ResetScrollPos()
+        {
+            if (Scroll)
+            {
+                if (Scroll.vertical)
+                    Scroll.verticalNormalizedPosition = ResetPos.y;
+                if (Scroll.horizontal)
+                    Scroll.horizontalNormalizedPosition = ResetPos.x;
+            }
+        }
+
         public void ActivateEmptyItem()
         {
             if(EmptyListItem)
@@ -189,24 +250,11 @@ namespace gametheory.UI
 			AddListElement(element);
 			element.transform.SetAsFirstSibling();
 		}
-		public void AddItem(object obj)
+		public virtual void AddItem(object obj)
 		{
 			DeactivateEmptyItem();
 
-			VisualElement element = (VisualElement)GameObject.Instantiate(_itemPrefab,Vector3.zero,Quaternion.identity);
-
-			(element.transform as RectTransform).SetParent(ContentTransform,false);
-
-			ListItems.Add(element);
-			
-			element.Init();
-			
-			AddListeners(element as ListElement,obj);
-			
-			if(_active)
-				element.Activate();
-			else
-				element.PresentVisuals(false);
+            AddListElement(Instantiate(_itemPrefab, Vector3.zero, Quaternion.identity));
 		}
         public void AddListElements(List<VisualElement> elements)
         {
@@ -307,7 +355,7 @@ namespace gametheory.UI
 				element.delete += ItemDeleted;
 			}
 		}
-		protected void AddListeners(ListElement element,object obj)
+		/*protected void AddListeners(ListElement element,object obj)
 		{
 			if(element != null)
 			{
@@ -316,7 +364,7 @@ namespace gametheory.UI
 				element.selected += ItemSelected;
 				element.delete += ItemDeleted;
 			}
-		}
+		}*/
 
 
 		public void SetItemPrefab(VisualElement element)
@@ -356,4 +404,19 @@ namespace gametheory.UI
 		}
 		#endregion
     }
+
+    #region IEnumerable Extenstions
+    public static class IEnumerableExtensions
+    {
+        public static int Count(this IEnumerable source)
+        {
+            int res = 0;
+
+            foreach (var item in source)
+                res++;
+
+            return res;
+        }
+    }
+    #endregion
 }

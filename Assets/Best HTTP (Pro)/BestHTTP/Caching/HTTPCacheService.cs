@@ -242,19 +242,14 @@ namespace BestHTTP.Caching
 
         #region Get Functions
 
-        internal static System.IO.Stream GetBody(Uri uri, out int length)
+        internal static HTTPCacheFileInfo GetEntity(Uri uri)
         {
-            length = 0;
-
             if (!IsSupported)
                 return null;
-
-            HTTPCacheFileInfo info;
+            HTTPCacheFileInfo info = null;
             lock (Library)
-                if (Library.TryGetValue(uri, out info))
-                    return info.GetBodyStream(out length);
-
-            return null;
+                Library.TryGetValue(uri, out info);
+            return info;
         }
 
         internal static HTTPResponse GetFullResponse(HTTPRequest request)
@@ -347,6 +342,8 @@ namespace BestHTTP.Caching
                 try
                 {
                     info.Store(response);
+                    if (HTTPManager.Logger.Level == Logger.Loglevels.All)
+                        HTTPManager.Logger.Verbose("HTTPCacheService", string.Format("{0} - Saved to cache", uri.ToString()));
                 }
                 catch
                 {

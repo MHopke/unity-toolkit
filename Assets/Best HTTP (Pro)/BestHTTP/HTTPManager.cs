@@ -62,7 +62,7 @@ namespace BestHTTP
         private static byte maxConnectionPerServer;
 
         /// <summary>
-        /// Default value of a HTTP request's IsKeepAlive value. Default value is true. If you make rare request to the server it's should be changed to false.
+        /// Default value of a HTTP request's IsKeepAlive value. Default value is true. If you make rare request to the server it should be changed to false.
         /// </summary>
         public static bool KeepAliveDefaultValue { get; set; }
 
@@ -96,7 +96,7 @@ namespace BestHTTP
         public static bool EnablePrivateBrowsing { get; set; }
 
         /// <summary>
-        /// Global, default value of the HTTPRequest's ConnectTimeout property. Default value is 20 seconds.
+        /// Global, default value of the HTTPRequest's ConnectTimeout property. If set to TimeSpan.Zero or lower, no connect timeout logic is executed. Default value is 20 seconds.
         /// </summary>
         public static TimeSpan ConnectTimeout { get; set; }
 
@@ -173,6 +173,15 @@ namespace BestHTTP
         public static bool UseAlternateSSLDefaultValue { get; set; }
 #endif
 
+#if !NETFX_CORE && !UNITY_WP8
+        public static Func<HTTPRequest, System.Security.Cryptography.X509Certificates.X509Certificate, System.Security.Cryptography.X509Certificates.X509Chain, bool> DefaultCertificationValidator { get; set; }
+#endif
+
+        /// <summary>
+        /// Setting this option to true, the processing connection will set the TCP NoDelay option to send out data as soon as it can.
+        /// </summary>
+        public static bool TryToMinimizeTCPLatency = false;
+
         /// <summary>
         /// On most systems the maximum length of a path is around 255 character. If a cache entity's path is longer than this value it doesn't get cached. There no platform independent API to query the exact value on the current system, but it's
         /// exposed here and can be overridden. It's default value is 255.
@@ -184,7 +193,7 @@ namespace BestHTTP
         #region Manager variables
 
         /// <summary>
-        /// All connection has a reference in this Dictionary untill it's removed completly.
+        /// All connection has a reference in this Dictionary until it's removed completely.
         /// </summary>
         private static Dictionary<string, List<ConnectionBase>> Connections = new Dictionary<string, List<ConnectionBase>>();
 
@@ -194,7 +203,7 @@ namespace BestHTTP
         private static List<ConnectionBase> ActiveConnections = new List<ConnectionBase>();
 
         /// <summary>
-        /// Free connections. They can be removed completly after a specified time.
+        /// Free connections. They can be removed completely after a specified time.
         /// </summary>
         private static List<ConnectionBase> FreeConnections = new List<ConnectionBase>();
 
@@ -369,7 +378,7 @@ namespace BestHTTP
         /// </summary>
         private static ConnectionBase CreateConnection(HTTPRequest request, string serverUrl)
         {
-            if (request.CurrentUri.IsFile)
+            if (request.CurrentUri.IsFile && Application.platform != RuntimePlatform.WebGLPlayer)
                 return new FileConnection(serverUrl);
 
 #if UNITY_WEBGL && !UNITY_EDITOR
@@ -514,8 +523,8 @@ namespace BestHTTP
         /// </summary>
         public static void OnUpdate()
         {
-            // We will try to acquire a lock only for a specified time
-            if (System.Threading.Monitor.TryEnter(Locker, TimeSpan.FromMilliseconds(10)))
+            // We will try to acquire a lock. If it fails, we will skip this frame without calling any callback.
+            if (System.Threading.Monitor.TryEnter(Locker))
             {
                 try
                 {
@@ -534,25 +543,38 @@ namespace BestHTTP
                                     if (conn.CurrentRequest.UseStreaming && conn.CurrentRequest.Response != null && conn.CurrentRequest.Response.HasStreamedFragments())
                                         conn.HandleCallback();
 
-                                    if (((!conn.CurrentRequest.UseStreaming && conn.CurrentRequest.UploadStream == null) || conn.CurrentRequest.EnableTimoutForStreaming) &&
-                                        DateTime.UtcNow - conn.StartTime > conn.CurrentRequest.Timeout)
-                                        conn.Abort(HTTPConnectionStates.TimedOut);
-
+                                    try
+                                    {
+                                        if (((!conn.CurrentRequest.UseStreaming && conn.CurrentRequest.UploadStream == null) || conn.CurrentRequest.EnableTimoutForStreaming) &&
+                                            DateTime.UtcNow - conn.StartTime > conn.CurrentRequest.Timeout)
+                                            conn.Abort(HTTPConnectionStates.TimedOut);
+                                    }
+                                    catch (OverflowException)
+                                    {
+                                        HTTPManager.Logger.Warning("HTTPManager", "TimeSpan overflow");
+                                    }
                                     break;
 
                                 case HTTPConnectionStates.TimedOut:
                                     // The connection is still in TimedOut state, and if we waited enough time, we will dispatch the
                                     //  callback and recycle the connection
-                                    if (DateTime.UtcNow - conn.TimedOutStart > TimeSpan.FromMilliseconds(500))
+                                    try
                                     {
-                                        HTTPManager.Logger.Information("HTTPManager", "Hard aborting connection because of a long waiting TimedOut state");
+                                        if (DateTime.UtcNow - conn.TimedOutStart > TimeSpan.FromMilliseconds(500))
+                                        {
+                                            HTTPManager.Logger.Information("HTTPManager", "Hard aborting connection because of a long waiting TimedOut state");
 
-                                        conn.CurrentRequest.Response = null;
-                                        conn.CurrentRequest.State = HTTPRequestStates.TimedOut;
-                                        conn.HandleCallback();
+                                            conn.CurrentRequest.Response = null;
+                                            conn.CurrentRequest.State = HTTPRequestStates.TimedOut;
+                                            conn.HandleCallback();
 
-                                        // this will set the connection's CurrentRequest to null
-                                        RecycleConnection(conn);
+                                            // this will set the connection's CurrentRequest to null
+                                            RecycleConnection(conn);
+                                        }
+                                    }
+                                    catch(OverflowException)
+                                    {
+                                        HTTPManager.Logger.Warning("HTTPManager", "TimeSpan overflow");
                                     }
                                     break;
 
@@ -702,8 +724,6 @@ namespace BestHTTP
                     System.Threading.Monitor.Exit(Locker);
                 }
             }
-            else
-                HTTPManager.Logger.Warning("HTTPManager", "OnUpdate - Can't acquire lock!");
 
             if (heartbeats != null)
                 heartbeats.Update();
@@ -720,17 +740,29 @@ namespace BestHTTP
                 var queue = RequestQueue.ToArray();
                 RequestQueue.Clear();
                 foreach (var req in queue)
-                    req.Abort();
+                {
+                    // Swallow any exceptions, we are quitting anyway.
+                    try
+                    {
+                        req.Abort();
+                    }
+                    catch { }
+                }
 
                 // Close all TCP connections when the application is terminating.
                 foreach (var kvp in Connections)
                 {
                     foreach (var conn in kvp.Value)
                     {
-                        if (conn.CurrentRequest != null)
-                            conn.CurrentRequest.State = HTTPRequestStates.Aborted;
-                        conn.Abort(HTTPConnectionStates.Closed);
-                        conn.Dispose();
+                        // Swallow any exceptions, we are quitting anyway.
+                        try
+                        {
+                            if (conn.CurrentRequest != null)
+                                conn.CurrentRequest.State = HTTPRequestStates.Aborted;
+                            conn.Abort(HTTPConnectionStates.Closed);
+                            conn.Dispose();
+                        }
+                        catch { }
                     }
                     kvp.Value.Clear();
                 }
