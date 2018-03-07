@@ -1,5 +1,6 @@
 # Read Me
 Unity Version: XXXX
+Deployed app version: XXX
 
 ### Target Platforms
 *Platforms*
@@ -13,7 +14,6 @@ Base Resolution: *640x1136*
 
 ### Project Settings
 Script Execution Order (specify order if files need to run before others)  
-Latest deployed version & number  
 package name(s)  
 *Any non-default settings need to go here*
 
