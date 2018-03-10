@@ -82,9 +82,17 @@ public class DefaultAlert : UIAlert
 		confirm = null;
 		cancel = null;
     }
-	#endregion
+    #endregion
 
     #region Methods
+    public static void Present(string title, string message, bool showClose = false, string confirmText = "")
+    {
+        Present(title, message, null, null, showClose, confirmText);
+    }
+    public static void Present(string title, string message, Action confirmCallback = null, bool showClose = false, string confirmText = "")
+    {
+        Present(title, message, confirmCallback, null, showClose, confirmText);
+    }
     public static void Present(string title, string message, Action confirmCallback=null, Action cancelCallback=null, bool showClose = false, string confirmText="")
     {
         if (confirmText == "")

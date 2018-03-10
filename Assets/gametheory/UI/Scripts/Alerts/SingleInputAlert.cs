@@ -29,9 +29,13 @@ public class SingleInputAlert : UIAlert
             Instance = this;
     }
     #endregion
-    
+
     #region Methods
-    public void Present(string title, string message, string inputPlaceholder, System.Action<string> confirmCallback, System.Action cancelCallback, bool showClose=false)
+    public void Present(string title, string message, string inputPlaceholder, System.Action<string> confirmCallback=null, bool showClose = false)
+    {
+        Present(title, message, inputPlaceholder, confirmCallback, null, showClose);
+    }
+    public void Present(string title, string message, string inputPlaceholder, System.Action<string> confirmCallback=null, System.Action cancelCallback=null, bool showClose=false)
     {
         confirm = confirmCallback;
         cancel = cancelCallback;
