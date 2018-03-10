@@ -204,17 +204,22 @@ namespace gametheory.UI
 		{
 			if(element)
 			{
-				element.enabled = display;
+                if (element.gameObject.activeSelf != display)//element.enabled = display;
+                    element.gameObject.SetActive(display);
 			}
 		}
 		protected virtual void PresentButton(Button element, bool display)
 		{
 			if(element)
 			{
-				element.enabled = display;
+                if (element.gameObject.activeSelf != display)//element.enabled = display;
+                    element.gameObject.SetActive(display);
 
-				if(element.targetGraphic)
-					element.targetGraphic.enabled = display;
+                if (element.targetGraphic)
+                {
+                    if (element.targetGraphic.gameObject.activeSelf != display)
+                        element.targetGraphic.gameObject.SetActive(display);
+                }
 			}
 		}
         #endregion
